@@ -1,0 +1,212 @@
+/*
+  ಕನ್ನಡ ಕುರ್‌ಆನ್ — Kannada Quran iOS localization
+*/
+
+// MARK: - General
+
+"button.done" = "ಮುಕ್ತಾಯ";
+"button.delete" = "ಅಳಿಸಿ";
+
+// MARK: - Errors
+
+"error.dialog.title" = "ದೋಷ";
+"error.message.connection_lost" = "ಇಂಟರ್ನೆಟ್ ಸಂಪರ್ಕ ಕಡಿತಗೊಂಡಿದೆ. ಉತ್ತಮ ಸಂಪರ್ಕ ಇರುವ ಸ್ಥಳಕ್ಕೆ ಹೋಗಿ ಅಥವಾ ಸಂಪರ್ಕ ಮರಳಿ ಬರುವವರೆಗೆ ಕಾಯಿರಿ.";
+"error.message.international_roaming_off" = "ಅಂತರರಾಷ್ಟ್ರೀಯ ರೋಮಿಂಗ್ ಅನುಮತಿಸಲಾಗಿಲ್ಲ. ರೋಮಿಂಗ್ ಸೆಟ್ಟಿಂಗ್ ಬದಲಿಸಿ ಅಥವಾ Wi-Fi ಆನ್ ಮಾಡಿ.";
+"error.message.not_connected_to_internet" = "ಇಂಟರ್ನೆಟ್‌ಗೆ ಸಂಪರ್ಕವಿಲ್ಲ. Wi-Fi ಆನ್ ಮಾಡಿ ಅಥವಾ ಮೊಬೈಲ್ ಡೇಟಾ ಅನುಮತಿಸಿ.";
+"error.message.general" = "ಓಹ್! ಏನೋ ತಪ್ಪಾಯಿತು. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.";
+"error.message.no_disk_space" = "ಡೌನ್‌ಲೋಡ್‌ಗಳನ್ನು ಉಳಿಸಲು ಸಾಕಷ್ಟು ಡಿಸ್ಕ್ ಸ್ಥಳವಿಲ್ಲ.";
+
+// MARK: - Quran
+
+"ayah" = "ಆಯತ್";
+"surah" = "ಸೂರಾ";
+"quran_alquran" = "ಕುರ್‌ಆನ್";
+
+// MARK: - Translation
+
+"translation.text-type.translation" = "ಅನುವಾದ";
+"translation.text-type.transliteration" = "ಲಿಪ್ಯಂತರ";
+"translation.selectedTranslations" = "ಆಯ್ಕೆ ಮಾಡಿದ";
+"translation.translator" = "ಅನುವಾದಕ: ";
+"translation.text.see-referenced-verse" = "%d ನೇ ಆಯತ್ ನೋಡಿ.";
+"translation.text.read-more" = "ಇನ್ನಷ್ಟು ಓದಿ";
+"translation.text.ayah-number" = "%d:%d";
+"translation.text.footnote-number" = "[%d]";
+"translation.text.footnote-title" = "ಅಡಿಟಿಪ್ಪಣಿ #%d";
+"error.translation.text-retrieval" = "ಓಹ್! ಏನೋ ತಪ್ಪಾಯಿತು. ಅನುವಾದವನ್ನು ಪಡೆಯಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ.";
+"error.translation.text-not-available" = "ಈ ಆಯತ್‌ಗೆ ಯಾವುದೇ ಅನುವಾದ ಲಭ್ಯವಿಲ್ಲ.";
+
+// MARK: - Search
+
+"search.recents.title" = "ಇತ್ತೀಚಿನ ಹುಡುಕಾಟಗಳು";
+"search.popular.title" = "ಜನಪ್ರಿಯ ಹುಡುಕಾಟಗಳು";
+"search.placeholder.text" = "ಸೂರಾ, ಆಯತ್, ಅನುವಾದ, ತಫ್ಸೀರ್ ಮತ್ತು ಸಂಖ್ಯೆಗಳು";
+"search.result.count" = "%@ (%d)";
+
+// MARK: - Settings
+
+"setting.write_review" = "ಆ್ಯಪ್ ಸ್ಟೋರ್ ವಿಮರ್ಶೆ ಬರೆಯಿರಿ...";
+"setting.contact_us" = "ನಮ್ಮನ್ನು ಸಂಪರ್ಕಿಸಿ";
+"setting.donate" = "ದೇಣಿಗೆ ನೀಡಿ";
+"setting.share_app" = "ಆ್ಯಪ್ ಹಂಚಿಕೊಳ್ಳಿ...";
+"setting.app_version" = "ಆ್ಯಪ್ ಆವೃತ್ತಿ";
+
+// MARK: - Quran Menu
+
+"menu.arabic" = "ಅರಬಿ";
+"menu.translation" = "ಅನುವಾದ/ತಫ್ಸೀರ್";
+"menu.select_translation" = "ಅನುವಾದ/ತಫ್ಸೀರ್ ಆಯ್ಕೆ ಮಾಡಿ";
+"menu.pointer" = "ಪದ ಅನುವಾದ ಪಾಯಿಂಟರ್";
+"menu.pointer.select_translation" = "ಪಾಯಿಂಟರ್ ತೋರಿಸುತ್ತಿದೆ";
+"menu.fontSizeLetter" = "ಅ";
+"menu.translationFontSize" = "ಅನುವಾದದ ಗಾತ್ರ";
+"menu.arabicFontSize" = "ಕುರ್‌ಆನ್ ಗಾತ್ರ";
+"menu.twoPages" = "ಲ್ಯಾಂಡ್‌ಸ್ಕೇಪ್‌ನಲ್ಲಿ 2 ಪುಟಗಳು ಅಕ್ಕಪಕ್ಕ";
+"menu.verticalScrolling" = "ಲಂಬ ಸ್ಕ್ರೋಲಿಂಗ್";
+"menu.theme_settings" = "ಥೀಮ್ ಮತ್ತು ಸೆಟ್ಟಿಂಗ್‌ಗಳು";
+
+// MARK: - Theme
+
+"theme.light" = "ತಿಳಿ";
+"theme.dark" = "ಕಡು";
+"theme.auto" = "ಸ್ವಯಂ";
+"theme.auto.message" = "ಕನ್ನಡ ಕುರ್‌ಆನ್ ಆ್ಯಪ್ ನಿಮ್ಮ ಐಫೋನ್‌ನ ಡಿಸ್‌ಪ್ಲೇ ಸೆಟ್ಟಿಂಗ್‌ಗಳಿಗೆ ಹೊಂದಿಕೊಳ್ಳುತ್ತದೆ";
+
+// MARK: - Tabs
+
+"tab.notes" = "ಟಿಪ್ಪಣಿಗಳು";
+
+// MARK: - Update
+
+"update.filesystem.title" = "ಡೇಟಾಬೇಸ್‌ಗಳನ್ನು ನವೀಕರಿಸಲಾಗುತ್ತಿದೆ...";
+"downloading_title" = "ಡೌನ್‌ಲೋಡ್ ಆಗುತ್ತಿದೆ…";
+
+// MARK: - Reciters
+
+"reciters.title" = "ಪಠಿಸುವವರನ್ನು ಆಯ್ಕೆ ಮಾಡಿ";
+"reciters.recent" = "ಇತ್ತೀಚಿನ";
+"reciters.downloaded" = "ಡೌನ್‌ಲೋಡ್ ಮಾಡಲಾದ";
+"reciters.all" = "ಎಲ್ಲಾ";
+
+// MARK: - Audio
+
+"audio.playing.action.modify" = "ಮಾರ್ಪಡಿಸಿ";
+"audio.playing.message" = "%@ ನಿಂದ %@ ವರೆಗೆ ಆಡಿಯೋ ಪ್ಲೇ ಆಗುತ್ತಿದೆ";
+"audio.downloading.message" = "%@ ನಿಂದ %@ ವರೆಗೆ ಆಡಿಯೋ ಡೌನ್‌ಲೋಡ್ ಆಗುತ್ತಿದೆ";
+
+"audio.playing-verses.label" = "ಆಡಿಯೋ ಆಯತ್‌ಗಳು";
+"audio.adjust-end-verse-to-the-end.label" = "ಕೊನೆಯ ಆಯತ್‌ಗೆ ಸರಿಹೊಂದಿಸಿ";
+
+"audio.select-start-verse" = "ಆರಂಭಿಕ ಆಯತ್ ಆಯ್ಕೆ ಮಾಡಿ";
+"audio.select-end-verse" = "ಕೊನೆಯ ಆಯತ್ ಆಯ್ಕೆ ಮಾಡಿ";
+
+"audio.download-play-amount" = "ಡೌನ್‌ಲೋಡ್/ಪ್ಲೇ ಪ್ರಮಾಣ";
+"audio.download-play-amount.description" = "ಆಡಿಯೋ ಪ್ಲೇ ಮಾಡುವಾಗ, ಇದರ ಕೊನೆಯವರೆಗೆ ಪ್ಲೇ ಆಗುತ್ತದೆ";
+
+// MARK: - Bookmarks
+
+"bookmarks.no-data.title" = "ಯಾವುದೇ ಬುಕ್‌ಮಾರ್ಕ್ ಸೇರಿಸಿಲ್ಲ";
+"bookmarks.no-data.text" = "ಕುರ್‌ಆನ್ ಓದುವಾಗ, ಪ್ರಸ್ತುತ ಪುಟವನ್ನು ಗುರುತಿಸಲು ಬುಕ್‌ಮಾರ್ಕ್ ಬಟನ್ ಒತ್ತಿರಿ.";
+"bookmarks.delete-all" = "ಎಲ್ಲವನ್ನೂ ಅಳಿಸಿ";
+"bookmarks.delete-all.confirmation" = "ನೀವು ಎಲ್ಲಾ ಬುಕ್‌ಮಾರ್ಕ್‌ಗಳನ್ನು ಅಳಿಸಲು ಖಚಿತವಾಗಿ ಬಯಸುತ್ತೀರಾ?";
+
+// MARK: - Notes
+
+"notes.no-data.title" = "ಯಾವುದೇ ಹೈಲೈಟ್ ಸೇರಿಸಿಲ್ಲ";
+"notes.no-data.text" = "ಆಯತ್ ಮೇಲೆ ದೀರ್ಘವಾಗಿ ಒತ್ತಿ ಹಿಡಿಯಿರಿ. ಆಯ್ಕೆಯನ್ನು ಹಲವು ಆಯತ್‌ಗಳಿಗೆ ವಿಸ್ತರಿಸಬಹುದು, ನಂತರ ಬುಕ್‌ಮಾರ್ಕ್ ಬಟನ್ ಒತ್ತಿರಿ.";
+"notes.verses-count" = "(+%d ಆಯತ್‌ಗಳು)";
+"notes.delete.alert.title" = "ಹೈಲೈಟ್ ಅಳಿಸಿ";
+"notes.delete.alert.body" = "ಸಂಬಂಧಿತ ಟಿಪ್ಪಣಿ ಕೂಡ ಅಳಿಸಲ್ಪಡುತ್ತದೆ.";
+"notes.icloud.alert.title" = "iCloud ಸಿಂಕ್";
+"notes.icloud.alert.body" = "ಆ್ಯಪ್ ನಿಮ್ಮ ಎಲ್ಲಾ ಸಾಧನಗಳಲ್ಲಿ ಬುಕ್‌ಮಾರ್ಕ್ ಮತ್ತು ಟಿಪ್ಪಣಿಗಳನ್ನು ಸಿಂಕ್ ಮಾಡಲು iCloud ಬಳಸುತ್ತದೆ. ಸಾಧನದ iCloud ಸೆಟ್ಟಿಂಗ್‌ಗಳಲ್ಲಿ ಅದನ್ನು ನಿಷ್ಕ್ರಿಯಗೊಳಿಸಬಹುದು.";
+
+// MARK: - Ayah Menu
+
+"ayah.menu.copy" = "ನಕಲಿಸಿ";
+"ayah.menu.share" = "ಹಂಚಿಕೊಳ್ಳಿ...";
+"ayah.menu.play-end-juz" = "ಜುಜ್ ಕೊನೆಯವರೆಗೆ";
+"ayah.menu.play-end-surah" = "ಸೂರಾ ಕೊನೆಯವರೆಗೆ";
+"ayah.menu.play-end-page" = "ಪುಟದ ಕೊನೆಯವರೆಗೆ";
+"ayah.menu.play-end-quran" = "ಕುರ್‌ಆನ್‌ನ ಕೊನೆಯವರೆಗೆ";
+"ayah.menu.repeat" = "ಪುನರಾವರ್ತಿಸಿ";
+"ayah.menu.selected-verse" = "ಆಯ್ಕೆ ಮಾಡಿದ ಆಯತ್";
+"ayah.menu.selected-verses" = "ಆಯ್ಕೆ ಮಾಡಿದ ಆಯತ್‌ಗಳು";
+"ayah.menu.highlight" = "ಹೈಲೈಟ್";
+"ayah.menu.highlight-select-color" = "ಬಣ್ಣ ಆಯ್ಕೆ ಮಾಡಿ";
+"ayah.menu.add-note" = "ಟಿಪ್ಪಣಿ ಸೇರಿಸಿ";
+"ayah.menu.edit-note" = "ಟಿಪ್ಪಣಿ ಸಂಪಾದಿಸಿ";
+"ayah.menu.delete-note" = "ಟಿಪ್ಪಣಿ ಅಳಿಸಿ";
+"ayah.menu.delete-highlight" = "ಹೈಲೈಟ್ ಅಳಿಸಿ";
+
+// MARK: - Reading Selector
+
+"reading.selector.selectMushaf.short" = "ಆಯ್ಕೆ";
+"reading.selector.selectMushaf.long" = "ಪ್ರಸ್ತುತ ಮುಸ್ಹಫ್ ಆಗಿ ಹೊಂದಿಸಿ";
+"reading.selector.title" = "ಮುಸ್ಹಫ್ ಆಯ್ಕೆ ಮಾಡಿ";
+"reading.selector.selection-description" = "ಹೆಚ್ಚಿನ ಮಾಹಿತಿಗಾಗಿ ಮುಸ್ಹಫ್ ಮೇಲೆ ಒತ್ತಿರಿ.";
+"reading.selector.property.hafs" = "ಹಫ್ಸ್ ಮುಸ್ಹಫ್";
+"reading.selector.property.pages.604" = "604 ಪುಟಗಳು";
+"reading.selector.property.lines.15" = "15-ಸಾಲುಗಳ ಪುಟ";
+"reading.selector.property.word-translation.supported" = "ಪದ-ಪ್ರತಿ-ಪದ ಅನುವಾದ";
+"reading.selector.property.word-translation.not-supported" = "ಪದ-ಪ್ರತಿ-ಪದ ಅನುವಾದ ಲಭ್ಯವಿಲ್ಲ";
+
+// Hafs 1405
+"reading.hafs-1405.title" = "ಹಫ್ಸ್, ಮದೀನಾ ಕ್ಲಾಸಿಕ್, 1405 AH";
+"reading.hafs-1405.description" = "1405 ಹಿಜ್ರಿಯಲ್ಲಿ ಮದೀನಾದಲ್ಲಿ ಪ್ರಕಟಗೊಂಡ ಶಾಸ್ತ್ರೀಯ ಹಫ್ಸ್ ಮುಸ್ಹಫ್.\nಕಿಂಗ್ ಫಹದ್ ಕುರ್‌ಆನ್ ಮುದ್ರಣ ಸಂಕೀರ್ಣದಿಂದ.";
+"reading.hafs-1405.issue" = "1405 ಹಿಜ್ರಿಯಲ್ಲಿ ಪ್ರಕಟಿತ";
+
+// Hafs 1421
+"reading.hafs-1421.title" = "ಹಫ್ಸ್, ಮದೀನಾ, 1421 AH";
+"reading.hafs-1421.description" = "1421 ಹಿಜ್ರಿಯಲ್ಲಿ ಮದೀನಾದಲ್ಲಿ ಪ್ರಕಟಗೊಂಡ ಹಫ್ಸ್ ಮುಸ್ಹಫ್.";
+"reading.hafs-1421.issue" = "1421 ಹಿಜ್ರಿಯಲ್ಲಿ ಪ್ರಕಟಿತ";
+
+// Hafs 1440
+"reading.hafs-1440.title" = "ಹಫ್ಸ್, ಮದೀನಾ, 1440 AH";
+"reading.hafs-1440.description" = "1440 ಹಿಜ್ರಿಯಲ್ಲಿ ಮದೀನಾದಲ್ಲಿ ಪ್ರಕಟಗೊಂಡ ಹಫ್ಸ್ ಮುಸ್ಹಫ್.";
+"reading.hafs-1440.issue" = "1440 ಹಿಜ್ರಿಯಲ್ಲಿ ಪ್ರಕಟಿತ";
+
+// Hafs 1439
+"reading.hafs-1439.title" = "ಮದನಿ ಮುಸ್ಹಫ್ (1439)";
+"reading.hafs-1439.description" = "ಕಿಂಗ್ ಫಹದ್ ಕುರ್‌ಆನ್ ಮುದ್ರಣ ಸಂಕೀರ್ಣದ 1439 ಮದನಿ ಲಿಪಿ. ದೊಡ್ಡ ಪರದೆಗಳಿಗೆ ಅನುಕೂಲಕರ.";
+"reading.hafs-1439.issue" = "1439 ಹಿಜ್ರಿಯಲ್ಲಿ ಪ್ರಕಟಿತ";
+
+// Hafs 1441
+"reading.hafs-1441.title" = "ಮದನಿ ಮುಸ್ಹಫ್ (1441)";
+"reading.hafs-1441.description" = "ಕಿಂಗ್ ಫಹದ್ ಕುರ್‌ಆನ್ ಮುದ್ರಣ ಸಂಕೀರ್ಣದ 1441 ಮದನಿ ಮುಸ್ಹಫ್. ದೊಡ್ಡ ಪರದೆಗಳಿಗೆ ಅನುಕೂಲಕರ.";
+"reading.hafs-1441.issue" = "1441 ಹಿಜ್ರಿಯಲ್ಲಿ ಪ್ರಕಟಿತ";
+
+// Hafs Tajweed
+"reading.tajweed.title" = "ಹಫ್ಸ್, ತಜ್ವೀದ್";
+"reading.tajweed.description" = "ತಜ್ವೀದ್ ಹಫ್ಸ್ ಮುಸ್ಹಫ್. ಅಲ್-ಕುರ್‌ಆನ್ ಅಲ್-ಕರೀಮ್ - ದಾರ್ ಅಲ್-ಮಾರಿಫಾ ಆವೃತ್ತಿ.";
+
+// MARK: - Diagnostics
+
+"diagnostics.title" = "ದೋಷಪರಿಶೀಲನೆ";
+"diagnostics.details" = "ಈ ಸೆಟ್ಟಿಂಗ್‌ಗಳನ್ನು ಆ್ಯಪ್ ಡೆವಲಪರ್ ಡೀಬಗ್ ಮತ್ತು ದೋಷಪರಿಶೀಲನೆ ಉದ್ದೇಶಗಳಿಗಾಗಿ ಬಳಸುತ್ತಾರೆ.";
+
+"diagnostics.share_app_logs" = "ಆ್ಯಪ್ ಲಾಗ್‌ಗಳನ್ನು ಹಂಚಿಕೊಳ್ಳಿ";
+"diagnostics.enable_debug_logs" = "ಡೀಬಗ್ ಲಾಗಿಂಗ್ ಸಕ್ರಿಯಗೊಳಿಸಿ";
+"diagnostics.enable_debug_logs.details" = "ಆ್ಯಪ್ ಮರುಪ್ರಾರಂಭಿಸಿದ ನಂತರ ಈ ಸೆಟ್ಟಿಂಗ್ ಪರಿಣಾಮ ಬೀರುತ್ತದೆ.";
+
+// MARK: - What's new
+
+"new.title" = "ಹೊಸದೇನಿದೆ";
+"new.action" = "ಮುಂದುವರಿಯಿರಿ";
+
+"new.mushafs" = "ಹೊಸ ಮುಸ್ಹಫ್‌ಗಳು:";
+"new.mushafs.details" = "* ತಜ್ವೀದ್ ಹಫ್ಸ್ ಮುಸ್ಹಫ್\n* ಮದೀನಾ ಮುಸ್ಹಫ್ 1421 ಹಿಜ್ರಿ\n* ಮದೀನಾ ಮುಸ್ಹಫ್ 1440 ಹಿಜ್ರಿ\n* ಕ್ಲಾಸಿಕ್ 1405 ಹಿಜ್ರಿ ಆವೃತ್ತಿ ಕೂಡ ಲಭ್ಯ.";
+
+"new.reciters" = "ಹೊಸ ಪಠಿಸುವವರು:";
+"new.reciters.details" = "ಹೊಸ ಖಾರಿಗಳನ್ನು ಸೇರಿಸಲಾಗಿದೆ.";
+
+"new.miscellaneous" = "ವಿವಿಧ:";
+"new.miscellaneous.details" = "* ಆ್ಯಪ್ ನೋಟ ನವೀಕರಿಸಲಾಗಿದೆ.\n* ಹುಡುಕಾಟ ವೈಶಿಷ್ಟ್ಯ ಸುಧಾರಿಸಲಾಗಿದೆ.\n* ಕನ್ನಡ ಭಾಷಾ ಬೆಂಬಲ ಸೇರಿಸಲಾಗಿದೆ.";
+
+"new.audio_upgrades" = "ಆಡಿಯೋ:";
+"new.audio_upgrades.details" = "* ಸರಿಹೊಂದಿಸಬಹುದಾದ ಪ್ಲೇಬ್ಯಾಕ್ ವೇಗ ನಿಯಂತ್ರಣ: 0.5x, 0.75x, 1x, 1.25x, 1.5x\n* ನಿಮ್ಮ ಆದ್ಯತೆಯ ವೇಗವನ್ನು ಆ್ಯಪ್ ನೆನಪಿಟ್ಟುಕೊಳ್ಳುತ್ತದೆ.";
+
+"new.personalization" = "ಓದುವ ಥೀಮ್‌ಗಳು:";
+"new.personalization.details" = "* ಹಲವು ಥೀಮ್‌ಗಳ ಬೆಂಬಲ. ಕುರ್‌ಆನ್ ಪುಟ ತೆರೆಯಿರಿ → ಮೇಲ್ಭಾಗದ ಬಲಗಡೆಯ ಮೆನು → ಥೀಮ್ ಮತ್ತು ಸೆಟ್ಟಿಂಗ್‌ಗಳು.";
+
+"new.library_navigation" = "ಗ್ರಂಥಾಲಯ ಮತ್ತು ನ್ಯಾವಿಗೇಷನ್:";
+"new.library_navigation.details" = "* ಮುಖಪುಟದಲ್ಲಿ ಸೂರಾ ಮತ್ತು ಜುಜ್‌ಗಳನ್ನು ವಿಂಗಡಿಸಲಾಗಿದೆ ಮತ್ತು ಸೂರಾ ಸಂಖ್ಯೆಗಳನ್ನು ಪ್ರದರ್ಶಿಸಲಾಗಿದೆ.";

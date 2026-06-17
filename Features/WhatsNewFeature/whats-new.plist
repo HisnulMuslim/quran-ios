@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>versions</key>
+	<array>
+		<dict>
+			<key>version</key>
+			<string>2.4.5</string>
+			<key>items</key>
+			<array>
+				<dict>
+					<key>title</key>
+					<string>new.audio_upgrades</string>
+					<key>subtitle</key>
+					<string>new.audio_upgrades.details</string>
+					<key>image</key>
+					<string>speedometer</string>
+				</dict>
+				<dict>
+					<key>title</key>
+					<string>new.personalization</string>
+					<key>subtitle</key>
+					<string>new.personalization.details</string>
+					<key>image</key>
+					<string>paintpalette.fill</string>
+				</dict>
+				<dict>
+					<key>title</key>
+					<string>new.library_navigation</string>
+					<key>subtitle</key>
+					<string>new.library_navigation.details</string>
+					<key>image</key>
+					<string>book.fill</string>
+				</dict>
+				<dict>
+					<key>title</key>
+					<string>new.reciters</string>
+					<key>subtitle</key>
+					<string>new.reciters.details</string>
+					<key>image</key>
+					<string>mic.fill</string>
+				</dict>
+			</array>
+		</dict>
+	</array>
+</dict>
+</plist>

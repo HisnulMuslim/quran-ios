@@ -1,0 +1,226 @@
+/*
+  Author: https://github.com/techyescountry
+ */
+
+
+// MARK: - General
+
+"button.done" = "Xong";
+"button.delete" = "Xóa";
+
+// MARK: - Errors
+
+// Metadata: Translated by ChatGPT; human review required.
+"error.dialog.title" = "Lỗi";
+"error.message.connection_lost" = "Mất kết nối mạng. Di chuyển đến nới có kết nối ổn định hơn hoặc đợi cho đến khi kết nối ổn định trở lại.";
+"error.message.international_roaming_off" = "Chuyển vùng quốc tế không được phép. Thay đổi cài đặt chuyển vùng quốc tế hoặc bật Wi-Fi.";
+"error.message.not_connected_to_internet" = "Không được kết nối với internet. Bật Wi-Fi hoặc cho phép kết nối dữ liệu di động.";
+"error.message.general" = "Ối! Đã xảy ra sự cố. Vui lòng thử lại.";
+"error.message.no_disk_space" = "Không đủ dung lượng trống để lưu các bản tải xuống.";
+
+// MARK: - Quran
+
+"ayah" = "Ayah";
+"surah" = "Surah";
+// Metadata: Translated by AI; human review required.
+"quran_alquran" = "Kinh Quran";
+
+// MARK: - Translation
+
+"translation.text-type.translation" = "Bản dịch";
+"translation.text-type.transliteration" = "Phiên âm";
+// Metadata: Translated by ChatGPT; human review required.
+"translation.selectedTranslations" = "Đã chọn";
+"translation.translator" = "Dịch giả: ";
+"translation.text.see-referenced-verse" = "Xem ayah %d.";
+"translation.text.read-more" = "Xem thêm";
+"error.translation.text-retrieval" = "Ối! Đã xảy ra sự cố. Chúng tôi không thể truy xuất bản dịch.";
+"error.translation.text-not-available" = "Không có bản dịch nào cho Ayah này.";
+
+// MARK: - Search
+
+"search.recents.title" = "Tìm kiếm gần đây";
+"search.popular.title" = "Thử tìm kiếm với";
+"search.placeholder.text" = "Surah, câu kinh, bản dịch, tafseer và số";
+"search.result.count" = "%@ (%d)";
+
+// MARK: - Settings
+
+"setting.write_review" = "Đánh giá ứng dụng trên Appstore...";
+"setting.contact_us" = "Liên hệ";
+// Metadata: Translated by ChatGPT; human review required.
+"setting.donate" = "Quyên góp";
+"setting.share_app" = "Chia sẻ ứng dụng...";
+"setting.app_version" = "Phiên bản ứng dụng";
+
+// MARK: - Quran Menu
+
+"menu.arabic" = "Ả Rập";
+"menu.translation" = "Bản dịch/Tafseer";
+"menu.select_translation" = "Chọn bản dịch/tafseer";
+"menu.pointer" = "Con trỏ dịch từ";
+"menu.pointer.select_translation" = "Hiển thị con trỏ";
+"menu.fontSizeLetter" = "A";
+"menu.translationFontSize" = "Cỡ chữ Bản dịch";
+"menu.arabicFontSize" = "Cỡ chữ Quran";
+"menu.twoPages" = "2 trang cạnh nhau (xoay ngang)";
+"menu.verticalScrolling" = "Cuộn dọc";
+// Metadata: Translated by ChatGPT; human review required.
+"menu.theme_settings" = "Chủ đề & Cài đặt";
+
+// MARK: - Theme
+
+"theme.light" = "Sáng";
+"theme.dark" = "Tối";
+"theme.auto" = "Tự động";
+"theme.auto.message" = "Ứng dụng Kinh Quran sẽ tự theo cài đặt giao diện trên iPhone của bạn";
+
+// MARK: - Tabs
+
+"tab.notes" = "Ghi chú";
+
+// MARK: - Update
+
+"update.filesystem.title" = "Nâng cấp cơ sở dữ liệu...";
+"downloading_title" = "Đang tải xuống…";
+
+// MARK: - Reciters
+
+"reciters.title" = "Chọn người xướng đọc để nghe";
+"reciters.recent" = "Gần đây";
+"reciters.downloaded" = "Đã tải";
+"reciters.all" = "Tất cả";
+
+// MARK: - Audio
+
+"audio.playing.action.modify" = "Sửa";
+"audio.playing.message" = "Phát âm thanh từ %@ đến %@";
+"audio.downloading.message" = "Đang tải âm thanh từ %@ đến %@";
+
+"audio.playing-verses.label" = "Câu đang Phát";
+"audio.adjust-end-verse-to-the-end.label" = "Điều chỉnh câu cuối thành kết thúc của";
+
+"audio.select-start-verse" = "Chọn Câu Đầu";
+"audio.select-end-verse" = "Chọn Câu Cuối";
+
+"audio.download-play-amount" = "Tải xuống/Phát đến";
+"audio.download-play-amount.description" = "Khi phát âm thanh, nó sẽ phát đến cuối của";
+
+// MARK: - Bookmarks
+
+"bookmarks.no-data.title" = "Thêm Đánh dấu...";
+"bookmarks.no-data.text" = "Khi bạn đang đọc Kinh Quran, hãy nhấn vào nút Đánh dấu trang để đánh dấu trang hiện tại.";
+
+// MARK: - Notes
+
+"notes.no-data.title" = "Thêm Tô sáng Ayah...";
+"notes.no-data.text" = "Chạm và giữ vào một Ayah. Bạn có thể mở rộng lựa chọn để bao gồm nhiều Ayat, sau đó chạm vào nút Đánh dấu.";
+"notes.verses-count" = "(+%d ayat)";
+"notes.delete.alert.title" = "Xóa Tô sáng";
+"notes.delete.alert.body" = "Ghi chú liên quan cũng sẽ bị xóa.";
+"notes.icloud.alert.title" = "Đồng bộ iCloud";
+"notes.icloud.alert.body" = "Ứng dụng sử dụng iCloud để đồng bộ hóa dấu trang và ghi chú trên các thiết bị của bạn. Bạn có thể tắt nó từ cài đặt iCloud của thiết bị.";
+
+// MARK: - Ayah Menu
+
+"ayah.menu.copy" = "Sao chép";
+"ayah.menu.share" = "Chia sẻ...";
+"ayah.menu.play-end-juz" = "đến cuối Juz'";
+"ayah.menu.play-end-surah" = "đến cuối Surah";
+"ayah.menu.play-end-page" = "đến cuối Trang";
+// Metadata: Translated by AI; human review required.
+"ayah.menu.play-end-quran" = "đến cuối Kinh Quran";
+"ayah.menu.repeat" = "Lặp lại";
+"ayah.menu.selected-verse" = "câu đã chọn";
+"ayah.menu.selected-verses" = "bộ câu đã chọn";
+"ayah.menu.highlight" = "Tô sáng";
+"ayah.menu.highlight-select-color" = "chọn màu";
+"ayah.menu.add-note" = "Thêm Ghi chú";
+"ayah.menu.edit-note" = "Sửa Ghi chú";
+"ayah.menu.delete-note" = "Xóa Ghi chú";
+"ayah.menu.delete-highlight" = "Xóa Tô sáng";
+
+// MARK: - Reading Selector
+
+// Selector UI
+"reading.selector.selectMushaf.short" = "Chọn";
+"reading.selector.selectMushaf.long" = "Đặt làm Mushaf hiện tại";
+"reading.selector.title" = "Chọn Mushaf";
+"reading.selector.selection-description" = "Chạm vào Mushaf để biết thêm thông tin.";
+"reading.selector.property.hafs" = "Hafs Mushaf";
+"reading.selector.property.pages.604" = "604 trang";
+"reading.selector.property.lines.15" = "15-dòng mỗi trang";
+"reading.selector.property.word-translation.supported" = "Dịch Từng Từ";
+"reading.selector.property.word-translation.not-supported" = "Không có Dịch Từng Từ";
+
+// Hafs 1405
+"reading.hafs-1405.title" = "Hafs, Madina cổ điển, 1405 AH";
+"reading.hafs-1405.description" = "Hafs cổ điển Mushaf ban hành ở Medina vào năm 1405 Hijri. Ứng dụng đã từng cung cấp phiên bản này trong một thời gian dài.\nTừ Tổ hợp In ấn Kinh Quran của Vua Fahd.";
+"reading.hafs-1405.issue" = "Ban hành năm 1405 Hijri";
+
+// Hafs 1421
+"reading.hafs-1421.title" = "Hafs, Medina, 1421 AH";
+"reading.hafs-1421.description" = "Hafs Mushaf ban hành ở Medina vào năm 1421 Hijri. Từ Tổ hợp in Kinh Quran King Fahd.";
+"reading.hafs-1421.issue" = "Ban hành năm 1421 Hijri";
+
+// Hafs 1440
+"reading.hafs-1440.title" = "Hafs, Medina, 1440 AH";
+"reading.hafs-1440.description" = "Hafs Mushaf ban hành ở Medina vào năm 1440 Hijri. Từ Tổ hợp in Kinh Quran King Fahd.";
+"reading.hafs-1440.issue" = "Ban hành năm 1440 Hijri";
+
+// Hafs Tajweed
+"reading.tajweed.title" = "Hafs, Tajweed";
+"reading.tajweed.description" = "Tajweed hafs Mushaf. Al-Quran Al-Kareem - Phiên bản Dar al-Marefa.";
+
+// MARK: - Diagnostics
+
+// Metadata: Translated by ChatGPT; human review required.
+"diagnostics.title" = "Chuẩn đoán";
+// Metadata: Translated by ChatGPT; human review required.
+"diagnostics.details" = "Các cài đặt này được nhà phát triển ứng dụng sử dụng cụ thể cho mục đích gỡ lỗi và chẩn đoán.";
+
+// Metadata: Translated by ChatGPT; human review required.
+"diagnostics.share_app_logs" = "Chia sẻ nhật ký ứng dụng";
+// Metadata: Translated by ChatGPT; human review required.
+"diagnostics.enable_debug_logs" = "Kích hoạt ghi nhật ký gỡ lỗi";
+// Metadata: Translated by ChatGPT; human review required.
+"diagnostics.enable_debug_logs.details" = "Cài đặt này sẽ có hiệu lực khi ứng dụng được khởi động lại lần tiếp theo.";
+
+
+// MARK: - What's new
+
+"new.title" = "Có gì mới";
+"new.action" = "Tiếp";
+
+// Mushafs
+// Metadata: Translated by ChatGPT; human review required.
+"new.mushafs" = "Mushaf Mới:";
+// Metadata: Translated by ChatGPT; human review required.
+"new.mushafs.details" = "* Tajweed Hafs Mushaf: Al-Quran Al-Kareem - Ấn bản Dar al-Marefa.\n* Mushaf Madina 1421 hijri.\n* Mushaf Madina 1440 hijri.\n* Ngoài ra, tiếp tục thưởng thức phiên bản cổ điển 1405 hijri.";
+
+// Reciters
+"new.reciters" = "Người đọc Mới";
+
+// Miscellaneous
+// Metadata: Translated by ChatGPT; human review required.
+"new.miscellaneous" = "Đa dạng:";
+// Metadata: Translated by ChatGPT; human review required.
+"new.miscellaneous.details" = "* Cập nhật giao diện ứng dụng.\n* Cải tiến tính năng tìm kiếm (thuật toán mới sắp ra mắt).\n* Hỗ trợ đa ngôn ngữ tiếng Việt.\n* Truy cập tùy chọn âm thanh nâng cao khi không có bản đọc nào đang phát.\n* Ứng dụng hiện đã là mã nguồn mở: https://github.com/quran/quran-ios";
+
+// Audio upgrades
+// Metadata: Translated by ChatGPT; human review required.
+"new.audio_upgrades" = "Âm thanh:";
+// Metadata: Translated by ChatGPT; human review required.
+"new.audio_upgrades.details" = "* Điều chỉnh tốc độ đọc: 0.5x, 0.75x, 1x, 1.25x, 1.5x - nhờ @adnan29979.\n* Phát lại ghi nhớ tốc độ ưa thích của bạn - nhờ @adnan29979.";
+
+// Personalization
+// Metadata: Translated by ChatGPT; human review required.
+"new.personalization" = "Chủ đề đọc:";
+// Metadata: Translated by ChatGPT; human review required.
+"new.personalization.details" = "* Hỗ trợ nhiều chủ đề. Mở một trang Quran -> Menu góc trên bên phải -> Chủ đề & Cài đặt.\n* Dùng 'Original' nếu bạn muốn quay lại phong cách trước.";
+
+// Library & Navigation
+// Metadata: Translated by ChatGPT; human review required.
+"new.library_navigation" = "Thư viện & Điều hướng:";
+// Metadata: Translated by ChatGPT; human review required.
+"new.library_navigation.details" = "* Sắp xếp surah và juz trên Trang chủ và hiển thị số surah để bạn đến nội dung cần nhanh hơn - nhờ @yismailuofa.";

@@ -1,0 +1,222 @@
+/*
+  Quran iOS app localization. Other localizations are from Android repo.
+ */
+
+
+// MARK: - General
+
+"button.done" = "Done";
+"button.delete" = "Delete";
+
+// MARK: - Errors
+
+"error.dialog.title" = "Error";
+"error.message.connection_lost" = "Internet connection is lost. Move to a location where more stable connection is available, or wait until the connection returns to be stable.";
+"error.message.international_roaming_off" = "International roaming is not allowed. Change the international roaming setting, or turn on Wi-Fi.";
+"error.message.not_connected_to_internet" = "Not connected to the internet. Turn on Wi-Fi, or allow cellular data connection.";
+"error.message.general" = "Oops! Something went wrong. Please try again.";
+"error.message.no_disk_space" = "No available disk space to save the downloads.";
+
+// MARK: - Quran
+
+"ayah" = "Ayah";
+"surah" = "Surah";
+// Metadata: Translated by AI; human review required.
+"quran_alquran" = "Quran";
+
+// MARK: - Translation
+
+"translation.text-type.translation" = "Translation";
+"translation.text-type.transliteration" = "Transliteration";
+"translation.selectedTranslations" = "Selected";
+"translation.translator" = "Translator: ";
+"translation.text.see-referenced-verse" = "See ayah %d.";
+"translation.text.read-more" = "Read more";
+"translation.text.ayah-number" = "%d:%d";
+"translation.text.footnote-number" = "[%d]";
+"translation.text.footnote-title" = "Footnote #%d";
+"error.translation.text-retrieval" = "Oops! Something went wrong. We couldn't retrieve the translation.";
+"error.translation.text-not-available" = "No translation available for this Ayah.";
+
+// MARK: - Search
+
+"search.recents.title" = "Recent searches";
+"search.popular.title" = "Try searching with";
+"search.placeholder.text" = "Surah, verse, translation, tafseer, and numbers";
+"search.result.count" = "%@ (%d)";
+
+// MARK: - Settings
+
+"setting.write_review" = "Write an app store review...";
+"setting.contact_us" = "Contact Us";
+"setting.donate" = "Donate";
+"setting.share_app" = "Share the app...";
+"setting.app_version" = "App Version";
+
+// MARK: - Quran Menu
+
+"menu.arabic" = "Arabic";
+"menu.translation" = "Translation/Tafseer";
+"menu.select_translation" = "Select translations/tafseer";
+"menu.pointer" = "Word translation pointer";
+"menu.pointer.select_translation" = "Pointer Showing";
+"menu.fontSizeLetter" = "A";
+"menu.translationFontSize" = "Translation Size";
+"menu.arabicFontSize" = "Quran Size";
+"menu.twoPages" = "2 pages side-by-side (in landscape)";
+"menu.verticalScrolling" = "Vertical scrolling";
+"menu.theme_settings" = "Themes & Settings";
+
+// MARK: - Theme
+
+"theme.light" = "Light";
+"theme.dark" = "Dark";
+"theme.auto" = "Auto";
+"theme.auto.message" = "Quran app will adhere to your iPhone's appearance setting";
+
+// MARK: - Tabs
+
+"tab.notes" = "Notes";
+
+// MARK: - Update
+
+"update.filesystem.title" = "Upgrading databases...";
+"downloading_title" = "Downloading…";
+
+// MARK: - Reciters
+
+"reciters.title" = "Select the reciter to listen to";
+"reciters.recent" = "Recent";
+"reciters.downloaded" = "Downloaded";
+"reciters.all" = "All";
+
+// MARK: - Audio
+
+"audio.playing.action.modify" = "Modify";
+"audio.playing.message" = "Playing audio from %@ to %@";
+"audio.downloading.message" = "Downloading audio from %@ to %@";
+
+"audio.playing-verses.label" = "Playing Verses";
+"audio.adjust-end-verse-to-the-end.label" = "Adjust end verse to the end of the";
+
+"audio.select-start-verse" = "Select Starting Verse";
+"audio.select-end-verse" = "Select Ending Verse";
+
+"audio.download-play-amount" = "Download/Play up to";
+"audio.download-play-amount.description" = "When playing audio, it will play to the end of the";
+
+// MARK: - Bookmarks
+
+"bookmarks.no-data.title" = "Adding Bookmarks...";
+"bookmarks.no-data.text" = "When you're reading the Quran, tap the Bookmark button to mark the current page.";
+"bookmarks.delete-all" = "Delete All";
+"bookmarks.delete-all.confirmation" = "Are you sure you want to delete all bookmarks?";
+
+// MARK: - Notes
+
+"notes.no-data.title" = "Adding Ayah Highlights...";
+"notes.no-data.text" = "Tap and hold on an Ayah. You can extend the selection to include multiple Ayat, then tap the Bookmark button.";
+"notes.verses-count" = "(+%d ayat)";
+"notes.delete.alert.title" = "Delete Highlight";
+"notes.delete.alert.body" = "The associated note will also be deleted.";
+"notes.icloud.alert.title" = "iCloud Sync";
+"notes.icloud.alert.body" = "The app uses iCloud to sync bookmarks & notes across your devices. You can disable it from your device's iCloud settings.";
+
+// MARK: - Ayah Menu
+
+"ayah.menu.copy" = "Copy";
+"ayah.menu.share" = "Share...";
+"ayah.menu.play-end-juz" = "to the end of Juz'";
+"ayah.menu.play-end-surah" = "to the end of Surah";
+"ayah.menu.play-end-page" = "to the end of Page";
+"ayah.menu.play-end-quran" = "to the end of Quran";
+"ayah.menu.repeat" = "Repeat";
+"ayah.menu.selected-verse" = "selected verse";
+"ayah.menu.selected-verses" = "selected verses";
+"ayah.menu.highlight" = "Highlight";
+"ayah.menu.highlight-select-color" = "select color";
+"ayah.menu.add-note" = "Add Note";
+"ayah.menu.edit-note" = "Edit Note";
+"ayah.menu.delete-note" = "Delete Note";
+"ayah.menu.delete-highlight" = "Delete Highlight";
+
+// MARK: - Reading Selector
+
+// Selector UI
+"reading.selector.selectMushaf.short" = "Select";
+"reading.selector.selectMushaf.long" = "Set as current Mushaf";
+"reading.selector.title" = "Choose Mushaf";
+"reading.selector.selection-description" = "Tap on a Mushaf for more information.";
+"reading.selector.property.hafs" = "Hafs Mushaf";
+"reading.selector.property.pages.604" = "604 pages";
+"reading.selector.property.lines.15" = "15-line page";
+"reading.selector.property.word-translation.supported" = "Word-by-word translation";
+"reading.selector.property.word-translation.not-supported" = "No Word-by-word translation";
+
+// Hafs 1405
+"reading.hafs-1405.title" = "Hafs, classic Medina, 1405 AH";
+"reading.hafs-1405.description" = "The classic hafs Mushaf issued in Madina in 1405 Hijri. The app used to offer this version for a long time.\nFrom the King Fahd Quran Printing Complex.";
+"reading.hafs-1405.issue" = "Issued in 1405 Hijri";
+
+// Hafs 1421
+"reading.hafs-1421.title" = "Hafs, Medina, 1421 AH";
+"reading.hafs-1421.description" = "The hafs Mushaf issued in Medina in 1421 Hijri. From the King Fahd Quran Printing Complex.";
+"reading.hafs-1421.issue" = "Issued in 1421 Hijri";
+
+// Hafs 1440
+"reading.hafs-1440.title" = "Hafs, Medina, 1440 AH";
+"reading.hafs-1440.description" = "The hafs Mushaf issued in Medina in 1440 Hijri. From the King Fahd Quran Printing Complex.";
+"reading.hafs-1440.issue" = "Issued in 1440 Hijri";
+
+// Hafs 1439
+"reading.hafs-1439.title" = "Madani Mushaf (1439)";
+"reading.hafs-1439.description" = "The 1439 Madani script from the King Fahd Quran Printing Complex. Optimized for larger screens.";
+"reading.hafs-1439.issue" = "Issued in 1439 Hijri";
+
+// Hafs 1441
+"reading.hafs-1441.title" = "Madani Mushaf (1441)";
+"reading.hafs-1441.description" = "The 1441 Madani Mushaf from the King Fahd Quran Printing Complex. Optimized for larger screens.";
+"reading.hafs-1441.issue" = "Issued in 1441 Hijri";
+
+// Hafs Tajweed
+"reading.tajweed.title" = "Hafs, Tajweed";
+"reading.tajweed.description" = "The tajweed hafs Mushaf. Al-Quran Al-Kareem - Dar al-Marefa Edition.";
+
+// MARK: - Diagnostics
+
+"diagnostics.title" = "Diagnostics";
+"diagnostics.details" = "These settings are utilized by the app developer specifically for debugging and diagnostic purposes.";
+
+"diagnostics.share_app_logs" = "Share app logs";
+"diagnostics.enable_debug_logs" = "Enable debug logging";
+"diagnostics.enable_debug_logs.details" = "The setting will take effect upon the next restart of the app.";
+
+
+// MARK: - What's new
+
+"new.title" = "What's new";
+"new.action" = "Continue";
+
+// Mushafs
+"new.mushafs" = "New Mushafs:";
+"new.mushafs.details" = "* Tajweed Hafs Mushaf: Al-Quran Al-Kareem - Dar al-Marefa Edition.\n* Medina Mushaf 1421 hijri.\n* Medina Mushaf 1440 hijri.\n* Plus, continue enjoying the classic 1405 hijri version.";
+
+// Reciters
+"new.reciters" = "New Reciters:";
+"new.reciters.details" = "* %%Readers:qari_abdulhadi_kanakeri_gapless%%\n* %%Readers:qari_ahmed_al_nufais_gapless%%\n* %%Readers:qari_alijon_qari_gapless%%\n* %%Readers:qari_badr_al_turki_gapless%%\n* %%Readers:qari_farman_shawani_gapless%%\n* %%Readers:qari_idrees_abkar_gapless%%\n* %%Readers:qari_luhaidan_gapless%%\n* %%Readers:qari_peshawa_qadir_al_qurdi_gapless%%\n* %%Readers:qari_raad_al_kurdi_gapless%%";
+
+// Miscellaneous
+"new.miscellaneous" = "Miscellaneous:";
+"new.miscellaneous.details" = "* Updated app look.\n* Enhanced search feature (new algorithm coming soon).\n* Vietnamese localization support.\n* Advanced audio options access available when no recitation is playing.\n* App now is open source: https://github.com/quran/quran-ios";
+
+// Audio upgrades
+"new.audio_upgrades" = "Audio:";
+"new.audio_upgrades.details" = "* Adjustable recitation speed control: 0.5x, 0.75x, 1x, 1.25x, 1.5x - thanks to @adnan29979.\n* Playback remembers your preferred rate - thanks to @adnan29979.";
+
+// Personalization
+"new.personalization" = "Reading Themes:";
+"new.personalization.details" = "* Support for multiple themes. Open a Quran Page -> Top Right Menu -> Themes & Settings.\n* Use 'Original' if you want to revert to the previous style.";
+
+// Library & Navigation
+"new.library_navigation" = "Library & Navigation:";
+"new.library_navigation.details" = "* Sort surahs and juz on Home, and display surah numbers so you can jump to what you need faster - thanks to @yismailuofa.";

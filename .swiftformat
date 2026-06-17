@@ -1,0 +1,35 @@
+# Don't format
+--exclude .build,UI/UIx/SwiftUI/Epoxy,BuildTools
+
+# Options
+
+--importgrouping testable-bottom # sortedImports
+--wraparguments before-first # wrapArguments
+--wrapparameters before-first # wrapArguments
+--funcattributes prev-line # wrapAttributes
+--typeattributes prev-line # wrapAttributes
+--beforemarks typealias,struct  # organizeDeclarations
+
+--structthreshold 70
+--classthreshold 70
+--enumthreshold 70
+
+# Disabled
+
+--disable andOperator
+--disable emptyBraces
+--disable extensionAccessControl
+--disable hoistAwait
+--disable hoistPatternLet
+--disable hoistTry
+--disable redundantType
+--disable unusedArguments
+--disable redundantReturn
+
+# Enabled
+
+--enable blankLineAfterImports
+--enable blankLinesBetweenImports
+--enable blockComments
+--enable isEmpty
+--enable organizeDeclarations

@@ -1,0 +1,216 @@
+
+
+// MARK: - General
+
+"button.done" = "تم";
+"button.delete" = "حذف";
+
+// MARK: - Errors
+
+"error.dialog.title" = "خطأ";
+"error.message.connection_lost" = "فقد الإتصال بشبكة الإنترنت. من فضلك تحرك إلى مكان به إشارة أفضل.";
+"error.message.international_roaming_off" = "لا يسمح باستخدام التجوال الدولي. من فضلك قم بتغيير إعدادات خدمة التجوال الدولي، أو إتصل بالإنترنت عن طريق Wi-Fi.";
+"error.message.not_connected_to_internet" = "لا يوجد إتصال بشبكة الإنترنت. من فضلك قم بتشغيل Wi-Fi، أو السماح باتصال البيانات الخلوية.";
+"error.message.general" = "عفوا. حدث خطأ، حاول مرة اخرى.";
+"error.message.no_disk_space" = "لا توجد مساحة كافيه في ذاكرة الهاتف لحفظ التنزيلات.";
+
+// MARK: - Quran
+
+"ayah" = "آية";
+"surah" = "السورة";
+"quran_alquran" = "القرآن";
+
+// MARK: - Translation
+
+"translation.text-type.translation" = "الترجمة إلى الإنجليزية";
+"translation.text-type.transliteration" = "نسخ الحروف للإنجليزية";
+"translation.selectedTranslations" = "المختار";
+"translation.translator" = "المفسر: ";
+"translation.text.see-referenced-verse" = "انظر آية رقم %d.";
+"translation.text.read-more" = "اقرأ المزيد";
+"error.translation.text-retrieval" = "عفوا. حدث خطأ، حاول مرة اخرى.";
+"error.translation.text-not-available" = "لا توجد ترجمة متاحة لهذه الآية.";
+
+// MARK: - Search
+
+"search.recents.title" = "عمليات البحث الأخيرة";
+"search.popular.title" = "اختبر البحث بإستخدام";
+"search.placeholder.text" = "سور أو آيات أو تفاسير أو ترجمات أو الأرقام";
+"search.result.count" = "(%2$d) %1$@";
+
+// MARK: - Settings
+
+"setting.write_review" = "قيم التطبيق على المتجر الالكتروني‎...";
+"setting.contact_us" = "اتصل بنا";
+"setting.donate" = "تبرع";
+"setting.share_app" = "مشاركة التطبيق...";
+"setting.app_version" = "نسخة التطبيق";
+
+// MARK: - Quran Menu
+
+"menu.arabic" = "عربي";
+"menu.translation" = "التفاسير والتراجم";
+"menu.select_translation" = "اختر التفاسير والتراجم";
+"menu.pointer" = "مؤشر ترجمة الكلمات";
+"menu.pointer.select_translation" = "لغة المؤشر";
+"menu.fontSizeLetter" = "أ";
+"menu.translationFontSize" = "حجم خط تفسير";
+"menu.arabicFontSize" = "حجم خط القرآن";
+"menu.twoPages" = "عرض صفحتين في الوضع الأفقي";
+"menu.verticalScrolling" = "تمرير رأسي";
+"menu.theme_settings" = "المظهر والإعدادات";
+
+// MARK: - Theme
+
+"theme.light" = "فاتح";
+"theme.dark" = "داكن";
+"theme.auto" = "تلقائي";
+"theme.auto.message" = "سوف يلتزم تطبيق القرآن بإعداد مظهر iPhone الخاص بك";
+
+// MARK: - Tabs
+
+"tab.notes" = "الملاحظات";
+
+// MARK: - Update
+
+"update.filesystem.title" = "جاري تحديث قواعد البيانات ...";
+"downloading_title" = "جاري التحميل....";
+
+// MARK: - Reciters
+
+"reciters.title" = "اختر القارئ";
+"reciters.recent" = "الأخيرة";
+"reciters.downloaded" = "التنزيلات";
+"reciters.all" = "الكل";
+
+// MARK: - Audio
+
+"audio.playing.action.modify" = "تغير";
+"audio.playing.message" = "تشغيل الصوت من %@ إلى %@";
+"audio.downloading.message" = "تنزيل الصوت من %@ إلى %@";
+
+"audio.playing-verses.label" = "سماع آيات";
+"audio.adjust-end-verse-to-the-end.label" = "ضبط نهاية الآية لنهاية";
+
+"audio.select-start-verse" = "حدد بداية التشغيل الصوتي";
+"audio.select-end-verse" = "حدد نهاية التشغيل الصوتي";
+
+"audio.download-play-amount" = "تحميل وتشغيل الصوت لنهاية";
+"audio.download-play-amount.description" = "عند بدء تشغيل الصوت، سيتوقف مع نهاية";
+
+// MARK: - Bookmarks
+
+"bookmarks.no-data.title" = "إضافة الإشارات المرجعية...";
+"bookmarks.no-data.text" = "عندما تقرأ القرآن، اضغط على زر الإشارة المرجعية لإضافة الصفحة.";
+
+// MARK: - Notes
+
+"notes.no-data.title" = "إضافة آيات مرجعية...";
+"notes.no-data.text" = "اضغط مع الاستمرار على الآيات. يمكنك تمديد التحديد ليشمل عدة آيات ، ثم اضغط على زر الإشارة المرجعية.";
+"notes.verses-count" = "(+%d آيات)";
+"notes.delete.alert.title" = "حذف الإشارة المرجعية";
+"notes.delete.alert.body" = "سيتم حذف الملاحظة أيضًا.";
+"notes.icloud.alert.title" = "مزامنة iCloud";
+"notes.icloud.alert.body" = "يستخدم التطبيق iCloud لمزامنة الإشارات المرجعية والملاحظات عبر أجهزتك. يمكنك تعطيله من جهازك من خلال إعدادات iCloud.";
+
+// MARK: - Ayah Menu
+
+"ayah.menu.copy" = "نسخ";
+"ayah.menu.share" = "مشاركة...";
+"ayah.menu.play-end-juz" = "إلى نهاية الجزء";
+"ayah.menu.play-end-surah" = "إلى نهاية السورة";
+"ayah.menu.play-end-page" = "إلى نهاية الصفحة";
+"ayah.menu.play-end-quran" = "إلى نهاية القرآن";
+"ayah.menu.repeat" = "كرر";
+"ayah.menu.selected-verse" = "الآية المختارة";
+"ayah.menu.selected-verses" = "الآيات المختارة";
+"ayah.menu.highlight" = "تحديد";
+"ayah.menu.highlight-select-color" = "اختر لون";
+"ayah.menu.add-note" = "اضف ملاحظة";
+"ayah.menu.edit-note" = "تحرير الملاحظة";
+"ayah.menu.delete-note" = "حذف الملاحظة";
+"ayah.menu.delete-highlight" = "حذف التحديد";
+
+// MARK: - Reading Selector
+
+// Selector UI
+"reading.selector.selectMushaf.short" = "اختر";
+"reading.selector.selectMushaf.long" = "اختر هذا المصحف";
+"reading.selector.title" = "اختر المصحف";
+"reading.selector.selection-description" = "اضغط على المصحف للمزيد من المعلومات.";
+"reading.selector.property.hafs" = "مصحف حفص عن عاصم";
+"reading.selector.property.pages.604" = "٦٠٤ صفحة";
+"reading.selector.property.lines.15" = "١٥ سطرًا بالصفحة";
+"reading.selector.property.word-translation.supported" = "يدعم ترجمة الكلمات";
+"reading.selector.property.word-translation.not-supported" = "لا يدعم ترجمة الكلمات";
+
+// Hafs 1405
+"reading.hafs-1405.title" = "حفص، مصحف المدينة المنورة النمطي، ١٤٠٥هـ";
+"reading.hafs-1405.description" = "مصحف حفص عن عاصم، إصدر المدينة المنورة عام ١٤٠٥ هـ. كان التطبيق يقدم هذا الإصدار لفترة طويلة. \n إصدار مجمع الملك فهد لطباعة المصحف.";
+"reading.hafs-1405.issue" = "إصدار ١٤٠٥ هجري";
+
+// Hafs 1421
+"reading.hafs-1421.title" = "حفص، مصحف المدينة المنورة النمطي، ١٤٢١هـ";
+"reading.hafs-1421.description" = "مصحف حفص عن عاصم، إصدر المدينة المنورة عام ١٤٢١ هـ. إصدار مجمع الملك فهد لطباعة المصحف.";
+"reading.hafs-1421.issue" = "إصدار ١٤٢١ هجري";
+
+// Hafs 1440
+"reading.hafs-1440.title" = "حفص، مصحف المدينة المنورة النمطي، ١٤٤٠هـ";
+"reading.hafs-1440.description" = "مصحف حفص عن عاصم، إصدر المدينة المنورة عام ١٤٤٠ هـ. إصدار مجمع الملك فهد لطباعة المصحف.";
+"reading.hafs-1440.issue" = "إصدار ١٤٤٠ هجري";
+
+// Hafs 1439
+"reading.hafs-1439.title" = "مصحف المدينة (١٤٣٩)";
+"reading.hafs-1439.description" = "مصحف المدينة الطبعة من عام ١٤٣٩ من مجمع الملك فهد لطباعة المصحف الشريف، وملائم للشاشات الأطول.";
+"reading.hafs-1439.issue" = "إصدار ١٤٣٩ هجري";
+
+// Hafs 1441
+"reading.hafs-1441.title" = "مصحف المدينة (١٤٤١)";
+"reading.hafs-1441.description" = "مصحف المدينة إصدار ١٤٤١ من مجمع الملك فهد لطباعة المصحف الشريف، ومهيأ للشاشات الأكبر.";
+"reading.hafs-1441.issue" = "إصدار ١٤٤١ هجري";
+
+// Hafs Tajweed
+"reading.tajweed.title" = "مصحف التجويد";
+"reading.tajweed.description" = "مصحف التجويد (حفص عن عاصم) – دار المعرفة";
+
+// MARK: - Diagnostics
+
+"diagnostics.title" = "تشخيص التطبيق";
+"diagnostics.details" = "يستخدم المطور هذه الإعدادات خصيصًا لأغراض التصحيح والتشخيص.";
+
+"diagnostics.share_app_logs" = "مشاركة سجلات التطبيق";
+"diagnostics.enable_debug_logs" = "تمكين تسجيل التصحيح";
+"diagnostics.enable_debug_logs.details" = "سيكون للإعداد تأثير عند إعادة تشغيل التطبيق التالية.";
+
+
+// MARK: - What's new
+
+"new.title" = "المضاف حديثاً";
+"new.action" = "استمر";
+
+// Mushafs
+"new.mushafs" = "مصاحف جديدة:";
+"new.mushafs.details" = "* مصحف حفص بالتجويد: القرآن الكريم - طبعة دار المعرفة.\n* مصحف المدينة 1421 هجري.\n* مصحف المدينة 1440 هجري.\n* بالإضافة إلى الاستمتاع بالنسخة الكلاسيكية 1405 هجري المستخدمة منذ بداية البرنامج.";
+
+// Reciters
+"new.reciters" = "قراء جدد:";
+
+// Miscellaneous
+"new.miscellaneous" = "متفرقات:";
+"new.miscellaneous.details" = "* تحديث مظهر التطبيق.\n* تحسين ميزة البحث (قادم قريباً خوارزمية بحث جديدة).\n* دعم توطين التطبيق باللغة الفيتنامية.\n* الوصول إلى خيارات الصوت المتقدمة متاح عند عدم تشغيل التلاوة.\n* التطبيق أصبح مفتوح المصدر: https://github.com/quran/quran-ios";
+
+// Audio upgrades
+// Metadata: Translated by ChatGPT; human review required.
+"new.audio_upgrades" = "صوتيات:";
+// Metadata: Translated by ChatGPT; human review required.
+"new.audio_upgrades.details" = "* التحكم في سرعة التلاوة: 0.5x، 0.75x، 1x، 1.25x، 1.5x - بفضل @adnan29979.\n* يتذكر تشغيل تلاوة جديدة السرعة المفضلة لديك - بفضل @adnan29979.";
+
+// Personalization
+"new.personalization" = "الأنماط:";
+"new.personalization.details" = "* دعم لعدة أنماط. افتح صفحة من القرآن -> القائمة العلوية اليمنى -> السمات والإعدادات.\n* استخدم \"الأصلي\" إذا كنت تريد العودة إلى النمط السابق.";
+
+// Library & Navigation
+// Metadata: Translated by ChatGPT; human review required.
+"new.library_navigation" = "التنقل:";
+// Metadata: Translated by ChatGPT; human review required.
+"new.library_navigation.details" = "* قم بترتيب السور والأجزاء على الصفحة الرئيسية، وعرض أرقام السور حتى تتمكن من الانتقال إلى ما تحتاجه بشكل أسرع - بفضل @yismailuofa.";
