@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "D975EDC12A4791D6009DE942"
-               BuildableName = "QuranEngineApp.app"
+               BuildableName = "Kannada Quran.app"
                BlueprintName = "QuranEngineApp"
                ReferencedContainer = "container:QuranEngineApp.xcodeproj">
             </BuildableReference>
@@ -44,7 +44,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "D975EDC12A4791D6009DE942"
-            BuildableName = "QuranEngineApp.app"
+            BuildableName = "Kannada Quran.app"
             BlueprintName = "QuranEngineApp"
             ReferencedContainer = "container:QuranEngineApp.xcodeproj">
          </BuildableReference>
@@ -61,7 +61,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "D975EDC12A4791D6009DE942"
-            BuildableName = "QuranEngineApp.app"
+            BuildableName = "Kannada Quran.app"
             BlueprintName = "QuranEngineApp"
             ReferencedContainer = "container:QuranEngineApp.xcodeproj">
          </BuildableReference>
