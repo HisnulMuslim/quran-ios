@@ -27,7 +27,6 @@ package.json
 
 # Swift Package Manager. See: https://github.com/apple/swift-package-manager/blob/main/Sources/Workspace/InitPackage.swift#L381
 
- .DS_Store
 .build
 /Packages
 xcuserdata/
