@@ -18,6 +18,12 @@ public enum FontName: CaseIterable {
     /// Used in arabic suras in Uthmanic font
     case suraNames
 
+    /// Used for Kannada translations
+    case kannada
+
+    /// Used for Kannada translations (bold)
+    case kannadaBold
+
     struct FontDetails {
         let name: String
         let family: String
@@ -45,6 +51,18 @@ public enum FontName: CaseIterable {
                 name: "icomoon",
                 family: "icomoon",
                 fileName: "surah_names.ttf"
+            )
+        case .kannada:
+            return FontDetails(
+                name: "NotoSansKannada-Regular",
+                family: "Noto Sans Kannada",
+                fileName: "NotoSansKannada-Regular.ttf"
+            )
+        case .kannadaBold:
+            return FontDetails(
+                name: "NotoSansKannada-Bold",
+                family: "Noto Sans Kannada",
+                fileName: "NotoSansKannada-Bold.ttf"
             )
         }
     }
@@ -79,6 +97,13 @@ extension FontName {
         let font = CGFont(fontDataProvider)!
         var error: Unmanaged<CFError>?
         if !CTFontManagerRegisterGraphicsFont(font, &error) {
+            if let unwrappedError = error {
+                let code = CFErrorGetCode(unwrappedError.takeUnretainedValue())
+                if code == 305 {
+                    // Ignore if the font is already registered / duplicated
+                    return
+                }
+            }
             var message = "Couldn't register font \(name)."
             if let error {
                 message += " Error: \(dump(error))"

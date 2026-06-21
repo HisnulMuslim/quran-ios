@@ -363,3 +363,29 @@ Quran permission?";
 "undo" = "Undo";
 "update_available" = "Update Available";
 "warning" = "Warning";
+
+"about_us_title" = "The Holy Qur'an";
+"about_us_description" = "The Holy Qur’an — A free Kannada Qur’an application designed for ios smartphones.";
+"about_us_open_source_description" = "This application has been developed using the open-source project from QURAN.COM .May Allah reward them with the best of rewards.";
+"about_us_translation_credits" = "The Kannada translation was translated by Muhammad Hamza Puttur and reviewed by Umar ibn Ahmad Madani, Ahmad S. M., and Abu Bakr Nazeer Salafi.";
+"about_us_translation_title" = "The Noble Qur’an along with its Kannada translation";
+"about_us_publisher" = "Publisher: King Fahd Holy Quran Printing Complex, Madinah, Saudi Arabia";
+"about_us_contact_us" = "Contact us";
+"about_us_copyright" = "©Kannada Quran Application";
+"about_us_sponsored_by" = "Sponsored by";
+"about_us_sponsor_name" = "Karnataka Salafi Association";
+
+"help_page_title" = "Frequently Asked Questions";
+"help_q1_question" = "How do I make the text larger?";
+"help_q1_answer" = "For the Arabic pages, hold your phone in landscape. This makes the text larger. For translations,click on the 3 dots at the right corner ,  go to themes/settings and set translation text size.";
+"help_q2_question" = "How do I play audio?";
+"help_q2_answer" = "Open any Quran page. Tap on the screen once. At the bottom, you will notice a play button and some text with the name of a qari. Click the name of the qari to choose a different qari. Click play to download and play the current page or sura.";
+"help_q3_question" = "How do I view translation?";
+"help_q3_answer" = "Open any Quran page. Tap on the screen once. In the top, you will notice click an icon with three dots - click this and choose translation to view the translation. Choose and download a translation.";
+"help_q4_question" = "How do I bookmark a page?";
+"help_q4_answer" = "Open any Quran page. Tap on the screen once. In the top right, you will see a bookmark icon. Tap the bookmark icon to bookmark the page (the color will turn solid white). Tap the bookmark icon again to remove the bookmark.";
+"help_q5_question" = "How do I share an ayah?";
+"help_q5_answer" = "While on any Arabic page, press and hold on any ayah to get a menu where you can choose to bookmark, tag, share or copy that ayah to the clipboard, see the translation, or listen to its recitation.";
+"help_footer_contact_text" = "If your question is not answered above, you can email hmkannada@gmail.com for support. Please note that we receive lots of emails, so we may not be able to reply to all of them.";
+
+

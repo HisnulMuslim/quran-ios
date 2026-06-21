@@ -37,9 +37,11 @@ Before running on a physical device, you need to configure code signing:
 3. Go to the **Signing & Capabilities** tab.
 4. Ensure **Automatically manage signing** is checked.
 5. In the **Team** dropdown, choose your development team:
-   * Select your paid Apple Developer Team (if matching `9VM9B8KX27`), or
-   * Select your personal Apple ID team (e.g., *Personal Team*).
-6. Under **Bundle Identifier**, ensure it is set to `com.quran.kannada`.
+   * **For Official Team Members:** Select the official development team (**9VM9B8KX27**).
+   * **For Other Developers / External Contributors:** Select your own Apple ID or Development Team (e.g., *Personal Team*).
+6. Under **Bundle Identifier**:
+   * **For Official Team Members:** Keep it set to `com.quran.kannada`.
+   * **For Other Developers / External Contributors:** Change it to a unique identifier (e.g., `com.yourname.kannadaquran`) to avoid conflicts with Apple's global App ID registry.
 
 ---
 
@@ -67,9 +69,9 @@ At the top of the Xcode window, look for the scheme dropdown selectors:
 2. Connect your iPhone to your Mac via USB.
 3. Select your device in the Xcode destination dropdown.
 4. Press **`⌘ + R`** to build and install.
-5. **Trust the Certificate** (if using a personal certificate):
+5. **Trust the Certificate**:
    * If you receive an *Untrusted Developer* alert on launch, go to **Settings** > **General** > **VPN & Device Management** on your device.
-   * Tap your developer profile / Apple ID and choose **Trust**.
+   * Tap your development team profile / Apple ID and choose **Trust**.
 
 ---
 
@@ -80,6 +82,8 @@ If SPM dependencies fail to resolve or load:
 1. Go to **File** > **Packages** > **Reset Package Caches**.
 2. Go to **File** > **Packages** > **Resolve Package Versions**.
 
+
 ### Code Signing / Bundle ID Conflict
-If you get a signature error using a free Apple ID:
-* You may need to change the **Bundle Identifier** under *Signing & Capabilities* to something unique (e.g., `com.yourname.kannadaquran`) since bundle IDs must be globally unique across Apple.
+If you see an error like *"An App ID with Identifier 'com.quran.kannada' is not available"*:
+* This happens if you are not part of the official developer team `9VM9B8KX27`.
+* To fix this, change the **Bundle Identifier** under *Signing & Capabilities* to something unique (e.g., `com.yourname.kannadaquran`) so Xcode can generate a personal provisioning profile for your account.

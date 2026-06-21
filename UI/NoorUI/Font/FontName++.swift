@@ -23,6 +23,24 @@ public extension Font {
     static func arabicTafseer() -> Font {
         custom(.arabic, size: arabicTafseerTextFontSize)
     }
+
+    static func kannada(for textStyle: Font.TextStyle, isBold: Bool = false) -> Font {
+        let size: CGFloat = switch textStyle {
+        case .largeTitle: 36
+        case .title: 30
+        case .title2: 24
+        case .title3: 22
+        case .headline: 19
+        case .body: 19
+        case .callout: 18
+        case .subheadline: 17
+        case .footnote: 16
+        case .caption: 14
+        case .caption2: 13
+        @unknown default: 19
+        }
+        return .custom(isBold ? .kannadaBold : .kannada, size: size, relativeTo: textStyle)
+    }
 }
 
 public func attributedString(of text: String, arabicSuraName: String, fontSize: CGFloat) -> NSAttributedString {

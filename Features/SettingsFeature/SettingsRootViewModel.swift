@@ -114,21 +114,13 @@ final class SettingsRootViewModel: ObservableObject {
         showSingleChoiceSelector(
             title: "App Language",
             sections: [SingleChoiceSection(
-                header: "Please restart the app after changing the language for it to take full effect.",
+                header: nil,
                 items: [Language.kannada, Language.english]
             )],
             selected: AppLanguage,
             itemText: { $0 == .kannada ? "ಕನ್ನಡ (Kannada)" : "English" },
-            onSelection: { [weak self] item in
+            onSelection: { item in
                 AppLanguage = item
-                
-                let alert = UIAlertController(
-                    title: "Language Changed",
-                    message: "The application language has been successfully switched. Please restart the app for the changes to fully apply.",
-                    preferredStyle: .alert
-                )
-                alert.addAction(UIAlertAction(title: "OK", style: .default))
-                self?.navigationController?.present(alert, animated: true)
             }
         )
     }

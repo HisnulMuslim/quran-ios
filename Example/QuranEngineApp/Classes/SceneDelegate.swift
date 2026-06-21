@@ -8,12 +8,17 @@
 import AppStructureFeature
 import NoorUI
 import UIKit
+import Localization
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     // MARK: Internal
 
     var window: UIWindow?
     private var launchBuilder: LaunchBuilder?
+
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
@@ -27,6 +32,20 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         launchStartup?.launch(from: window)
 
         self.launchStartup = launchStartup
+
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleLanguageChange),
+            name: .appLanguageDidChange,
+            object: nil
+        )
+    }
+
+    @objc private func handleLanguageChange() {
+        guard let window = self.window else { return }
+        let launchStartup = launchBuilder?.launchStartup()
+        self.launchStartup = launchStartup
+        launchStartup?.launch(from: window)
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {

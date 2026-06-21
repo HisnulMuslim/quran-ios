@@ -12,10 +12,17 @@ import SwiftUI
 
 extension Translation {
     var textFont: Font {
-        languageCode == "ar" ? .arabicTafseer() : .body
+        if languageCode == "ar" {
+            return .arabicTafseer()
+        } else if languageCode == "kn" {
+            return .kannada(for: .body)
+        } else {
+            return .body
+        }
     }
 
     var characterDirection: Locale.LanguageDirection {
         Locale.characterDirection(forLanguage: languageCode)
     }
 }
+

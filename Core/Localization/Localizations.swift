@@ -45,7 +45,12 @@ public var AppLanguage: Language {
     }
     set {
         UserDefaults.standard.set(newValue.rawValue, forKey: "AppLanguage")
+        NotificationCenter.default.post(name: .appLanguageDidChange, object: nil)
     }
+}
+
+public extension Notification.Name {
+    static let appLanguageDidChange = Notification.Name("AppLanguageDidChange")
 }
 
 public func l(_ key: String, table: Table = .localizable, language: Language? = nil) -> String {
