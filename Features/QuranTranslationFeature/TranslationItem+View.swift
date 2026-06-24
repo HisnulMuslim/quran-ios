@@ -8,6 +8,7 @@
 import NoorUI
 import QuranKit
 import QuranText
+import QuranTextKit
 import SwiftUI
 
 extension TranslationPageHeader: View {
@@ -50,7 +51,7 @@ extension TranslationTextChunk {
 
 extension TranslationTextChunk: View {
     var body: some View {
-        QuranTranslationTextChunk(
+        TranslationTextChunkBody(
             text: text.text,
             chunk: chunks[chunkIndex],
             footnoteRanges: text.footnoteRanges,
@@ -65,7 +66,35 @@ extension TranslationTextChunk: View {
                     footnoteIndex: index
                 ).url
             },
-            font: translation.textFont,
+            translation: translation,
+            translationFontSize: translationFontSize,
+            translationFont: translationFont
+        )
+    }
+}
+
+private struct TranslationTextChunkBody: View {
+    let text: String
+    let chunk: Range<String.Index>
+    let footnoteRanges: [Range<String.Index>]
+    let quranRanges: [Range<String.Index>]
+    let firstChunk: Bool
+    let readMoreURL: URL?
+    let footnoteURL: (Int) -> URL
+    let translation: Translation
+    let translationFontSize: FontSize
+    let translationFont: TranslationFont
+
+    var body: some View {
+        QuranTranslationTextChunk(
+            text: text,
+            chunk: chunk,
+            footnoteRanges: footnoteRanges,
+            quranRanges: quranRanges,
+            firstChunk: firstChunk,
+            readMoreURL: readMoreURL,
+            footnoteURL: footnoteURL,
+            font: translation.textFont(selection: translationFont.rawValue),
             fontSize: translationFontSize,
             characterDirection: translation.characterDirection
         )
@@ -169,7 +198,8 @@ private struct ContentTranslationPreview: View {
                             chunks: chunks,
                             chunkIndex: chunkIndex,
                             readMore: readMore && chunkIndex == 0,
-                            translationFontSize: fontSize
+                            translationFontSize: fontSize,
+                            translationFont: .notoSans
                         ), nil
                     )
                 }

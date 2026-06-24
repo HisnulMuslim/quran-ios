@@ -103,6 +103,13 @@ final class SettingsRootViewModel: ObservableObject {
         navigationController?.pushViewController(viewController, animated: true)
     }
 
+    func navigateToShareSettings() {
+        logger.info("Settings: navigateToShareSettings")
+        let viewController = UIHostingController(rootView: ShareSettingsView())
+        viewController.title = lAndroid("prefs_category_sharing")
+        navigationController?.pushViewController(viewController, animated: true)
+    }
+
     func navigateToReadingSelectors() {
         logger.info("Settings: navigateToReadingSelectors")
         let viewController = readingSelectorBuilder.build()

@@ -47,11 +47,90 @@ public struct ShareableVerseTextRetriever {
     // MARK: Public
 
     public func textForVerses(_ verses: [AyahNumber]) async throws -> [String] {
-        async let arabicText = arabicScript(for: verses)
-        async let translationText = translations(for: verses)
+        let sharingPreferences = SharePreferences.shared
+        let wantInlineAyahNumbers = sharingPreferences.includeInlineAyahNumbers
+        let includeTranslation = sharingPreferences.includeTranslation
+        let inlineTranslation = sharingPreferences.inlineTranslation
+        let includeNotes = sharingPreferences.showNotes
 
-        let result = try await [arabicText, translationText].flatMap { $0 }
-        return result + ["", versesSummary(verses)]
+        var footnotes: [String] = []
+        var result: [String] = []
+
+        if inlineTranslation {
+            // Fetch translations if needed
+            let selectedTrans = includeTranslation ? try await selectedTranslations() : []
+            let verseTexts = selectedTrans.isEmpty ? [:] : try await textService.textForVerses(verses, translations: selectedTrans)
+
+            for verse in verses {
+                var ayahLine = ""
+                
+                // Prepend Ayah number in Western digits if enabled
+                if wantInlineAyahNumbers && includeTranslation {
+                    ayahLine += "\(verse.ayah). "
+                }
+
+                // Arabic text of this verse
+                let arabicVerse = try await arabicText(for: verse)
+                ayahLine += arabicVerse
+
+                if includeTranslation && !selectedTrans.isEmpty {
+                    result.append(ayahLine)
+
+                    if let verseText = verseTexts[verse] {
+                        for (index, _) in selectedTrans.enumerated() {
+                            let text = verseText.translations[index]
+                            let processedText = processTranslationText(text, includeNotes: includeNotes, footnotes: &footnotes)
+
+                            if !processedText.isEmpty {
+                                result.append(processedText)
+                            }
+                        }
+                    }
+                    
+                    result.append("")
+                } else {
+                    // No translation or grouped, use ۩ separator
+                    result.append(ayahLine + " ۩")
+                }
+            }
+
+        } else {
+            // Grouped: Arabic first, then translations at the end
+            let arabicScriptText = try await arabicScript(for: verses)
+            result.append(contentsOf: arabicScriptText)
+            result.append("")
+
+            let translationsText = try await translations(for: verses, footnotes: &footnotes)
+            if !translationsText.isEmpty {
+                var cleanTranslations = translationsText
+                if cleanTranslations.first == "" {
+                    cleanTranslations.removeFirst()
+                }
+                result.append(contentsOf: cleanTranslations)
+                result.append("")
+            }
+        }
+
+        // Footnotes
+        if includeNotes && !footnotes.isEmpty {
+            let footnotesHeader = AppLanguage == .kannada ? "ಟಿಪ್ಪಣಿಗಳು : " : "Footnotes : "
+            result.append(footnotesHeader)
+            for (idx, note) in footnotes.enumerated() {
+                result.append("\u{2007}\(idx + 1). \(note)")
+            }
+            result.append("")
+        }
+
+        // Summary
+        let localizedSummary = versesSummary(verses)
+        result.append("[\(localizedSummary)]")
+        result.append("")
+
+        // Download footer
+        result.append("Download :")
+        result.append("https://quran.hisnulmuslimdua.com/")
+
+        return result
     }
 
     // MARK: Private
@@ -63,51 +142,65 @@ public struct ShareableVerseTextRetriever {
     private let localTranslationsRetriever: LocalTranslationsRetriever
 
     private func versesSummary(_ verses: [AyahNumber]) -> String {
+        guard let first = verses.first else { return "" }
+        let suraName = first.sura.localizedName(withPrefix: false, language: .english)
         if verses.count == 1 {
-            return verses[0].localizedName
+            return "Surah \(suraName): \(first.ayah)"
         }
-        return "\(verses[0].localizedName) - \(verses.last!.localizedName)"
+        return "Surah \(suraName): \(first.ayah)-\(verses.last!.ayah)"
     }
 
+    private static let rightToLeftMark = "\u{202B}"
+    private static let endMark = "\u{202C}"
+
     private func arabicText(for verse: AyahNumber) async throws -> String {
-        let verseNumber = NumberFormatter.arabicNumberFormatter.format(verse.ayah)
-
         // Avoid the arabic text to be displayed in the wrong direction in LTR languages
-        let rightToLeftMark = "\u{202B}"
-        let endMark = "\u{202C}"
+        let arabicVerse = try await shareableVersePersistence.textForVerse(verse)
 
-        let arabicVerse = try await shareableVersePersistence.textForVerse(verse) + "﴿ \(verseNumber) ﴾"
-
-        return "\(rightToLeftMark)\(arabicVerse)\(endMark)"
+        return "\(Self.rightToLeftMark)\(arabicVerse)\(Self.endMark)"
     }
 
     private func arabicScript(for verses: [AyahNumber]) async throws -> [String] {
         // TODO: improve performance by parallize the loading
         let arabicAyahsText = try await verses.asyncMap { try await arabicText(for: $0) }
-            .joined(separator: " ")
-        return [arabicAyahsText]
+            .joined(separator: " ۩ ")
+        return [arabicAyahsText + " ۩"]
     }
 
-    private func translations(for verses: [AyahNumber]) async throws -> [String] {
-        guard preferences.quranMode == .translation else {
+    private func translations(for verses: [AyahNumber], footnotes: inout [String]) async throws -> [String] {
+        let sharingPreferences = SharePreferences.shared
+        guard sharingPreferences.includeTranslation else {
             return []
         }
 
         let translations = try await selectedTranslations()
         let verseTexts = try await textService.textForVerses(verses, translations: translations)
         let orderedVerseTexts = verses.compactMap { verseTexts[$0] }
-        return versesTranslationsText(translations: translations, verseTexts: orderedVerseTexts)
+        return versesTranslationsText(translations: translations, verseTexts: orderedVerseTexts, verses: verses, footnotes: &footnotes)
     }
 
-    private func versesTranslationsText(translations: [Translation], verseTexts: [VerseText]) -> [String] {
+    private func versesTranslationsText(
+        translations: [Translation],
+        verseTexts: [VerseText],
+        verses: [AyahNumber],
+        footnotes: inout [String]
+    ) -> [String] {
         var components = [""]
+        let sharingPreferences = SharePreferences.shared
 
         for (index, translation) in translations.enumerated() {
-            // translator
-            components.append("• \(translation.translationName):")
-
             // translation text for all verses
-            components.append(contentsOf: verseTexts.map { stringFromTranslationText($0.translations[index]) })
+            for (vIdx, verseText) in verseTexts.enumerated() {
+                var transText = processTranslationText(
+                    verseText.translations[index],
+                    includeNotes: sharingPreferences.showNotes,
+                    footnotes: &footnotes
+                )
+                if sharingPreferences.includeInlineAyahNumbers {
+                    transText = "[\(verses[vIdx].ayah)] \(transText)"
+                }
+                components.append(transText)
+            }
 
             // separate multiple translations
             components.append("")
@@ -121,12 +214,31 @@ public struct ShareableVerseTextRetriever {
         return selectedTranslationsPreferences.selectedTranslations(from: localTranslations)
     }
 
-    private func stringFromTranslationText(_ text: TranslationText) -> String {
+    private func cleanTextWithoutFootnotes(_ string: TranslationString) -> String {
+        var cleanText = ""
+        var currentIndex = string.text.startIndex
+        for range in string.footnoteRanges {
+            cleanText.append(contentsOf: string.text[currentIndex..<range.lowerBound])
+            currentIndex = range.upperBound
+        }
+        cleanText.append(contentsOf: string.text[currentIndex...])
+        return cleanText
+    }
+
+    private func processTranslationText(_ text: TranslationText, includeNotes: Bool, footnotes: inout [String]) -> String {
         switch text {
         case .reference(let verse):
             return lFormat("translation.text.see-referenced-verse", verse.ayah)
         case .string(let string):
-            return string.text
+            if includeNotes {
+                for footnote in string.footnotes {
+                    let cleanFootnote = footnote.trimmingCharacters(in: CharacterSet(charactersIn: "[]"))
+                    footnotes.append(cleanFootnote)
+                }
+                return string.text
+            } else {
+                return cleanTextWithoutFootnotes(string)
+            }
         }
     }
 }

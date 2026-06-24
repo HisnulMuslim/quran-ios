@@ -22,6 +22,7 @@ struct SettingsRootView: View {
             navigateToAudioEndSelector: { viewModel.navigateToAudioEndSelector() },
             navigateToAudioManager: { viewModel.navigateToAudioManager() },
             navigateToTranslationsList: { viewModel.navigateToTranslationsList() },
+            navigateToShareSettings: { viewModel.navigateToShareSettings() },
             navigateToReadingSelector: { viewModel.navigateToReadingSelectors() },
             navigateToHelp: { viewModel.navigateToHelp() },
             navigateToAboutUs: { viewModel.navigateToAboutUs() },
@@ -38,6 +39,7 @@ private struct SettingsRootViewUI: View {
     let navigateToAudioEndSelector: AsyncAction
     let navigateToAudioManager: AsyncAction
     let navigateToTranslationsList: AsyncAction
+    let navigateToShareSettings: AsyncAction
     let navigateToReadingSelector: AsyncAction
     let navigateToHelp: AsyncAction
     let navigateToAboutUs: AsyncAction
@@ -92,6 +94,13 @@ private struct SettingsRootViewUI: View {
                     accessory: .disclosureIndicator,
                     action: navigateToTranslationsList
                 )
+
+                NoorListItem(
+                    image: .init(.share),
+                    title: .text(lAndroid("prefs_category_sharing")),
+                    accessory: .disclosureIndicator,
+                    action: navigateToShareSettings
+                )
             }
 
             NoorBasicSection {
@@ -137,6 +146,7 @@ struct SettingsRootView_Previews: PreviewProvider {
                 navigateToAudioEndSelector: {},
                 navigateToAudioManager: {},
                 navigateToTranslationsList: {},
+                navigateToShareSettings: {},
                 navigateToReadingSelector: {},
                 navigateToHelp: {},
                 navigateToAboutUs: {},

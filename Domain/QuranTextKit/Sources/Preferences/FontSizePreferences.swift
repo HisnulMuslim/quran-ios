@@ -8,6 +8,12 @@
 import Preferences
 import QuranText
 
+public enum TranslationFont: String, CaseIterable {
+    case notoSans
+    case kohinoor
+    case system
+}
+
 public struct FontSizePreferences {
     // MARK: Lifecycle
 
@@ -23,9 +29,13 @@ public struct FontSizePreferences {
     @TransformedPreference(arabicFontSizeKey, transformer: .rawRepresentable(defaultValue: defaultValue))
     public var arabicFontSize: FontSize
 
+    @TransformedPreference(translationFontKey, transformer: .rawRepresentable(defaultValue: .notoSans))
+    public var translationFont: TranslationFont
+
     // MARK: Private
 
     private static let defaultValue = FontSize.large
     private static let translationFontSizeKey = PreferenceKey<Int>(key: "translationFontSize", defaultValue: defaultValue.rawValue)
     private static let arabicFontSizeKey = PreferenceKey<Int>(key: "arabicFont", defaultValue: defaultValue.rawValue)
+    private static let translationFontKey = PreferenceKey<String>(key: "translationFontSelection", defaultValue: TranslationFont.notoSans.rawValue)
 }

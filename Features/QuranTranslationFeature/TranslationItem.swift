@@ -7,6 +7,7 @@
 
 import QuranKit
 import QuranText
+import QuranTextKit
 import SwiftUI
 
 enum TranslationItemId: Hashable, Sendable {
@@ -77,6 +78,7 @@ struct TranslationTextChunk: Identifiable & Hashable {
     let readMore: Bool
 
     let translationFontSize: FontSize
+    let translationFont: TranslationFont
 
     var id: TranslationItemId { .translationTextChunk(verse, translationId: translation.id, chunkIndex: chunkIndex) }
 }

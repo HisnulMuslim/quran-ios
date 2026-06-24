@@ -22,6 +22,7 @@ final class MoreMenuThemeSettingsViewModel: ObservableObject {
     private let fontSizePreferences = FontSizePreferences.shared
     @Published var arabicFontSize: FontSize
     @Published var translationFontSize: FontSize
+    @Published var translationFont: TranslationFont
 
     init() {
         themeStyle = themeService.themeStyle
@@ -29,6 +30,7 @@ final class MoreMenuThemeSettingsViewModel: ObservableObject {
 
         translationFontSize = fontSizePreferences.translationFontSize
         arabicFontSize = fontSizePreferences.arabicFontSize
+        translationFont = fontSizePreferences.translationFont
 
         $themeStyle
             .dropFirst()
@@ -59,6 +61,14 @@ final class MoreMenuThemeSettingsViewModel: ObservableObject {
             .sink { [weak self] newValue in
                 logger.info("More Menu: set arabic font size \(newValue)")
                 self?.fontSizePreferences.arabicFontSize = newValue
+            }
+            .store(in: &cancellables)
+
+        $translationFont
+            .dropFirst()
+            .sink { [weak self] newValue in
+                logger.info("More Menu: set translation font \(newValue)")
+                self?.fontSizePreferences.translationFont = newValue
             }
             .store(in: &cancellables)
     }

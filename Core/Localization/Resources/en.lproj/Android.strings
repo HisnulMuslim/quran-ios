@@ -388,4 +388,21 @@ Quran permission?";
 "help_q5_answer" = "While on any Arabic page, press and hold on any ayah to get a menu where you can choose to bookmark, tag, share or copy that ayah to the clipboard, see the translation, or listen to its recitation.";
 "help_footer_contact_text" = "If your question is not answered above, you can email hmkannada@gmail.com for support. Please note that we receive lots of emails, so we may not be able to reply to all of them.";
 
+"menu_translation_font" = "Translation Font";
+"menu_translation_font_noto" = "Noto Sans Kannada";
+"menu_translation_font_kohinoor" = "Kohinoor Kannada";
+"menu_translation_font_system" = "System Font";
+
+"prefs_category_sharing" = "Sharing Settings";
+"prefs_include_translation_title" = "Include Translation";
+"prefs_include_translation_summary" = "Include translation when sharing/copying";
+"prefs_inline_translation_title" = "Inline Translation";
+"prefs_inline_translation_summary_on" = "Show translation next to each Ayah";
+"prefs_inline_translation_summary_off" = "Show translations at the end";
+"prefs_include_inline_ayah_numbers_title" = "Include Inline Ayah Numbers";
+"prefs_include_inline_ayah_numbers_summary" = "Include Ayah numbers inline with text";
+"prefs_include_notes_title" = "Include Footnotes";
+"prefs_include_notes_summary" = "Include footnotes when sharing/copying";
+
+
 

@@ -31,6 +31,7 @@ public final class ContentTranslationViewModel: ObservableObject {
         self.localTranslationsRetriever = localTranslationsRetriever
         arabicFontSize = fontSizePreferences.arabicFontSize
         translationFontSize = fontSizePreferences.translationFontSize
+        translationFont = fontSizePreferences.translationFont
         selectedTranslations = selectedTranslationsPreferences.selectedTranslationIds
         highlights = highlightsService.highlights.versesByHighlights().mapValues { Color($0) }
 
@@ -46,6 +47,10 @@ public final class ContentTranslationViewModel: ObservableObject {
 
         fontSizePreferences.$translationFontSize
             .sink { [weak self] in self?.translationFontSize = $0 }
+            .store(in: &cancellables)
+
+        fontSizePreferences.$translationFont
+            .sink { [weak self] in self?.translationFont = $0 }
             .store(in: &cancellables)
 
         fontSizePreferences.$arabicFontSize
@@ -72,6 +77,7 @@ public final class ContentTranslationViewModel: ObservableObject {
     @Published var expandedTranslations: [AyahNumber: [Translation: [Range<String.Index>]]] = [:]
 
     @Published var translationFontSize: FontSize
+    @Published var translationFont: TranslationFont
     @Published var arabicFontSize: FontSize
 
     @Published var highlights: [AyahNumber: Color]
@@ -144,7 +150,8 @@ public final class ContentTranslationViewModel: ObservableObject {
                                     chunks: chunks,
                                     chunkIndex: chunkIndex,
                                     readMore: chunkIndex == chunks.count - 1 ? readMore : false, // Add read more to the last chunk.
-                                    translationFontSize: translationFontSize
+                                    translationFontSize: translationFontSize,
+                                    translationFont: translationFont
                                 ), color
                             )
                         )
@@ -247,7 +254,8 @@ public final class ContentTranslationViewModel: ObservableObject {
                 string: string,
                 footnoteIndex: footnoteIndex,
                 translation: translation,
-                translationFontSize: translationFontSize
+                translationFontSize: translationFontSize,
+                translationFont: translationFont
             )
         }
     }

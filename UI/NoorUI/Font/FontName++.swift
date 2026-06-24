@@ -11,6 +11,7 @@
 import NoorFont
 import QuranText
 import SwiftUI
+import VLogging
 
 private let arabicQuranTextFontSize: CGFloat = 21
 private let arabicTafseerTextFontSize: CGFloat = 21
@@ -24,7 +25,7 @@ public extension Font {
         custom(.arabic, size: arabicTafseerTextFontSize)
     }
 
-    static func kannada(for textStyle: Font.TextStyle, isBold: Bool = false) -> Font {
+    static func kannada(for textStyle: Font.TextStyle, selection: String = UserDefaults.standard.string(forKey: "translationFontSelection") ?? "notoSans", isBold: Bool = false) -> Font {
         let size: CGFloat = switch textStyle {
         case .largeTitle: 36
         case .title: 30
@@ -39,7 +40,20 @@ public extension Font {
         case .caption2: 13
         @unknown default: 19
         }
-        return .custom(isBold ? .kannadaBold : .kannada, size: size, relativeTo: textStyle)
+        
+        switch selection {
+        case "kohinoor":
+            let fontName = isBold ? "KohinoorKannada-SemiBold" : "KohinoorKannada-Regular"
+            return .custom(fontName, size: size, relativeTo: textStyle)
+        case "system":
+            if isBold {
+                return .system(textStyle).bold()
+            } else {
+                return .system(textStyle)
+            }
+        default: // "notoSans"
+            return .custom(isBold ? .kannadaBold : .kannada, size: size, relativeTo: textStyle)
+        }
     }
 }
 

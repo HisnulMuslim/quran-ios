@@ -9,6 +9,7 @@ import Combine
 import Localization
 import NoorUI
 import QuranText
+import QuranTextKit
 import SwiftUI
 import UIx
 
@@ -132,11 +133,12 @@ private struct MoreMenuThemeSettingsView: View {
 
     @State private var arabicLabelSize: CGSize = .zero
     @State private var translationLabelSize: CGSize = .zero
+    @State private var fontLabelSize: CGSize = .zero
 
     @ScaledMetric var compactVerticalPadding = 3.0
 
     var fontSizeLabelWidth: CGFloat {
-        max(arabicLabelSize.width, translationLabelSize.width)
+        max(arabicLabelSize.width, translationLabelSize.width, fontLabelSize.width)
     }
 
     var body: some View {
@@ -168,6 +170,27 @@ private struct MoreMenuThemeSettingsView: View {
                             size: $viewModel.translationFontSize,
                             labelSize: $translationLabelSize
                         )
+
+                        Divider()
+                            .padding(.vertical, compactVerticalPadding)
+
+                        HStack(spacing: 30) {
+                            Text(lAndroid("menu_translation_font"))
+                                .fixedSize()
+                                .onSizeChange {
+                                    fontLabelSize = $0
+                                }
+                                .frame(width: fontSizeLabelWidth, alignment: .leading)
+
+                            Spacer()
+
+                            DropdownButton(
+                                items: TranslationFont.allCases,
+                                selectedItem: $viewModel.translationFont
+                            ) { font in
+                                Text(localizedName(for: font))
+                            }
+                        }
                     }
 
                     Divider()
@@ -189,6 +212,17 @@ private struct MoreMenuThemeSettingsView: View {
             }
         }
         .background(.thickMaterial)
+    }
+
+    private func localizedName(for font: TranslationFont) -> String {
+        switch font {
+        case .notoSans:
+            return lAndroid("menu_translation_font_noto")
+        case .kohinoor:
+            return lAndroid("menu_translation_font_kohinoor")
+        case .system:
+            return lAndroid("menu_translation_font_system")
+        }
     }
 }
 

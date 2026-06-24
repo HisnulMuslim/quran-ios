@@ -9,13 +9,14 @@
 import NoorUI
 import QuranText
 import SwiftUI
+import VLogging
 
 extension Translation {
-    var textFont: Font {
+    func textFont(selection: String) -> Font {
         if languageCode == "ar" {
             return .arabicTafseer()
-        } else if languageCode == "kn" {
-            return .kannada(for: .body)
+        } else if languageCode == "kn" || languageCode == "kan" || languageCode.hasPrefix("kn") {
+            return .kannada(for: .body, selection: selection)
         } else {
             return .body
         }

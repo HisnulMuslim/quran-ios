@@ -7,6 +7,7 @@
 
 import Localization
 import QuranText
+import QuranTextKit
 import SwiftUI
 
 struct TranslationFootnote: View, Identifiable {
@@ -16,9 +17,10 @@ struct TranslationFootnote: View, Identifiable {
 
         let translation: Translation
         let translationFontSize: FontSize
+        let translationFont: TranslationFont
     }
 
-    var id: Id { Id(string: string, footnoteIndex: footnoteIndex, translation: translation, translationFontSize: translationFontSize) }
+    var id: Id { Id(string: string, footnoteIndex: footnoteIndex, translation: translation, translationFontSize: translationFontSize, translationFont: translationFont) }
 
     var text: String {
         let text = string.footnotes[footnoteIndex]
@@ -30,6 +32,7 @@ struct TranslationFootnote: View, Identifiable {
 
     let translation: Translation
     let translationFontSize: FontSize
+    let translationFont: TranslationFont
 
     @Environment(\.dismiss) private var dismiss
 
@@ -37,7 +40,7 @@ struct TranslationFootnote: View, Identifiable {
         NavigationView {
             ScrollView {
                 Text(text)
-                    .font(translation.textFont)
+                    .font(translation.textFont(selection: translationFont.rawValue))
                     .dynamicTypeSize(translationFontSize.dynamicTypeSize)
                     .padding()
             }
@@ -98,7 +101,7 @@ private struct TranslationFootnotePreview: View {
     }
 
     private static func buildFootnote(index: Int) -> TranslationFootnote {
-        TranslationFootnote(string: string, footnoteIndex: index, translation: translation, translationFontSize: .medium)
+        TranslationFootnote(string: string, footnoteIndex: index, translation: translation, translationFontSize: .medium, translationFont: .notoSans)
     }
 }
 
