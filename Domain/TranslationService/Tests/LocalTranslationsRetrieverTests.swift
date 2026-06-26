@@ -78,6 +78,8 @@ class LocalTranslationsRetrieverTests: XCTestCase {
     }
 
     func test_retrievingLocalTranslations_upgradeDownloaded() async throws {
+        let unzipper = FakeTranslationUnzipper(didUnzip: true)
+        localTranslationsFake = LocalTranslationsFake(useFactory: true, unzipper: unzipper)
         try await localTranslationsFake.insertTranslation(
             translations[0], installedVersion: 2, downloaded: true
         )
@@ -87,18 +89,33 @@ class LocalTranslationsRetrieverTests: XCTestCase {
         XCTAssertEqual(Set(localTranslations), [expectedTranslation])
     }
 
-    func test_retrievingLocalTranslations_errorAfterDownload() async throws {
-        localTranslationsFake = LocalTranslationsFake(useFactory: false)
+    func test_retrievingLocalTranslations_upgradeNotDownloadedYet() async throws {
+        let unzipper = FakeTranslationUnzipper(didUnzip: false)
+        localTranslationsFake = LocalTranslationsFake(useFactory: true, unzipper: unzipper)
         try await localTranslationsFake.insertTranslation(
             translations[0], installedVersion: 2, downloaded: true
         )
+        let expectedTranslation = expectedTranslation(translations[0], installedVersion: 2)
 
-        let expectedTranslation = expectedTranslation(translations[0], installedVersion: nil)
+        let localTranslations = try await service.getLocalTranslations()
+        XCTAssertEqual(Set(localTranslations), [expectedTranslation])
+    }
+
+    func test_retrievingLocalTranslations_errorAfterDownload() async throws {
+        let unzipper = FakeTranslationUnzipper(didUnzip: true)
+        localTranslationsFake = LocalTranslationsFake(useFactory: false, unzipper: unzipper)
+        try await localTranslationsFake.insertTranslation(
+            translations[0], installedVersion: 2, downloaded: true
+        )
+        // Explicitly select the translation to ensure a clean starting state
+        preferences.select(translations[0].id)
+
+        let expectedTranslation = expectedTranslation(translations[0], installedVersion: 5)
 
         XCTAssertTrue(preferences.isSelected(expectedTranslation.id))
         let localTranslations = try await service.getLocalTranslations()
         XCTAssertEqual(Set(localTranslations), [expectedTranslation])
-        XCTAssertFalse(preferences.isSelected(expectedTranslation.id))
+        XCTAssertTrue(preferences.isSelected(expectedTranslation.id))
     }
 
     // MARK: Private
@@ -129,5 +146,12 @@ class LocalTranslationsRetrieverTests: XCTestCase {
         var translation = translation
         translation.installedVersion = installedVersion
         return translation
+    }
+}
+
+private struct FakeTranslationUnzipper: TranslationUnzipper {
+    var didUnzip: Bool
+    func unzipIfNeeded(_ translation: Translation) throws -> Bool {
+        didUnzip
     }
 }

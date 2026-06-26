@@ -45,6 +45,12 @@ class NetworkManagerTests: XCTestCase {
         )
     }
 
+    func testRequestWithoutParametersHasNoTrailingQuestionMark() {
+        let path = "v1/products"
+        let request = NetworkManager.request(baseURL: baseURL, path: path, parameters: [])
+        XCTAssertEqual(request.url?.absoluteString, "http://example.com/v1/products")
+    }
+
     // MARK: Private
 
     private var networkManager: NetworkManager!

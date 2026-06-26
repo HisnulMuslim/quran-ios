@@ -16,6 +16,7 @@ class TranslationDeleterTests: XCTestCase {
     override func setUp() {
         super.setUp()
         localTranslationsFake = LocalTranslationsFake(useFactory: true)
+        preferences.selectedTranslationIds = []
         service = TranslationDeleter(
             databasesURL: LocalTranslationsFake.databasesURL,
             fileSystem: fileSystem

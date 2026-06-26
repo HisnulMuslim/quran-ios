@@ -17,6 +17,7 @@ class SelectedTranslationsPreferencesTests: XCTestCase {
     }
 
     func testPreferences() {
+        preferences.selectedTranslationIds = []
         XCTAssertEqual(preferences.selectedTranslationIds, [])
 
         preferences.toggleSelection(45)

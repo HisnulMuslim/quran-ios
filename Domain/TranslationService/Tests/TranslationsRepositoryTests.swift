@@ -119,7 +119,7 @@ class TranslationsRepositoryTests: XCTestCase {
 
     private func nextResponse(_ response: TranslationsResponse) throws {
         let encoder = JSONEncoder()
-        let parameters = [("v", "5")]
+        let parameters: [(String, String)] = []
         let request = NetworkManager.request(
             baseURL: baseURL,
             path: TranslationNetworkManager.path,

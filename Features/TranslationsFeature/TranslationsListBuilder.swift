@@ -22,13 +22,21 @@ public struct TranslationsListBuilder {
 
     public func build() -> UIViewController {
         let repository = TranslationsRepository(databasesURL: container.databasesURL, baseURL: container.appHost)
-        let downloader = container.downloadManager
+        let localRetriever = LocalTranslationsRetriever(databasesURL: container.databasesURL)
+        let downloader = TranslationsDownloader(downloader: container.downloadManager)
+        let updater = TranslationsUpdater(
+            translationsRepository: repository,
+            localTranslationsRetriever: localRetriever,
+            downloader: downloader
+        )
+
         let viewModel = TranslationsListViewModel(
             analytics: container.analytics,
             translationsRepository: repository,
-            localTranslationsRetriever: LocalTranslationsRetriever(databasesURL: container.databasesURL),
+            localTranslationsRetriever: localRetriever,
             deleter: TranslationDeleter(databasesURL: container.databasesURL),
-            downloader: TranslationsDownloader(downloader: downloader)
+            downloader: downloader,
+            translationsUpdater: updater
         )
 
         let viewController = TranslationsViewController(viewModel: viewModel)

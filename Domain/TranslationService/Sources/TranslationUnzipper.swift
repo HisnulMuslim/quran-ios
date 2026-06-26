@@ -11,14 +11,16 @@ import Utilities
 import Zip
 
 protocol TranslationUnzipper {
-    func unzipIfNeeded(_ translation: Translation) throws
+    @discardableResult
+    func unzipIfNeeded(_ translation: Translation) throws -> Bool
 }
 
 struct DefaultTranslationUnzipper: TranslationUnzipper {
-    func unzipIfNeeded(_ translation: Translation) throws {
+    @discardableResult
+    func unzipIfNeeded(_ translation: Translation) throws -> Bool {
         // installed latest version
         guard translation.version != translation.installedVersion else {
-            return
+            return false
         }
 
         // states:
@@ -44,7 +46,9 @@ struct DefaultTranslationUnzipper: TranslationUnzipper {
                 try attempt(times: 3) {
                     try Zip.unzipFile(zipFile, destination: zipFile.deletingLastPathComponent(), overwrite: true, password: nil, progress: nil)
                 }
+                return true
             }
         }
+        return false
     }
 }

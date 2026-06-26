@@ -32,8 +32,11 @@ public final class NetworkManager {
     static func request(baseURL: URL, path: String, parameters: [(String, String)] = []) -> URLRequest {
         let url = baseURL.appendingPathComponent(path)
         var components = URLComponents(url: url, resolvingAgainstBaseURL: false)!
-        components.queryItems = parameters.map { URLQueryItem(name: $0, value: $1) }
+        if !parameters.isEmpty {
+            components.queryItems = parameters.map { URLQueryItem(name: $0, value: $1) }
+        }
         var request = URLRequest(url: components.url!)
+        request.cachePolicy = .reloadIgnoringLocalCacheData
         request.setValue("https://www.hisnulmuslimdua.com/", forHTTPHeaderField: "Referer")
         request.setValue(
             "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148",

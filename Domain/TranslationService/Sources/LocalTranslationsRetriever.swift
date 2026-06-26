@@ -29,13 +29,14 @@ public struct LocalTranslationsRetriever {
     init(
         databasesURL: URL,
         fileSystem: FileSystem,
+        unzipper: TranslationUnzipper = DefaultTranslationUnzipper(),
         versionPersistenceFactory: @escaping VersionPersistenceFactory
     ) {
         persistence = GRDBActiveTranslationsPersistence(directory: databasesURL)
         versionUpdater = TranslationsVersionUpdater(
             persistence: persistence,
             versionPersistenceFactory: versionPersistenceFactory,
-            unzipper: DefaultTranslationUnzipper(),
+            unzipper: unzipper,
             fileSystem: fileSystem
         )
     }

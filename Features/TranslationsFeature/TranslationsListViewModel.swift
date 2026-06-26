@@ -25,13 +25,15 @@ final class TranslationsListViewModel: ObservableObject {
         translationsRepository: TranslationsRepository,
         localTranslationsRetriever: LocalTranslationsRetriever,
         deleter: TranslationDeleter,
-        downloader: TranslationsDownloader
+        downloader: TranslationsDownloader,
+        translationsUpdater: TranslationsUpdater
     ) {
         self.analytics = analytics
         self.translationsRepository = translationsRepository
         self.localTranslationsRetriever = localTranslationsRetriever
         self.deleter = deleter
         self.downloader = downloader
+        self.translationsUpdater = translationsUpdater
 
         let downloadsObserver = DownloadsObserver(
             extractKey: { [weak self] in self?.translations.firstMatches($0) },
@@ -148,6 +150,7 @@ final class TranslationsListViewModel: ObservableObject {
     private let localTranslationsRetriever: LocalTranslationsRetriever
     private let deleter: TranslationDeleter
     private let downloader: TranslationsDownloader
+    private let translationsUpdater: TranslationsUpdater
     private let selectedTranslationsPreferences = SelectedTranslationsPreferences.shared
     private var downloadsObserver: DownloadsObserver<Translation>?
     private var cancellables = Set<AnyCancellable>()
@@ -157,9 +160,17 @@ final class TranslationsListViewModel: ObservableObject {
     @Published private var progress: [Translation: Double] = [:]
 
     private func translationItem(_ translation: Translation) -> TranslationItem {
-        TranslationItem(
+        let itemProgress: TranslationItem.DownloadingProgress
+        if let currentProgress = progress[translation] {
+            itemProgress = .downloading(currentProgress)
+        } else if translation.needsUpgrade {
+            itemProgress = .needsUpgrade
+        } else {
+            itemProgress = .notDownloading
+        }
+        return TranslationItem(
             info: translation,
-            progress: progress[translation].map { .downloading($0) } ?? .notDownloading
+            progress: itemProgress
         )
     }
 
@@ -182,7 +193,14 @@ final class TranslationsListViewModel: ObservableObject {
 
     private func loadFromServer() async throws {
         try await translationsRepository.downloadAndSyncTranslations()
+        TranslationUpdatePreferences.shared.lastChecked = Date()
         try await loadLocalTranslations()
+
+        // Asynchronously run updater to trigger auto-upgrade downloads for any outdated local translations
+        Task {
+            await translationsUpdater.updateTranslationsIfNeeded(bypassThrottle: true)
+            try? await loadLocalTranslations()
+        }
     }
 
     private func observeRunningDownloads() async {

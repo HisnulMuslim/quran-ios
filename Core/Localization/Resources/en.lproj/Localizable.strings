@@ -220,3 +220,8 @@
 // Library & Navigation
 "new.library_navigation" = "Library & Navigation:";
 "new.library_navigation.details" = "* Sort surahs and juz on Home, and display surah numbers so you can jump to what you need faster - thanks to @yismailuofa.";
+
+// Translation Update Notification
+"translation.update.notification.title" = "Translation Updated";
+"translation.update.notification.body" = "The translation '%@' has been updated to the latest version.";
+

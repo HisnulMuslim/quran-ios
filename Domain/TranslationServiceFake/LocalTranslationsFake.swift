@@ -16,17 +16,18 @@ import VerseTextPersistence
 public struct LocalTranslationsFake {
     // MARK: Lifecycle
 
-    public init(useFactory: Bool = false) {
+    public init(useFactory: Bool = false, unzipper: TranslationUnzipper = DefaultTranslationUnzipper()) {
         persistence = GRDBActiveTranslationsPersistence(directory: Self.databasesURL)
-        if useFactory {
-            let persistenceFactory = { (translation: Translation) in
-                let url = TestResources.resourceURL(translation.fileName)
-                return GRDBDatabaseVersionPersistence(fileURL: url)
-            }
-            retriever = LocalTranslationsRetriever(databasesURL: Self.databasesURL, fileSystem: fileSystem, versionPersistenceFactory: persistenceFactory)
-        } else {
-            retriever = LocalTranslationsRetriever(databasesURL: Self.databasesURL, fileSystem: fileSystem)
+        let persistenceFactory = { (translation: Translation) in
+            let url = useFactory ? TestResources.resourceURL(translation.fileName) : translation.localPath.url
+            return GRDBDatabaseVersionPersistence(fileURL: url)
         }
+        retriever = LocalTranslationsRetriever(
+            databasesURL: Self.databasesURL,
+            fileSystem: fileSystem,
+            unzipper: unzipper,
+            versionPersistenceFactory: persistenceFactory
+        )
     }
 
     // MARK: Public

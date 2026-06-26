@@ -36,28 +36,19 @@ struct TranslationsVersionUpdater {
     let fileSystem: FileSystem
 
     func updateInstalledVersion(for translation: Translation) async throws -> Translation {
-        try unzipper.unzipIfNeeded(translation) // unzip if needed
-        return try await updateInstalledVersion(translation) // update versions
+        let didUnzip = try unzipper.unzipIfNeeded(translation) // unzip if needed
+        return try await updateInstalledVersion(translation, didUnzip: didUnzip) // update versions
     }
 
     // MARK: Private
 
-    private func updateInstalledVersion(_ translation: Translation) async throws -> Translation {
+    private func updateInstalledVersion(_ translation: Translation, didUnzip: Bool) async throws -> Translation {
         var translation = translation
         let isReachable = fileSystem.fileExists(at: translation.localPath)
         let previousInstalledVersion = translation.installedVersion
 
-        // installed on the latest version & the db file exists
-        if translation.version != translation.installedVersion, isReachable {
-            do {
-                let versionPersistence = versionPersistenceFactory(translation)
-                let version = try await versionPersistence.getTextVersion()
-                translation.installedVersion = version
-            } catch {
-                // if an error occurred while getting the version
-                // that means the db file is corrupted.
-                translation.installedVersion = nil
-            }
+        if isReachable, (previousInstalledVersion == nil || didUnzip) {
+            translation.installedVersion = translation.version
         } else if translation.installedVersion != nil, !isReachable {
             translation.installedVersion = nil
         }

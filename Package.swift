@@ -727,6 +727,7 @@ private func featuresTargets() -> [[Target]] {
             "WhatsNewFeature",
             "AudioUpdater",
             "AppMigrationFeature",
+            "TranslationService",
         ]),
     ]
 }

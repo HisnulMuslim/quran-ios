@@ -12,6 +12,7 @@ import AudioUpdater
 import SettingsService
 import UIKit
 import VLogging
+import TranslationService
 
 @MainActor
 public final class LaunchStartup {
@@ -20,12 +21,14 @@ public final class LaunchStartup {
     init(
         appBuilder: AppBuilder,
         audioUpdater: AudioUpdater,
+        translationsUpdater: TranslationsUpdater,
         fileSystemMigrator: FileSystemMigrator,
         recitersPathMigrator: RecitersPathMigrator,
         reviewService: ReviewService
     ) {
         self.appBuilder = appBuilder
         self.audioUpdater = audioUpdater
+        self.translationsUpdater = translationsUpdater
         self.fileSystemMigrator = fileSystemMigrator
         self.recitersPathMigrator = recitersPathMigrator
         self.reviewService = reviewService
@@ -43,6 +46,7 @@ public final class LaunchStartup {
     private let recitersPathMigrator: RecitersPathMigrator
     private let appBuilder: AppBuilder
     private let audioUpdater: AudioUpdater
+    private let translationsUpdater: TranslationsUpdater
     private let reviewService: ReviewService
 
     private let appMigrator = AppMigrator()
@@ -74,6 +78,14 @@ public final class LaunchStartup {
         }
 
         updateAudioIfNeeded()
+        updateTranslationsIfNeeded()
+
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(applicationWillEnterForeground),
+            name: UIApplication.willEnterForegroundNotification,
+            object: nil
+        )
 
         let wasUpdated = window.rootViewController != nil
 
@@ -88,6 +100,11 @@ public final class LaunchStartup {
         }
     }
 
+    @objc private func applicationWillEnterForeground() {
+        updateAudioIfNeeded()
+        updateTranslationsIfNeeded()
+    }
+
     private func registerMigrators() {
         appMigrator.register(migrator: fileSystemMigrator, for: "1.16.0")
         appMigrator.register(migrator: recitersPathMigrator, for: "1.19.1")
@@ -98,6 +115,15 @@ public final class LaunchStartup {
         if case .sameVersion = appMigrator.launchVersion {
             Task {
                 await audioUpdater.updateAudioIfNeeded()
+            }
+        }
+    }
+
+    private func updateTranslationsIfNeeded() {
+        // don't run translations updater after upgrading the app
+        if case .sameVersion = appMigrator.launchVersion {
+            Task {
+                await translationsUpdater.updateTranslationsIfNeeded()
             }
         }
     }
