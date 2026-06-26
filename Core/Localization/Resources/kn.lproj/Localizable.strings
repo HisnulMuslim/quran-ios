@@ -209,4 +209,8 @@
 "new.personalization.details" = "* ಹಲವು ಥೀಮ್‌ಗಳ ಬೆಂಬಲ. ಕುರ್‌ಆನ್ ಪುಟ ತೆರೆಯಿರಿ → ಮೇಲ್ಭಾಗದ ಬಲಗಡೆಯ ಮೆನು → ಥೀಮ್ ಮತ್ತು ಸೆಟ್ಟಿಂಗ್‌ಗಳು.";
 
 "new.library_navigation" = "ಗ್ರಂಥಾಲಯ ಮತ್ತು ನ್ಯಾವಿಗೇಷನ್:";
-"new.library_navigation.details" = "* ಮುಖಪುಟದಲ್ಲಿ ಸೂರಾ ಮತ್ತು ಜುಜ್‌ಗಳನ್ನು ವಿಂಗಡಿಸಲಾಗಿದೆ ಮತ್ತು ಸೂರಾ ಸಂಖ್ಯೆಗಳನ್ನು ಪ್ರದರ್ಶಿಸಲಾಗಿದೆ.";"translation.update.notification.body" = "'%@' ಅನುವಾದವನ್ನು ಇತ್ತೀಚಿನ ಆವೃತ್ತಿಗೆ ಯಶಸ್ವಿಯಾಗಿ ನವೀಕರಿಸಲಾಗಿದೆ.";
+"new.library_navigation.details" = "* ಮುಖಪುಟದಲ್ಲಿ ಸೂರಾ ಮತ್ತು ಜುಜ್‌ಗಳನ್ನು ವಿಂಗಡಿಸಲಾಗಿದೆ ಮತ್ತು ಸೂರಾ ಸಂಖ್ಯೆಗಳನ್ನು ಪ್ರದರ್ಶಿಸಲಾಗಿದೆ.";
+
+// Translation Update Notification
+"translation.update.notification.title" = "ಅನುವಾದವನ್ನು ನವೀಕರಿಸಲಾಗಿದೆ";
+"translation.update.notification.body" = "'%@' ಅನುವಾದವನ್ನು ಇತ್ತೀಚಿನ ಆವೃತ್ತಿಗೆ ಯಶಸ್ವಿಯಾಗಿ ನವೀಕರಿಸಲಾಗಿದೆ.";
