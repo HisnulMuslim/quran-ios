@@ -1,24 +1,23 @@
-//
-//  AudioUpdatesNetworkManager.swift
-//
-//
-//  Created by Mohamed Afifi on 2021-11-28.
-//
-
 import Foundation
 import NetworkSupport
+import VLogging
 
 struct AudioUpdatesNetworkManager {
     // MARK: Internal
 
-    static let path = "/data/audio_updates.php"
-    static let revision = "revision"
-
     let networkManager: NetworkManager
 
     func getAudioUpdates(revision: Int) async throws -> AudioUpdates? {
-        let data = try await networkManager.request(Self.path, parameters: [(Self.revision, "\(revision)")])
-        return try parse(data: data)
+        let path = "/data/api/audio_updates/audio_updates_v\(revision).json"
+        do {
+            let data = try await networkManager.request(path)
+            return try parse(data: data)
+        } catch is DecodingError {
+            logger.info("AudioUpdatesNetworkManager: Failed to decode updates JSON (likely 404/no updates). Returning nil.")
+            return nil
+        } catch {
+            throw error
+        }
     }
 
     // MARK: Private
@@ -27,8 +26,20 @@ struct AudioUpdatesNetworkManager {
         if data.isEmpty { // no updates
             return nil
         }
+
+        var sanitizedData = data
+        if let jsonString = String(data: data, encoding: .utf8) {
+            // If the server concatenated multiple JSON objects (e.g. `}{`), take only the first object
+            if let range = jsonString.range(of: "}{") {
+                let firstObjectString = String(jsonString[..<range.lowerBound]) + "}"
+                if let firstObjectData = firstObjectString.data(using: .utf8) {
+                    sanitizedData = firstObjectData
+                }
+            }
+        }
+
         let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .convertFromSnakeCase
-        return try decoder.decode(AudioUpdates.self, from: data)
+        return try decoder.decode(AudioUpdates.self, from: sanitizedData)
     }
 }

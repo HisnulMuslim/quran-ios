@@ -54,7 +54,5 @@ public struct Reciter: Hashable, Identifiable, Sendable {
     public let hasGaplessAlternative: Bool
     public let category: Category
 
-    // MARK: Internal
-
-    let directory: String
+    public let directory: String
 }

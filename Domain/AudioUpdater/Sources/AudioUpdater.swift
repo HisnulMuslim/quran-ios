@@ -47,12 +47,12 @@ public final class AudioUpdater {
             return
         }
 
-        // update if 7 days passed since last checked
+        // update if interval has passed since last checked
         let lastChecked = preferences.lastChecked
         if let lastChecked {
             let today = time.now
-            let difference = Calendar.current.dateComponents([.day], from: lastChecked, to: today)
-            if let day = difference.day, day < 7 {
+            let timePassed = today.timeIntervalSince(lastChecked)
+            if timePassed < AudioUpdatePreferences.updateCheckInterval {
                 return
             }
         }
@@ -92,7 +92,7 @@ public final class AudioUpdater {
     }
 
     private func update(reciters: [Reciter], updates: AudioUpdates) async {
-        let reciters = Dictionary(uniqueKeysWithValues: reciters.map { ($0.audioURL.absoluteString.removingLastSlash, $0) })
+        let reciters = Dictionary(uniqueKeysWithValues: reciters.map { ($0.directory.removingLastSlash, $0) })
 
         for update in updates.updates {
             guard let reciter = reciters[update.path.removingLastSlash] else {

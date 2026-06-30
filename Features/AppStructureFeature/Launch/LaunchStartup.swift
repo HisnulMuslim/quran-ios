@@ -54,20 +54,36 @@ public final class LaunchStartup {
 
     private func upgradeIfNeeded(window: UIWindow) {
         registerMigrators()
-        switch appMigrator.migrationStatus() {
-        case .noMigration:
-            showApp(window: window)
-        case let .migrate(blocksUI, titles):
-            if blocksUI {
-                logger.notice("Performing long upgrade task: \(titles)")
-                let migrationVC = MigrationViewController()
-                migrationVC.setTitles(titles)
-                window.rootViewController = migrationVC
-                window.makeKeyAndVisible()
+
+        // Show the SplashViewController for the branding delay
+        let splashVC = SplashViewController()
+        window.rootViewController = splashVC
+        window.makeKeyAndVisible()
+
+        Task {
+            let delayTask = Task {
+                try? await Task.sleep(nanoseconds: 2_000_000_000) // 2.0 seconds branding delay (matching Android)
             }
-            Task {
-                await appMigrator.migrate()
+
+            switch appMigrator.migrationStatus() {
+            case .noMigration:
+                _ = await delayTask.result
                 showApp(window: window)
+            case let .migrate(blocksUI, titles):
+                if blocksUI {
+                    _ = await delayTask.result
+                    logger.notice("Performing long upgrade task: \(titles)")
+                    let migrationVC = MigrationViewController()
+                    migrationVC.setTitles(titles)
+                    window.rootViewController = migrationVC
+
+                    await appMigrator.migrate()
+                    showApp(window: window)
+                } else {
+                    await appMigrator.migrate()
+                    _ = await delayTask.result
+                    showApp(window: window)
+                }
             }
         }
     }
@@ -96,8 +112,8 @@ public final class LaunchStartup {
             appViewController.transition(to: window, duration: 0.3, options: .transitionCrossDissolve)
         } else {
             appViewController.launch(from: window)
-            reviewService.checkForReview(in: window)
         }
+        reviewService.checkForReview(in: window)
     }
 
     @objc private func applicationWillEnterForeground() {

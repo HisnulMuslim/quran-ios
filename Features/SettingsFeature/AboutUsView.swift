@@ -71,18 +71,27 @@ struct AboutUsView: View {
             }
 
             NoorBasicSection {
-                VStack(spacing: 5) {
+                VStack(spacing: 8) {
                     Text(lAndroid("about_us_sponsored_by"))
                         .font(.footnote)
                     
-                    Image("ksa-logo")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(height: 40)
+                    HStack(spacing: 24) {
+                        Image("ksa-logo")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: 40)
+                        
+                        Image("wisdom-logo")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: 32)
+                    }
+                    .padding(.vertical, 4)
                         
                     Text(lAndroid("about_us_sponsor_name"))
                         .font(.footnote)
                         .fontWeight(.semibold)
+                        .multilineTextAlignment(.center)
                 }
                 .frame(maxWidth: .infinity, alignment: .center)
                 .padding(.bottom, 30)

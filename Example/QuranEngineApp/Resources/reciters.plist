@@ -48,7 +48,7 @@
 		<key>path</key>
 		<string>abdullah_basfar</string>
 		<key>url</key>
-		<string>https://download.quranicaudio.com/quran/abdullaah_basfar/</string>
+		<string>https://download.quranicaudio.com/quran/abdullaah_basfar/archive/</string>
 	</dict>
 	<dict>
 		<key>category</key>
@@ -96,7 +96,7 @@
 		<key>path</key>
 		<string>maher_al_muaiqly</string>
 		<key>url</key>
-		<string>https://download.quranicaudio.com/quran/maher_256/</string>
+		<string>https://mirrors.quranicaudio.com/tvquran/maher_al_mu3aiqly/</string>
 	</dict>
 	<dict>
 		<key>category</key>
@@ -112,7 +112,7 @@
 		<key>path</key>
 		<string>sa3d_alghamidi</string>
 		<key>url</key>
-		<string>https://download.quranicaudio.com/quran/sa3d_al-ghaamidi/complete/</string>
+		<string>https://download.quranicaudio.com/quran/sa3d_al-ghaamidi/complete/128kbps/</string>
 	</dict>
 	<dict>
 		<key>category</key>

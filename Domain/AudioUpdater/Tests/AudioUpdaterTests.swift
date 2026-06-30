@@ -50,7 +50,7 @@ class AudioUpdaterTests: XCTestCase {
         await updater.updateAudioIfNeeded()
         XCTAssertEqual(fileSystem.removedItems, [])
         XCTAssertNil(preferences.lastChecked)
-        XCTAssertEqual(preferences.lastRevision, 0)
+        XCTAssertEqual(preferences.lastRevision, 1)
     }
 
     func test_updateAudioIfNeeded_noUpdates() async throws {
@@ -83,14 +83,14 @@ class AudioUpdaterTests: XCTestCase {
         let nextUpdate = AudioUpdates(currentRevision: updates.currentRevision + 1, updates: [update])
 
         // Try again same day
-        time.now = Date(timeInterval: 60 * 60, since: now)
+        time.now = Date(timeInterval: AudioUpdatePreferences.updateCheckInterval / 2, since: now)
         try nextUpdates(nextUpdate)
 
         await updater.updateAudioIfNeeded()
         XCTAssertEqual(preferences.lastRevision, updates.currentRevision)
 
         // Try again after 7 days
-        time.now = Date(timeInterval: 60 * 60 * 24 * 7 + 1, since: now)
+        time.now = Date(timeInterval: AudioUpdatePreferences.updateCheckInterval + 1, since: now)
         try nextUpdates(nextUpdate)
 
         await updater.updateAudioIfNeeded()
@@ -115,14 +115,14 @@ class AudioUpdaterTests: XCTestCase {
         let nextUpdate = AudioUpdates(currentRevision: updates.currentRevision + 1, updates: [update])
 
         // Try again same day
-        time.now = Date(timeInterval: 60 * 60, since: now)
+        time.now = Date(timeInterval: AudioUpdatePreferences.updateCheckInterval / 2, since: now)
         try nextUpdates(nextUpdate)
 
         await updater.updateAudioIfNeeded()
         XCTAssertEqual(preferences.lastRevision, updates.currentRevision)
 
         // Try again after 7 days
-        time.now = Date(timeInterval: 60 * 60 * 24 * 7 + 1, since: now)
+        time.now = Date(timeInterval: AudioUpdatePreferences.updateCheckInterval + 1, since: now)
         try nextUpdates(nextUpdate)
 
         await updater.updateAudioIfNeeded()
@@ -164,6 +164,27 @@ class AudioUpdaterTests: XCTestCase {
         XCTAssertEqual(preferences.lastChecked, time.now)
     }
 
+    func test_updateAudioIfNeeded_noUpdates_decodingErrorGraceful() async throws {
+        let now = Date(timeIntervalSince1970: 0)
+        time.now = now
+
+        let requestRevision = preferences.lastRevision
+        let path = "/data/api/audio_updates/audio_updates_v\(requestRevision).json"
+        let request = NetworkManager.request(
+            baseURL: baseURL,
+            path: path,
+            parameters: []
+        )
+        // Simulate a 404 response by returning non-JSON data
+        session.dataResults[request.url!] = .success("Not Found".data(using: .utf8)!)
+
+        await updater.updateAudioIfNeeded()
+
+        XCTAssertEqual(Set(fileSystem.removedItems), [])
+        XCTAssertEqual(preferences.lastRevision, 1)
+        XCTAssertNotNil(preferences.lastChecked)
+    }
+
     // MARK: Private
 
     private var updater: AudioUpdater!
@@ -202,7 +223,7 @@ class AudioUpdaterTests: XCTestCase {
 
     private func makeUpdate(reciter: Reciter, databaseVersion: Int? = nil, files: [String]) -> AudioUpdates.Update {
         AudioUpdates.Update(
-            path: reciter.audioURL.absoluteString,
+            path: reciter.directory,
             databaseVersion: databaseVersion,
             files: files.map { AudioUpdates.Update.File(filename: $0, md5: "") }
         )
@@ -211,11 +232,12 @@ class AudioUpdaterTests: XCTestCase {
     private func nextUpdates(_ updates: AudioUpdates) throws {
         let encoder = JSONEncoder()
         encoder.keyEncodingStrategy = .convertToSnakeCase
-        let parameters = [(AudioUpdatesNetworkManager.revision, preferences.lastRevision.description)]
+        let requestRevision = preferences.lastRevision
+        let path = "/data/api/audio_updates/audio_updates_v\(requestRevision).json"
         let request = NetworkManager.request(
             baseURL: baseURL,
-            path: AudioUpdatesNetworkManager.path,
-            parameters: parameters
+            path: path,
+            parameters: []
         )
         session.dataResults[request.url!] = .success(try encoder.encode(updates))
     }

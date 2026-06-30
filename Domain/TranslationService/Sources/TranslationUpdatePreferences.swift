@@ -17,7 +17,7 @@ public final class TranslationUpdatePreferences {
 
     public static let shared = TranslationUpdatePreferences()
 
-    public static let updateCheckInterval: TimeInterval = 12 * 60 * 60 // 12 hours (in seconds)
+    public static let updateCheckInterval: TimeInterval = 24 * 60 * 60 // 24 hours (in seconds)
 
     @Preference(lastChecked)
     public var lastChecked: Date?
