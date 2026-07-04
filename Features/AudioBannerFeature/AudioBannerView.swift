@@ -26,7 +26,8 @@ struct AudioBannerView: View {
             cancelDownloading: { await viewModel.cancelDownload() },
             reciters: { viewModel.presentReciterList() },
             more: { viewModel.showAdvancedAudioOptions() },
-            setPlaybackRate: { viewModel.updatePlaybackRate(to: $0) }
+            setPlaybackRate: { viewModel.updatePlaybackRate(to: $0) },
+            setSleepTimer: { viewModel.updateSleepTimer(to: $0) }
         )
         AudioBannerViewUI(
             state: viewModel.audioBannerState,

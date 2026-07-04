@@ -11,8 +11,8 @@ import AppMigrationFeature
 import AudioUpdater
 import ReciterService
 import SettingsService
-import UIKit
 import TranslationService
+import UIKit
 
 @MainActor
 public struct LaunchBuilder {
@@ -30,7 +30,7 @@ public struct LaunchBuilder {
             databasesURL: container.databasesURL,
             recitersRetreiver: ReciterDataRetriever()
         )
-        
+
         let translationsRepository = TranslationsRepository(databasesURL: container.databasesURL, baseURL: container.appHost)
         let localTranslationsRetriever = LocalTranslationsRetriever(databasesURL: container.databasesURL)
         let translationsDownloader = TranslationsDownloader(downloader: container.downloadManager)
@@ -42,6 +42,7 @@ public struct LaunchBuilder {
 
         return LaunchStartup(
             appBuilder: AppBuilder(container: container),
+            baseURL: container.appHost,
             audioUpdater: audioUpdater,
             translationsUpdater: translationsUpdater,
             fileSystemMigrator: fileSystemMigrator,

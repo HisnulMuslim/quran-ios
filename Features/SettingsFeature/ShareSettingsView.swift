@@ -2,13 +2,13 @@
 //  ShareSettingsView.swift
 //  Quran
 //
-//  
+//
 //
 
-import SwiftUI
-import NoorUI
 import Localization
+import NoorUI
 import QuranTextKit
+import SwiftUI
 
 struct ShareSettingsView: View {
     @StateObject private var viewModel = ShareSettingsViewModel()

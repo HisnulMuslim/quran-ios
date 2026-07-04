@@ -169,7 +169,7 @@ class AudioUpdaterTests: XCTestCase {
         time.now = now
 
         let requestRevision = preferences.lastRevision
-        let path = "/data/api/audio_updates/audio_updates_v\(requestRevision).json"
+        let path = AudioUpdatesNetworkManager.path(revision: requestRevision)
         let request = NetworkManager.request(
             baseURL: baseURL,
             path: path,
@@ -233,7 +233,7 @@ class AudioUpdaterTests: XCTestCase {
         let encoder = JSONEncoder()
         encoder.keyEncodingStrategy = .convertToSnakeCase
         let requestRevision = preferences.lastRevision
-        let path = "/data/api/audio_updates/audio_updates_v\(requestRevision).json"
+        let path = AudioUpdatesNetworkManager.path(revision: requestRevision)
         let request = NetworkManager.request(
             baseURL: baseURL,
             path: path,

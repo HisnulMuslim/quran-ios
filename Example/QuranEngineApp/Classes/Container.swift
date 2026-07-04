@@ -96,21 +96,19 @@ struct AppReadingRemoteResources: ReadingRemoteResources {
     let appHost: URL
 
     func resource(for reading: Reading) -> RemoteResource? {
-        let path: String
-        switch reading {
+        let path: String = switch reading {
         case .hafs_1405:
             // Pointing to images_1920 to prevent folder mismatch crashes in ContentImageBuilder
-            path = "data/zips/images_1920.zip"
+            "data/zips/images_1920.zip"
         case .tajweed:
-            path = "data/tajweed/zips/images_1280.zip"
+            "data/tajweed/zips/images_1280.zip"
         default:
             // Since other readings are commented out, we don't need their paths.
             // Using a dummy path just in case.
-            path = ""
+            ""
         }
-        
+
         let url = appHost.appendingPathComponent(path)
         return RemoteResource(url: url, reading: reading, version: 1)
     }
 }
-

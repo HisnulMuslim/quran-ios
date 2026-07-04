@@ -1,7 +1,7 @@
-import SwiftUI
 import Localization
-import UIx
 import NoorUI
+import SwiftUI
+import UIx
 
 struct AboutUsView: View {
     private struct DataSourceItem: Identifiable {
@@ -11,12 +11,7 @@ struct AboutUsView: View {
         let url: String
     }
 
-    private var sources: [DataSourceItem] {
-        [
-            DataSourceItem(id: 1, title: lAndroid("about_images"), subtitle: lAndroid("about_madani_images"), url: "https://github.com/quran/quran.com-images"),
-            DataSourceItem(id: 2, title: "QuranicAudio", subtitle: lAndroid("about_quranicaudio_summary"), url: "https://quranicaudio.com/")
-        ]
-    }
+    // MARK: Internal
 
     var body: some View {
         NoorList {
@@ -30,15 +25,15 @@ struct AboutUsView: View {
                     Text(lAndroid("about_us_description"))
                         .font(.body)
                         .multilineTextAlignment(.center)
-                    
+
                     Text(lAndroid("about_us_open_source_description"))
                         .font(.body)
                         .multilineTextAlignment(.center)
-                    
+
                     Text(lAndroid("about_us_translation_credits"))
                         .font(.body)
                         .multilineTextAlignment(.center)
-                    
+
                     VStack(spacing: 8) {
                         Text(lAndroid("about_us_translation_title"))
                         Text(lAndroid("about_us_publisher"))
@@ -74,20 +69,20 @@ struct AboutUsView: View {
                 VStack(spacing: 8) {
                     Text(lAndroid("about_us_sponsored_by"))
                         .font(.footnote)
-                    
+
                     HStack(spacing: 24) {
                         Image("ksa-logo")
                             .resizable()
                             .scaledToFit()
                             .frame(height: 40)
-                        
+
                         Image("wisdom-logo")
                             .resizable()
                             .scaledToFit()
                             .frame(height: 32)
                     }
                     .padding(.vertical, 4)
-                        
+
                     Text(lAndroid("about_us_sponsor_name"))
                         .font(.footnote)
                         .fontWeight(.semibold)
@@ -97,5 +92,14 @@ struct AboutUsView: View {
                 .padding(.bottom, 30)
             }
         }
+    }
+
+    // MARK: Private
+
+    private var sources: [DataSourceItem] {
+        [
+            DataSourceItem(id: 1, title: lAndroid("about_images"), subtitle: lAndroid("about_madani_images"), url: "https://github.com/quran/quran.com-images"),
+            DataSourceItem(id: 2, title: "QuranicAudio", subtitle: lAndroid("about_quranicaudio_summary"), url: "https://quranicaudio.com/"),
+        ]
     }
 }

@@ -85,11 +85,13 @@ public final class AudioBannerViewModel: ObservableObject {
     @Published var viewControllerToPresent: UIViewController?
     @Published var dismissPresentedViewController = false
     @Published var playbackRate: Float
+    @Published var sleepTimerOption: SleepTimerOption = .off
+    @Published var sleepTimeRemaining: TimeInterval? = nil
 
     var audioBannerState: AudioBannerState {
         switch playingState {
-        case .playing: .playing(paused: false, rate: playbackRate)
-        case .paused: .playing(paused: true, rate: playbackRate)
+        case .playing: .playing(paused: false, rate: playbackRate, sleepTimerOption: sleepTimerOption, sleepTimeRemaining: sleepTimeRemaining)
+        case .paused: .playing(paused: true, rate: playbackRate, sleepTimerOption: sleepTimerOption, sleepTimeRemaining: sleepTimeRemaining)
         case .stopped: .readyToPlay(reciter: selectedReciter?.localizedName ?? "")
         case .downloading(let progress): .downloading(progress: progress)
         }
@@ -126,7 +128,55 @@ public final class AudioBannerViewModel: ObservableObject {
         audioPlayer.setRate(rate)
     }
 
+    func updateSleepTimer(to option: SleepTimerOption) {
+        logger.info("AudioBanner: Setting sleep timer to \(option)")
+        sleepTimer?.invalidate()
+        sleepTimer = nil
+        sleepTimerOption = option
+        shouldPauseAfterCurrentAyah = false
+
+        switch option {
+        case .off:
+            sleepTimeRemaining = nil
+            lastPlayingSura = nil
+        case .minutes(let mins):
+            let seconds = TimeInterval(mins * 60)
+            sleepTimeRemaining = seconds
+            lastPlayingSura = nil
+
+            // Set up a repeating 1-second timer
+            sleepTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
+                Task { @MainActor [weak self] in
+                    guard let self else { return }
+                    if let remaining = sleepTimeRemaining {
+                        if remaining <= 1 {
+                            sleepTimeRemaining = nil
+                            shouldPauseAfterCurrentAyah = true
+                            sleepTimer?.invalidate()
+                            sleepTimer = nil
+                            logger.info("AudioBanner: Sleep timer duration ended. Flagged shouldPauseAfterCurrentAyah.")
+                        } else {
+                            sleepTimeRemaining = remaining - 1
+                        }
+                    }
+                }
+            }
+        case .endOfSurah:
+            sleepTimeRemaining = nil
+            if let currentPlayingAyah {
+                lastPlayingSura = currentPlayingAyah.sura.suraNumber
+            } else {
+                lastPlayingSura = nil
+            }
+        }
+    }
+
     // MARK: Private
+
+    private var sleepTimer: Timer? = nil
+    private var shouldPauseAfterCurrentAyah = false
+    private var lastPlayingSura: Int? = nil
+    private var currentPlayingAyah: AyahNumber? = nil
 
     private var audioRange: AudioRange?
 
@@ -265,6 +315,7 @@ public final class AudioBannerViewModel: ObservableObject {
     private func pause() {
         playingState = .paused
         audioPlayer.pauseAudio()
+        resetSleepTimer()
     }
 
     private func resume() {
@@ -333,6 +384,35 @@ public final class AudioBannerViewModel: ObservableObject {
         logger.info("AudioBanner: playing verse \(ayah)")
         crasher.setValue(ayah, forKey: .playingAyah)
         listener?.highlightReadingAyah(ayah)
+        currentPlayingAyah = ayah
+
+        if shouldPauseAfterCurrentAyah {
+            logger.info("AudioBanner: shouldPauseAfterCurrentAyah is true. Pausing playback.")
+            shouldPauseAfterCurrentAyah = false
+            resetSleepTimer()
+            pause()
+            return
+        }
+
+        if case .endOfSurah = sleepTimerOption {
+            if let lastSura = lastPlayingSura, ayah.sura.suraNumber != lastSura {
+                logger.info("AudioBanner: End of Surah reached (transition from \(lastSura) to \(ayah.sura.suraNumber)). Pausing playback.")
+                resetSleepTimer()
+                pause()
+                return
+            }
+            lastPlayingSura = ayah.sura.suraNumber
+        }
+    }
+
+    private func resetSleepTimer() {
+        sleepTimer?.invalidate()
+        sleepTimer = nil
+        sleepTimerOption = .off
+        sleepTimeRemaining = nil
+        shouldPauseAfterCurrentAyah = false
+        lastPlayingSura = nil
+        currentPlayingAyah = nil
     }
 
     // MARK: - State changes
@@ -347,6 +427,7 @@ public final class AudioBannerViewModel: ObservableObject {
         crasher.setValue(nil, forKey: .playingAyah)
         crasher.setValue(false, forKey: .downloadingQuran)
         playingState = .stopped
+        resetSleepTimer()
     }
 
     private func startDownloading() {

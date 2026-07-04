@@ -17,7 +17,7 @@ final class AudioUpdatePreferences {
 
     static let shared = AudioUpdatePreferences()
 
-    static let updateCheckInterval: TimeInterval =  1 * 24 * 60 * 60 // 1 day in seconds
+    static let updateCheckInterval: TimeInterval = 1 * 24 * 60 * 60 // 1 day in seconds
 
     @Preference(lastRevision) var lastRevision: Int
     @Preference(lastChecked) var lastChecked: Date?

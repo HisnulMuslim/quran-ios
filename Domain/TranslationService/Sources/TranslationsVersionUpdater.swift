@@ -47,7 +47,7 @@ struct TranslationsVersionUpdater {
         let isReachable = fileSystem.fileExists(at: translation.localPath)
         let previousInstalledVersion = translation.installedVersion
 
-        if isReachable, (previousInstalledVersion == nil || didUnzip) {
+        if isReachable, previousInstalledVersion == nil || didUnzip {
             translation.installedVersion = translation.version
         } else if translation.installedVersion != nil, !isReachable {
             translation.installedVersion = nil

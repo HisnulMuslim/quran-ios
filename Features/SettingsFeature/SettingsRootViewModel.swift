@@ -16,11 +16,11 @@ import QuranProfileService
 import ReadingSelectorFeature
 import SafariServices
 import SettingsService
+import SwiftUI
 import TranslationsFeature
 import UIKit
 import UIx
 import VLogging
-import SwiftUI
 
 @MainActor
 final class SettingsRootViewModel: ObservableObject {
@@ -144,6 +144,11 @@ final class SettingsRootViewModel: ObservableObject {
         let viewController = UIHostingController(rootView: AboutUsView())
         viewController.title = AppLanguage == .kannada ? "ನಮ್ಮ ಬಗ್ಗೆ" : "About Us"
         navigationController?.pushViewController(viewController, animated: true)
+    }
+
+    func writeAReview() {
+        logger.info("Settings: writeAReview")
+        reviewService.openAppReview()
     }
 
     func loginToQuranCom() async {

@@ -26,6 +26,7 @@ struct SettingsRootView: View {
             navigateToReadingSelector: { viewModel.navigateToReadingSelectors() },
             navigateToHelp: { viewModel.navigateToHelp() },
             navigateToAboutUs: { viewModel.navigateToAboutUs() },
+            writeAReview: { viewModel.writeAReview() },
             loginAction: { await viewModel.loginToQuranCom() }
         )
     }
@@ -43,6 +44,7 @@ private struct SettingsRootViewUI: View {
     let navigateToReadingSelector: AsyncAction
     let navigateToHelp: AsyncAction
     let navigateToAboutUs: AsyncAction
+    let writeAReview: AsyncAction
     let loginAction: AsyncAction
 
     var body: some View {
@@ -112,6 +114,13 @@ private struct SettingsRootViewUI: View {
                 )
 
                 NoorListItem(
+                    image: .init(.star),
+                    title: .text(AppLanguage == .kannada ? "ರೇಟ್ ಮಾಡಿ" : "Rate the App"),
+                    accessory: .disclosureIndicator,
+                    action: writeAReview
+                )
+
+                NoorListItem(
                     image: .init(.info), // Assuming .info exists, else we can change it later.
                     title: .text(AppLanguage == .kannada ? "ನಮ್ಮ ಬಗ್ಗೆ" : "About Us"),
                     accessory: .disclosureIndicator,
@@ -128,8 +137,6 @@ private struct SettingsRootViewUI: View {
                     )
                 }
             #endif
-
-
         }
     }
 }
@@ -150,6 +157,7 @@ struct SettingsRootView_Previews: PreviewProvider {
                 navigateToReadingSelector: {},
                 navigateToHelp: {},
                 navigateToAboutUs: {},
+                writeAReview: {},
                 loginAction: {}
             )
         }

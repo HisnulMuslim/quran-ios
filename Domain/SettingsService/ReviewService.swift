@@ -39,18 +39,17 @@ public struct ReviewService {
         if appOpenedCounter == 0 {
             persistence.appInstalledDate = Date()
         } else {
-            let requestReviewDate = persistence.requestReviewDate
+            let oldDate = persistence.requestReviewDate ?? persistence.appInstalledDate
+            let today = Date()
+            let difference = Calendar.current.dateComponents([.day], from: oldDate, to: today)
 
-            if requestReviewDate == nil {
-                let oldDate = persistence.appInstalledDate
-                let today = Date()
-                let difference = Calendar.current.dateComponents([.day], from: oldDate, to: today)
+            if let daysCount = difference.day {
+                let isFirstTimePrompt = persistence.requestReviewDate == nil && daysCount >= 7 && appOpenedCounter >= 10
+                let isPeriodicPrompt = persistence.requestReviewDate != nil && daysCount >= 90
 
-                if let daysCount = difference.day {
-                    if daysCount >= 7, appOpenedCounter >= 10 {
-                        requestReview(in: window)
-                        persistence.requestReviewDate = Date()
-                    }
+                if isFirstTimePrompt || isPeriodicPrompt {
+                    requestReview(in: window)
+                    persistence.requestReviewDate = Date()
                 }
             }
         }
@@ -60,7 +59,7 @@ public struct ReviewService {
     }
 
     public func openAppReview() {
-        let url = URL(validURL: "itms-apps://itunes.apple.com/app/id1118663303?action=write-review")
+        let url = URL(validURL: "itms-apps://itunes.apple.com/app/id6780201059?action=write-review")
         application.open(url)
         analytics.review(automatic: false)
     }

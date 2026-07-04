@@ -9,7 +9,11 @@ import NetworkSupport
 import QuranText
 
 struct TranslationNetworkManager {
-    static let path = "/data/api/translations.json"
+    #if DEBUG
+        static let path = "/data/api-test/translations.json"
+    #else
+        static let path = "/data/api/translations.json"
+    #endif
 
     let networkManager: NetworkManager
     let parser: TranslationsParser

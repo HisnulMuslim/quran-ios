@@ -7,8 +7,16 @@ struct AudioUpdatesNetworkManager {
 
     let networkManager: NetworkManager
 
+    static func path(revision: Int) -> String {
+        #if DEBUG
+            return "/data/api-test/audio_updates/audio_updates_v\(revision).json"
+        #else
+            return "/data/api/audio_updates/audio_updates_v\(revision).json"
+        #endif
+    }
+
     func getAudioUpdates(revision: Int) async throws -> AudioUpdates? {
-        let path = "/data/api/audio_updates/audio_updates_v\(revision).json"
+        let path = Self.path(revision: revision)
         do {
             let data = try await networkManager.request(path)
             return try parse(data: data)

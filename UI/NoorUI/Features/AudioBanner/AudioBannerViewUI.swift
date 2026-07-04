@@ -9,8 +9,14 @@ import Localization
 import SwiftUI
 import UIx
 
+public enum SleepTimerOption: Hashable, Sendable {
+    case off
+    case minutes(Int)
+    case endOfSurah
+}
+
 public enum AudioBannerState {
-    case playing(paused: Bool, rate: Float)
+    case playing(paused: Bool, rate: Float, sleepTimerOption: SleepTimerOption, sleepTimeRemaining: TimeInterval?)
     case readyToPlay(reciter: String)
     case downloading(progress: Double)
 }
@@ -26,6 +32,7 @@ public struct AudioBannerActions {
     let reciters: () -> Void
     let more: () -> Void
     let setPlaybackRate: (Float) -> Void
+    let setSleepTimer: (SleepTimerOption) -> Void
 
     public init(
         play: @escaping () -> Void,
@@ -37,7 +44,8 @@ public struct AudioBannerActions {
         cancelDownloading: @escaping AsyncAction,
         reciters: @escaping () -> Void,
         more: @escaping () -> Void,
-        setPlaybackRate: @escaping (Float) -> Void
+        setPlaybackRate: @escaping (Float) -> Void,
+        setSleepTimer: @escaping (SleepTimerOption) -> Void
     ) {
         self.play = play
         self.pause = pause
@@ -49,6 +57,7 @@ public struct AudioBannerActions {
         self.reciters = reciters
         self.more = more
         self.setPlaybackRate = setPlaybackRate
+        self.setSleepTimer = setSleepTimer
     }
 }
 
@@ -63,8 +72,14 @@ public struct AudioBannerViewUI: View {
     public var body: some View {
         ZStack {
             switch state {
-            case .playing(let paused, let rate):
-                AudioPlaying(paused: paused, currentRate: rate, actions: actions)
+            case .playing(let paused, let rate, let sleepTimerOption, let sleepTimeRemaining):
+                AudioPlaying(
+                    paused: paused,
+                    currentRate: rate,
+                    sleepTimerOption: sleepTimerOption,
+                    sleepTimeRemaining: sleepTimeRemaining,
+                    actions: actions
+                )
             case .readyToPlay(let reciter):
                 ReadyToPlay(reciter: reciter, actions: actions)
             case .downloading(let progress):
@@ -94,9 +109,17 @@ private func formattedSpeed(_ rate: Float) -> String {
     return speedFormatter.format(rate) + "×"
 }
 
+private func formatTimeRemaining(_ time: TimeInterval) -> String {
+    let minutes = Int(time) / 60
+    let seconds = Int(time) % 60
+    return String(format: "%d:%02d", minutes, seconds)
+}
+
 private struct AudioPlaying: View {
     let paused: Bool
     let currentRate: Float
+    let sleepTimerOption: SleepTimerOption
+    let sleepTimeRemaining: TimeInterval?
     let actions: AudioBannerActions
 
     var body: some View {
@@ -117,6 +140,46 @@ private struct AudioPlaying: View {
                     .padding(.vertical, 6)
                     .background(Color(.systemGray5))
                     .clipShape(Capsule())
+            }
+            .padding(.leading, 4)
+
+            // Sleep Timer Menu
+            Menu {
+                Button(l("audio.sleep_timer.off")) { actions.setSleepTimer(.off) }
+                Button(lFormat("audio.sleep_timer.minutes", 5)) { actions.setSleepTimer(.minutes(5)) }
+                Button(lFormat("audio.sleep_timer.minutes", 10)) { actions.setSleepTimer(.minutes(10)) }
+                Button(lFormat("audio.sleep_timer.minutes", 15)) { actions.setSleepTimer(.minutes(15)) }
+                Button(lFormat("audio.sleep_timer.minutes", 30)) { actions.setSleepTimer(.minutes(30)) }
+                Button(lFormat("audio.sleep_timer.minutes", 45)) { actions.setSleepTimer(.minutes(45)) }
+                Button(lFormat("audio.sleep_timer.minutes", 60)) { actions.setSleepTimer(.minutes(60)) }
+                Button(l("audio.sleep_timer.end_of_surah")) { actions.setSleepTimer(.endOfSurah) }
+            } label: {
+                if let remaining = sleepTimeRemaining {
+                    HStack(spacing: 2) {
+                        NoorSystemImage.sleepActive.image
+                        Text(formatTimeRemaining(remaining))
+                            .font(.caption2.monospacedDigit())
+                    }
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 6)
+                    .background(Color.accentColor.opacity(0.15))
+                    .clipShape(Capsule())
+                    .foregroundColor(.accentColor)
+                } else if case .endOfSurah = sleepTimerOption {
+                    HStack(spacing: 2) {
+                        NoorSystemImage.sleepActive.image
+                        Text("Surah")
+                            .font(.caption2)
+                    }
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 6)
+                    .background(Color.accentColor.opacity(0.15))
+                    .clipShape(Capsule())
+                    .foregroundColor(.accentColor)
+                } else {
+                    NoorSystemImage.sleep.image
+                        .padding()
+                }
             }
             .padding(.leading, 4)
 
@@ -242,11 +305,12 @@ private struct BannerBackground: View {
             cancelDownloading: {},
             reciters: {},
             more: {},
-            setPlaybackRate: { _ in }
+            setPlaybackRate: { _ in },
+            setSleepTimer: { _ in }
         )
 
         let readyToPlay = AudioBannerState.readyToPlay(reciter: "Mishary Al-afasy")
-        let playing = AudioBannerState.playing(paused: false, rate: 1.0)
+        let playing = AudioBannerState.playing(paused: false, rate: 1.0, sleepTimerOption: .off, sleepTimeRemaining: nil)
         let downloading = AudioBannerState.downloading(progress: 0.7)
         var state: AudioBannerState {
             switch counter % 3 {

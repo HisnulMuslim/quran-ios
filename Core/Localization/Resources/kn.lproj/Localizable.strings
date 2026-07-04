@@ -94,6 +94,17 @@
 "audio.playing.message" = "%@ ನಿಂದ %@ ವರೆಗೆ ಆಡಿಯೋ ಪ್ಲೇ ಆಗುತ್ತಿದೆ";
 "audio.downloading.message" = "%@ ನಿಂದ %@ ವರೆಗೆ ಆಡಿಯೋ ಡೌನ್‌ಲೋಡ್ ಆಗುತ್ತಿದೆ";
 
+"audio.sleep_timer.off" = "ಆಫ್";
+"audio.sleep_timer.minutes" = "%d ನಿಮಿಷಗಳು";
+"audio.sleep_timer.end_of_surah" = "ಸೂರಾದ ಕೊನೆಯಲ್ಲಿ";
+
+"update.mandatory.title" = "ನವೀಕರಣ ಅಗತ್ಯವಿದೆ";
+"update.mandatory.message" = "ಮುಂದುವರಿಯಲು ಅಪ್ಲಿಕೇಶನ್‌ನ ಹೊಸ ಆವೃತ್ತಿಯ ಅಗತ್ಯವಿದೆ. ದಯವಿಟ್ಟು ಇತ್ತೀಚಿನ ಆವೃತ್ತಿಗೆ ನವೀಕರಿಸಿ.";
+"update.optional.title" = "ನವೀಕರಣ ಲಭ್ಯವಿದೆ";
+"update.optional.message" = "ಅಪ್ಲಿಕೇಶನ್‌ನ ಹೊಸ ಆವೃತ್ತಿ ಲಭ್ಯವಿದೆ. ನೀವು ಈಗ ನವೀಕರಿಸಲು ಬಯಸುವಿರಾ?";
+"update.action.update" = "ನವೀಕರಿಸಿ";
+"update.action.skip" = "ನಂತರ";
+
 "audio.playing-verses.label" = "ಆಡಿಯೋ ಆಯತ್‌ಗಳು";
 "audio.adjust-end-verse-to-the-end.label" = "ಕೊನೆಯ ಆಯತ್‌ಗೆ ಸರಿಹೊಂದಿಸಿ";
 

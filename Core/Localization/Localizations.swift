@@ -57,12 +57,12 @@ public func l(_ key: String, table: Table = .localizable, language: Language? = 
     if let language {
         return localizedString(key, table: table, language: language)
     }
-    
+
     // Always fall back to the selected `AppLanguage` first!
     if let appLangValue = optionalLocalizedString(key, table: table, language: AppLanguage), appLangValue != key {
         return appLangValue
     }
-    
+
     // If not found in user's preferred language, fallback to English natively.
     return localizedString(key, table: table, language: .english)
 }

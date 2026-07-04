@@ -5,15 +5,15 @@
 //  Created by Antigravity on 2026-06-25.
 //
 
-import XCTest
-import QuranText
-import TranslationPersistence
-import VerseTextPersistence
 import BatchDownloaderFake
 import NetworkSupportFake
+import QuranText
 import SystemDependenciesFake
+import TranslationPersistence
 import TranslationServiceFake
 import Utilities
+import VerseTextPersistence
+import XCTest
 @testable import BatchDownloader
 @testable import NetworkSupport
 @testable import TranslationService
@@ -34,14 +34,14 @@ class TranslationsUpdaterTests: XCTestCase {
         persistence = GRDBActiveTranslationsPersistence(directory: uniqueDatabasesURL)
 
         testContext = BatchDownloaderFake.makeContext()
-        
+
         let expectation = expectation(description: "Downloader Setup")
         Task {
             (batchDownloader, downloaderSession) = await testContext.makeDownloader(fileManager: fileSystem)
             expectation.fulfill()
         }
         wait(for: [expectation], timeout: 5)
-        
+
         downloader = TranslationsDownloader(downloader: batchDownloader)
 
         repository = TranslationsRepository(
@@ -257,6 +257,7 @@ private final class FakeTranslationUnzipper: TranslationUnzipper, @unchecked Sen
     init(didUnzip: Bool) {
         self.didUnzip = didUnzip
     }
+
     func unzipIfNeeded(_ translation: Translation) throws -> Bool {
         didUnzip
     }

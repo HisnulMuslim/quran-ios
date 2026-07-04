@@ -5,12 +5,12 @@
 //  Created by Antigravity on 2026-06-25.
 //
 
-import Foundation
-import UserNotifications
-import VLogging
 import Crashing
+import Foundation
 import Localization
 import QuranText
+import UserNotifications
+import VLogging
 
 public protocol TranslationUpdateNotifier: Sendable {
     func requestAuthorization() async -> Bool
@@ -70,7 +70,7 @@ public final class TranslationsUpdater {
 
     public func updateTranslationsIfNeeded(bypassThrottle: Bool = false) async {
         logger.info("TranslationsUpdater: Checking for translation updates...")
-        
+
         if !bypassThrottle {
             if let lastChecked = preferences.lastChecked {
                 let timePassed = Date().timeIntervalSince(lastChecked)
@@ -84,7 +84,7 @@ public final class TranslationsUpdater {
         do {
             // 1. Sync remote translations
             try await translationsRepository.downloadAndSyncTranslations()
-            
+
             // Update last checked time on a successful check
             preferences.lastChecked = Date()
 
@@ -117,7 +117,7 @@ public final class TranslationsUpdater {
                     for try await _ in response.progress {
                         // Wait for the download to complete
                     }
-                    
+
                     // Unzip and update version
                     let updated = try await localTranslationsRetriever.getLocalTranslations()
                     if let newVersion = updated.first(where: { $0.id == translation.id }), !newVersion.needsUpgrade {

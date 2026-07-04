@@ -17,7 +17,7 @@ public class AudioPreferences {
 
     public static let shared = AudioPreferences()
 
-    @TransformedPreference(audioEndKey, transformer: .rawRepresentable(defaultValue: .sura))
+    @TransformedPreference(audioEndKey, transformer: .rawRepresentable(defaultValue: .juz))
     public var audioEnd: AudioEnd
 
     @Preference(audioPlaybackRateKey)
@@ -25,6 +25,6 @@ public class AudioPreferences {
 
     // MARK: Private
 
-    private static let audioEndKey = PreferenceKey<Int>(key: "audioEndKey", defaultValue: AudioEnd.sura.rawValue)
+    private static let audioEndKey = PreferenceKey<Int>(key: "audioEndKey", defaultValue: AudioEnd.juz.rawValue)
     private static let audioPlaybackRateKey = PreferenceKey<Float>(key: "audioPlaybackRate", defaultValue: 1.0)
 }

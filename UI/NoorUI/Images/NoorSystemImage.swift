@@ -29,6 +29,8 @@ public enum NoorSystemImage: String {
     case stop = "stop.fill"
     case pause = "pause.fill"
     case more = "ellipsis.circle"
+    case sleep = "moon"
+    case sleepActive = "moon.fill"
     case backward = "backward.fill"
     case forward = "forward.fill"
     case cancel = "xmark"

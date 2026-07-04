@@ -40,7 +40,7 @@ public extension Font {
         case .caption2: 13
         @unknown default: 19
         }
-        
+
         switch selection {
         case "kohinoor":
             let fontName = isBold ? "KohinoorKannada-SemiBold" : "KohinoorKannada-Regular"

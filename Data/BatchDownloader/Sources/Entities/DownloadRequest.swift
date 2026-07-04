@@ -69,7 +69,7 @@ extension NetworkSession {
         if let data = try? Data(contentsOf: request.resumePath) {
             return downloadTask(withResumeData: data)
         } else {
-            return downloadTask(with: request.request)  // Uses Referer-injected URLRequest
+            return downloadTask(with: request.request) // Uses Referer-injected URLRequest
         }
     }
 }

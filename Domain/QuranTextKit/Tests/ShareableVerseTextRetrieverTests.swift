@@ -15,8 +15,6 @@ import XCTest
 final class ShareableVerseTextRetrieverTests: XCTestCase {
     // MARK: Internal
 
-    private var previousLanguage: String?
-
     override func setUp() async throws {
         try await super.setUp()
         previousLanguage = UserDefaults.standard.string(forKey: "AppLanguage")
@@ -86,7 +84,7 @@ final class ShareableVerseTextRetrieverTests: XCTestCase {
         for var test in tests {
             if test.verses.count > 1 {
                 test.result = [
-                    "\(rightToLeftMark)بِسۡمِ ٱللَّهِ ٱلرَّحۡمَـٰنِ ٱلرَّحِیمِ\(endMark) ۩ \(rightToLeftMark)ٱلۡحَمۡದು ಲೆಲ್ಲಾಹಿ ರಬ್ಬಿಲ್ ಆಲಮೀನ್...\(endMark) ۩ \(rightToLeftMark)ಅರ್ರಹ್ಮಾನ್...\(endMark) ۩"
+                    "\(rightToLeftMark)بِسۡمِ ٱللَّهِ ٱلرَّحۡمَـٰنِ ٱلرَّحِیمِ\(endMark) ۩ \(rightToLeftMark)ٱلۡحَمۡದು ಲೆಲ್ಲಾಹಿ ರಬ್ಬಿಲ್ ಆಲಮೀನ್...\(endMark) ۩ \(rightToLeftMark)ಅರ್ರಹ್ಮಾನ್...\(endMark) ۩",
                 ]
                 // We'll replace it dynamically below to avoid encoding differences
             }
@@ -172,7 +170,7 @@ final class ShareableVerseTextRetrieverTests: XCTestCase {
         sharePrefs.showNotes = false
 
         let versesText = try await shareableTextRetriever.textForVerses([quran.suras[0].verses[0], quran.suras[0].verses[1]])
-        
+
         XCTAssertEqual(versesText.count, 12)
         XCTAssertFalse(versesText[0].contains("﴿"))
         XCTAssertEqual(versesText[1], TestData.translationTextAt(translations[0], quran.suras[0].verses[0]))
@@ -189,13 +187,15 @@ final class ShareableVerseTextRetrieverTests: XCTestCase {
         sharePrefs.showNotes = false
 
         let versesText = try await shareableTextRetriever.textForVerses([quran.suras[0].verses[0]])
-        
+
         XCTAssertEqual(versesText.count, 8)
         XCTAssertTrue(versesText[0].hasPrefix("1. "))
         XCTAssertEqual(versesText[4], "[Surah Al-Fātihah: 1]")
     }
 
     // MARK: Private
+
+    private var previousLanguage: String?
 
     private var shareableTextRetriever: ShareableVerseTextRetriever!
     private var textService: QuranTextDataService!

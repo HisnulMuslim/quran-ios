@@ -63,7 +63,7 @@ public struct ShareableVerseTextRetriever {
 
             for verse in verses {
                 var ayahLine = ""
-                
+
                 // Prepend Ayah number in Western digits if enabled
                 if wantInlineAyahNumbers && includeTranslation {
                     ayahLine += "\(verse.ayah). "
@@ -86,7 +86,7 @@ public struct ShareableVerseTextRetriever {
                             }
                         }
                     }
-                    
+
                     result.append("")
                 } else {
                     // No translation or grouped, use ۩ separator
@@ -135,6 +135,9 @@ public struct ShareableVerseTextRetriever {
 
     // MARK: Private
 
+    private static let rightToLeftMark = "\u{202B}"
+    private static let endMark = "\u{202C}"
+
     private let preferences = QuranContentStatePreferences.shared
     private let selectedTranslationsPreferences = SelectedTranslationsPreferences.shared
     private let textService: QuranTextDataService
@@ -149,9 +152,6 @@ public struct ShareableVerseTextRetriever {
         }
         return "Surah \(suraName): \(first.ayah)-\(verses.last!.ayah)"
     }
-
-    private static let rightToLeftMark = "\u{202B}"
-    private static let endMark = "\u{202C}"
 
     private func arabicText(for verse: AyahNumber) async throws -> String {
         // Avoid the arabic text to be displayed in the wrong direction in LTR languages
@@ -218,7 +218,7 @@ public struct ShareableVerseTextRetriever {
         var cleanText = ""
         var currentIndex = string.text.startIndex
         for range in string.footnoteRanges {
-            cleanText.append(contentsOf: string.text[currentIndex..<range.lowerBound])
+            cleanText.append(contentsOf: string.text[currentIndex ..< range.lowerBound])
             currentIndex = range.upperBound
         }
         cleanText.append(contentsOf: string.text[currentIndex...])

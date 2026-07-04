@@ -160,13 +160,12 @@ final class TranslationsListViewModel: ObservableObject {
     @Published private var progress: [Translation: Double] = [:]
 
     private func translationItem(_ translation: Translation) -> TranslationItem {
-        let itemProgress: TranslationItem.DownloadingProgress
-        if let currentProgress = progress[translation] {
-            itemProgress = .downloading(currentProgress)
+        let itemProgress: TranslationItem.DownloadingProgress = if let currentProgress = progress[translation] {
+            .downloading(currentProgress)
         } else if translation.needsUpgrade {
-            itemProgress = .needsUpgrade
+            .needsUpgrade
         } else {
-            itemProgress = .notDownloading
+            .notDownloading
         }
         return TranslationItem(
             info: translation,

@@ -10,7 +10,7 @@ import UIKit
 public final class SplashViewController: UIViewController {
     // MARK: Public
 
-    public override func viewDidLoad() {
+    override public func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .black
 

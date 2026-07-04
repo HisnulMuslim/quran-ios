@@ -1,7 +1,7 @@
-import SwiftUI
 import Localization
-import UIx
 import NoorUI
+import SwiftUI
+import UIx
 
 struct HelpView: View {
     private struct FAQ: Identifiable {
@@ -16,7 +16,7 @@ struct HelpView: View {
             FAQ(id: 2, question: lAndroid("help_q2_question"), answer: lAndroid("help_q2_answer")),
             FAQ(id: 3, question: lAndroid("help_q3_question"), answer: lAndroid("help_q3_answer")),
             FAQ(id: 4, question: lAndroid("help_q4_question"), answer: lAndroid("help_q4_answer")),
-            FAQ(id: 5, question: lAndroid("help_q5_question"), answer: lAndroid("help_q5_answer"))
+            FAQ(id: 5, question: lAndroid("help_q5_question"), answer: lAndroid("help_q5_answer")),
         ]
     }
 
@@ -28,7 +28,7 @@ struct HelpView: View {
                     subtitle: .init(text: faq.answer, location: .bottom)
                 )
             }
-            
+
             NoorBasicSection(footer: lAndroid("help_footer_contact_text")) {
                 NoorListItem(
                     title: .text("hmkannada@gmail.com"),

@@ -2,7 +2,7 @@
 //  SharePreferences.swift
 //  Quran
 //
-//  
+//
 //
 
 import Preferences
