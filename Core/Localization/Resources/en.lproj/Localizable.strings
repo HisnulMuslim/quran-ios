@@ -236,3 +236,9 @@
 "translation.update.notification.title" = "Translation Updated";
 "translation.update.notification.body" = "The translation '%@' has been updated to the latest version.";
 
+// Display Modes
+"menu.displayMode" = "Display Mode";
+"menu.displayMode.both" = "Arabic & Translation";
+"menu.displayMode.arabicOnly" = "Arabic Only";
+"menu.displayMode.translationOnly" = "Translation Only";
+

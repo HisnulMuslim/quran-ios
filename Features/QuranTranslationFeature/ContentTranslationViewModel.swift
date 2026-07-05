@@ -32,6 +32,7 @@ public final class ContentTranslationViewModel: ObservableObject {
         arabicFontSize = fontSizePreferences.arabicFontSize
         translationFontSize = fontSizePreferences.translationFontSize
         translationFont = fontSizePreferences.translationFont
+        translationViewMode = quranContentStatePreferences.translationViewMode
         selectedTranslations = selectedTranslationsPreferences.selectedTranslationIds
         highlights = highlightsService.highlights.versesByHighlights().mapValues { Color($0) }
 
@@ -57,6 +58,10 @@ public final class ContentTranslationViewModel: ObservableObject {
             .sink { [weak self] in self?.arabicFontSize = $0 }
             .store(in: &cancellables)
 
+        quranContentStatePreferences.$translationViewMode
+            .sink { [weak self] in self?.translationViewMode = $0 }
+            .store(in: &cancellables)
+
         selectedTranslationsPreferences.$selectedTranslationIds
             .sink { [weak self] in self?.selectedTranslations = $0 }
             .store(in: &cancellables)
@@ -79,6 +84,7 @@ public final class ContentTranslationViewModel: ObservableObject {
     @Published var translationFontSize: FontSize
     @Published var translationFont: TranslationFont
     @Published var arabicFontSize: FontSize
+    @Published var translationViewMode: TranslationViewMode
 
     @Published var highlights: [AyahNumber: Color]
 
@@ -105,70 +111,74 @@ public final class ContentTranslationViewModel: ObservableObject {
             }
 
             // Add arabic quran text
-            let arabicVerseNumber = NumberFormatter.arabicNumberFormatter.format(verse.ayah)
-            let arabicText = verseText.arabicText + " " + arabicVerseNumber
-            items.append(.arabicText(TranslationArabicText(verse: verse, text: arabicText, arabicFontSize: arabicFontSize), color))
+            if translationViewMode == .both || translationViewMode == .arabicOnly {
+                let arabicVerseNumber = NumberFormatter.arabicNumberFormatter.format(verse.ayah)
+                let arabicText = verseText.arabicText + " " + arabicVerseNumber
+                items.append(.arabicText(TranslationArabicText(verse: verse, text: arabicText, arabicFontSize: arabicFontSize), color))
+            }
 
-            for (index, translation) in translations.enumerated() {
-                let text = verseText.translations[index]
+            if translationViewMode == .both || translationViewMode == .translationOnly {
+                for (index, translation) in translations.enumerated() {
+                    let text = verseText.translations[index]
 
-                switch text {
-                case .reference(let reference):
-                    items.append(
-                        .translationReferenceVerse(
-                            TranslationReferenceVerse(
-                                verse: verse,
-                                translation: translation,
-                                reference: reference,
-                                translationFontSize: translationFontSize
-                            ), color
-                        )
-                    )
-                case .string(let string):
-                    let chunks: [Range<String.Index>]
-                    let readMore: Bool
-                    if let cutoffChunk = cutoffChunkIfTruncationNeeded(string.text) {
-                        if let expandedChunks = expandedChunks(verse: verse, translation: translation) {
-                            chunks = expandedChunks
-                            readMore = false
-                        } else {
-                            chunks = [cutoffChunk]
-                            readMore = true
-                        }
-                    } else {
-                        chunks = [string.text.startIndex ..< string.text.endIndex]
-                        readMore = false
-                    }
-
-                    for chunkIndex in 0 ..< chunks.count {
+                    switch text {
+                    case .reference(let reference):
                         items.append(
-                            .translationTextChunk(
-                                TranslationTextChunk(
+                            .translationReferenceVerse(
+                                TranslationReferenceVerse(
                                     verse: verse,
                                     translation: translation,
-                                    text: string,
-                                    chunks: chunks,
-                                    chunkIndex: chunkIndex,
-                                    readMore: chunkIndex == chunks.count - 1 ? readMore : false, // Add read more to the last chunk.
-                                    translationFontSize: translationFontSize,
-                                    translationFont: translationFont
+                                    reference: reference,
+                                    translationFontSize: translationFontSize
+                                ), color
+                            )
+                        )
+                    case .string(let string):
+                        let chunks: [Range<String.Index>]
+                        let readMore: Bool
+                        if let cutoffChunk = cutoffChunkIfTruncationNeeded(string.text) {
+                            if let expandedChunks = expandedChunks(verse: verse, translation: translation) {
+                                chunks = expandedChunks
+                                readMore = false
+                            } else {
+                                chunks = [cutoffChunk]
+                                readMore = true
+                            }
+                        } else {
+                            chunks = [string.text.startIndex ..< string.text.endIndex]
+                            readMore = false
+                        }
+
+                        for chunkIndex in 0 ..< chunks.count {
+                            items.append(
+                                .translationTextChunk(
+                                    TranslationTextChunk(
+                                        verse: verse,
+                                        translation: translation,
+                                        text: string,
+                                        chunks: chunks,
+                                        chunkIndex: chunkIndex,
+                                        readMore: chunkIndex == chunks.count - 1 ? readMore : false, // Add read more to the last chunk.
+                                        translationFontSize: translationFontSize,
+                                        translationFont: translationFont
+                                    ), color
+                                )
+                            )
+                        }
+                    }
+
+                    // Show translator if showing more than a single translation.
+                    if translations.count > 1 {
+                        items.append(
+                            .translatorText(
+                                TranslatorText(
+                                    verse: verse,
+                                    translation: translation,
+                                    translationFontSize: translationFontSize
                                 ), color
                             )
                         )
                     }
-                }
-
-                // Show translator if showing more than a single translation.
-                if translations.count > 1 {
-                    items.append(
-                        .translatorText(
-                            TranslatorText(
-                                verse: verse,
-                                translation: translation,
-                                translationFontSize: translationFontSize
-                            ), color
-                        )
-                    )
                 }
             }
 
@@ -226,6 +236,7 @@ public final class ContentTranslationViewModel: ObservableObject {
     private let localTranslationsRetriever: LocalTranslationsRetriever
     private let selectedTranslationsPreferences = SelectedTranslationsPreferences.shared
     private let fontSizePreferences = FontSizePreferences.shared
+    private let quranContentStatePreferences = QuranContentStatePreferences.shared
 
     private func cutoffChunkIfTruncationNeeded(_ string: String) -> Range<String.Index>? {
         guard let maxUntruncatedIndex = string.index(string.startIndex, offsetBy: Self.maxChunkSize, limitedBy: string.endIndex) else {

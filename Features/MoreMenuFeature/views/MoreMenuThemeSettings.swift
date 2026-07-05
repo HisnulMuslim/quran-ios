@@ -134,11 +134,12 @@ private struct MoreMenuThemeSettingsView: View {
     @State private var arabicLabelSize: CGSize = .zero
     @State private var translationLabelSize: CGSize = .zero
     @State private var fontLabelSize: CGSize = .zero
+    @State private var displayModeLabelSize: CGSize = .zero
 
     @ScaledMetric var compactVerticalPadding = 3.0
 
     var fontSizeLabelWidth: CGFloat {
-        max(arabicLabelSize.width, translationLabelSize.width, fontLabelSize.width)
+        max(arabicLabelSize.width, translationLabelSize.width, fontLabelSize.width, displayModeLabelSize.width)
     }
 
     var body: some View {
@@ -191,6 +192,27 @@ private struct MoreMenuThemeSettingsView: View {
                                 Text(localizedName(for: font))
                             }
                         }
+
+                        Divider()
+                            .padding(.vertical, compactVerticalPadding)
+
+                        HStack(spacing: 30) {
+                            Text(l("menu.displayMode"))
+                                .fixedSize()
+                                .onSizeChange {
+                                    displayModeLabelSize = $0
+                                }
+                                .frame(width: fontSizeLabelWidth, alignment: .leading)
+
+                            Spacer()
+
+                            DropdownButton(
+                                items: TranslationViewMode.allCases,
+                                selectedItem: $viewModel.translationViewMode
+                            ) { mode in
+                                Text(localizedName(for: mode))
+                            }
+                        }
                     }
 
                     Divider()
@@ -222,6 +244,17 @@ private struct MoreMenuThemeSettingsView: View {
             return lAndroid("menu_translation_font_kohinoor")
         case .system:
             return lAndroid("menu_translation_font_system")
+        }
+    }
+
+    private func localizedName(for mode: TranslationViewMode) -> String {
+        switch mode {
+        case .both:
+            return l("menu.displayMode.both")
+        case .arabicOnly:
+            return l("menu.displayMode.arabicOnly")
+        case .translationOnly:
+            return l("menu.displayMode.translationOnly")
         }
     }
 }

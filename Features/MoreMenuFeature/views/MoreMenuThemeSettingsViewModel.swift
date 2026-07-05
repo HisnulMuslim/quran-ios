@@ -13,16 +13,7 @@ import VLogging
 
 @MainActor
 final class MoreMenuThemeSettingsViewModel: ObservableObject {
-    private var cancellables: Set<AnyCancellable> = []
-
-    private let themeService = ThemeService.shared
-    @Published var themeStyle: ThemeStyle
-    @Published var appearanceMode: AppearanceMode
-
-    private let fontSizePreferences = FontSizePreferences.shared
-    @Published var arabicFontSize: FontSize
-    @Published var translationFontSize: FontSize
-    @Published var translationFont: TranslationFont
+    // MARK: Lifecycle
 
     init() {
         themeStyle = themeService.themeStyle
@@ -31,6 +22,7 @@ final class MoreMenuThemeSettingsViewModel: ObservableObject {
         translationFontSize = fontSizePreferences.translationFontSize
         arabicFontSize = fontSizePreferences.arabicFontSize
         translationFont = fontSizePreferences.translationFont
+        translationViewMode = contentStatePreferences.translationViewMode
 
         $themeStyle
             .dropFirst()
@@ -71,5 +63,31 @@ final class MoreMenuThemeSettingsViewModel: ObservableObject {
                 self?.fontSizePreferences.translationFont = newValue
             }
             .store(in: &cancellables)
+
+        $translationViewMode
+            .dropFirst()
+            .sink { [weak self] newValue in
+                logger.info("More Menu: set translation view mode \(newValue)")
+                self?.contentStatePreferences.translationViewMode = newValue
+            }
+            .store(in: &cancellables)
     }
+
+    // MARK: Internal
+
+    @Published var themeStyle: ThemeStyle
+    @Published var appearanceMode: AppearanceMode
+
+    @Published var arabicFontSize: FontSize
+    @Published var translationFontSize: FontSize
+    @Published var translationFont: TranslationFont
+    @Published var translationViewMode: TranslationViewMode
+
+    // MARK: Private
+
+    private var cancellables: Set<AnyCancellable> = []
+
+    private let themeService = ThemeService.shared
+    private let fontSizePreferences = FontSizePreferences.shared
+    private let contentStatePreferences = QuranContentStatePreferences.shared
 }

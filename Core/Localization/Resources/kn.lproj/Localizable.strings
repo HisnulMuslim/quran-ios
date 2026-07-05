@@ -225,3 +225,9 @@
 // Translation Update Notification
 "translation.update.notification.title" = "ಅನುವಾದವನ್ನು ನವೀಕರಿಸಲಾಗಿದೆ";
 "translation.update.notification.body" = "'%@' ಅನುವಾದವನ್ನು ಇತ್ತೀಚಿನ ಆವೃತ್ತಿಗೆ ಯಶಸ್ವಿಯಾಗಿ ನವೀಕರಿಸಲಾಗಿದೆ.";
+
+// Display Modes
+"menu.displayMode" = "ಪ್ರದರ್ಶನ ಮೋಡ್";
+"menu.displayMode.both" = "ಅರೇಬಿಕ್ ಮತ್ತು ಅನುವಾದ";
+"menu.displayMode.arabicOnly" = "ಅರೇಬಿಕ್ ಮಾತ್ರ";
+"menu.displayMode.translationOnly" = "ಅನುವಾದ ಮಾತ್ರ";
