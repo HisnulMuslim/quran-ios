@@ -54,12 +54,7 @@ public struct AdaptiveQuranScrollView<Header: View, Footer: View, Content: View>
 
     @ViewBuilder
     private func scrollView(@ViewBuilder content: () -> some View) -> some View {
-        if #available(iOS 16.4, *) {
-            ScrollView(content: content)
-                .scrollBounceBehavior(.basedOnSize)
-        } else {
-            ScrollView(content: content)
-        }
+        ZoomableScrollView(content: content)
     }
 
     private func availableContentSize(from geometry: GeometryProxy) -> CGSize {

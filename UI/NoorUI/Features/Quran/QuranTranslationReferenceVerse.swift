@@ -14,22 +14,36 @@ import UIx
 public struct QuranTranslationReferenceVerse: View {
     @ScaledMetric var topPadding = 10
 
+    let ayahNumber: AyahNumber?
     let reference: AyahNumber
     let fontSize: FontSize
     let characterDirection: Locale.LanguageDirection
 
-    public init(reference: AyahNumber, fontSize: FontSize, characterDirection: Locale.LanguageDirection) {
+    public init(ayahNumber: AyahNumber? = nil, reference: AyahNumber, fontSize: FontSize, characterDirection: Locale.LanguageDirection) {
+        self.ayahNumber = ayahNumber
         self.reference = reference
         self.fontSize = fontSize
         self.characterDirection = characterDirection
     }
 
     public var body: some View {
-        Text(lFormat("translation.text.see-referenced-verse", reference.ayah))
-            .font(.body)
-            .dynamicTypeSize(fontSize.dynamicTypeSize)
-            .textAlignment(follows: characterDirection)
-            .padding(.top, topPadding)
-            .readableInsetsPadding(.horizontal)
+        HStack(alignment: .center, spacing: 8) {
+            if let ayahNumber {
+                Text(lFormat("translation.text.ayah-number", ayahNumber.sura.suraNumber, ayahNumber.ayah))
+                    .font(.system(size: max(11, min(16, fontSize.translationFontSize * 0.62)), weight: .semibold, design: .monospaced))
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 3)
+                    .themedSecondaryForeground()
+                    .themedSecondaryBackground()
+                    .cornerRadius(5)
+            }
+            Text(lFormat("translation.text.see-referenced-verse", reference.ayah))
+                .font(.body)
+                .dynamicTypeSize(fontSize.translationDynamicTypeSize)
+                .themedSecondaryForeground()
+        }
+        .textAlignment(follows: characterDirection)
+        .padding(.top, topPadding)
+        .readableInsetsPadding(.horizontal)
     }
 }

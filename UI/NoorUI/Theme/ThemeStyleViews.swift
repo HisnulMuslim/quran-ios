@@ -130,7 +130,7 @@ private extension UIColor {
 }
 
 extension ThemeStyle {
-    var textColor: UIColor {
+    public var textColor: UIColor {
         switch self {
         case .calm: .themeCalmText
         case .focus: .themeFocusText
@@ -140,7 +140,7 @@ extension ThemeStyle {
         }
     }
 
-    var secondaryTextColor: UIColor {
+    public var secondaryTextColor: UIColor {
         switch self {
         case .calm: .themeCalmSecondaryText
         case .focus: .themeFocusSecondaryText
@@ -160,7 +160,7 @@ extension ThemeStyle {
         }
     }
 
-    var secondaryBackgroundColor: UIColor {
+    public var secondaryBackgroundColor: UIColor {
         switch self {
         case .calm: .themeCalmSecondaryBackground
         case .focus: .themeFocusSecondaryBackground
@@ -170,7 +170,7 @@ extension ThemeStyle {
         }
     }
 
-    var pageSeparatorBackground: UIColor {
+    public var pageSeparatorBackground: UIColor {
         switch self {
         case .calm: .themeCalmPageSeparatorBackground
         case .focus: .themeFocusPageSeparatorBackground
@@ -180,13 +180,22 @@ extension ThemeStyle {
         }
     }
 
-    var pageSeparatorLine: UIColor {
+    public var pageSeparatorLine: UIColor {
         switch self {
         case .calm: .themeCalmPageSeparatorLine
         case .focus: .themeFocusPageSeparatorLine
         case .original: .themeOriginalPageSeparatorLine
         case .paper: .themePaperPageSeparatorLine
         case .quiet: .themeQuietPageSeparatorLine
+        }
+    }
+
+    public var statusBarStyle: UIStatusBarStyle {
+        switch self {
+        case .original, .paper, .calm, .focus:
+            return .darkContent
+        case .quiet:
+            return .lightContent
         }
     }
 }

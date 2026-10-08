@@ -15,109 +15,108 @@ struct FontSizeStepper: View {
     // MARK: Internal
 
     @Binding var fontSize: FontSize
-    let range = Array(FontSize.allCases.sorted().reversed())
+    let range = FontSize.supportedRange
 
     @ScaledMetric var cornerRadius = Dimensions.cornerRadius
     @ScaledMetric var defaultSpacing = 5
     @ScaledMetric var dotsSpacing = 8
 
     var body: some View {
-        VStack(spacing: defaultSpacing) {
+        VStack(spacing: 8) {
             HStack(spacing: 0) {
-                // Decrease button (smaller A)
-                stepperButton {
-                    guard currentSizeIndex > 0 else {
+                // Decrease button (minus)
+                stepperButton(systemName: "minus") {
+                    let index = currentSizeIndex
+                    guard index > 0 else {
                         logger.error("FontSizeStepper: Cannot decrease font size beyond 0 index.")
                         return
                     }
-                    fontSize = range[currentSizeIndex - 1]
+                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                    fontSize = range[index - 1]
                 }
-                .font(.body)
                 .disabled(currentSizeIndex == 0)
 
                 Divider()
 
-                // Increase button (larger A)
-                stepperButton {
-                    guard currentSizeIndex < range.count - 1 else {
+                // Increase button (plus)
+                stepperButton(systemName: "plus") {
+                    let index = currentSizeIndex
+                    guard index < range.count - 1 else {
                         logger.error("FontSizeStepper: Cannot increase font size beyond \(range.count - 1) index.")
                         return
                     }
-                    fontSize = range[currentSizeIndex + 1]
+                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                    fontSize = range[index + 1]
                 }
-                .font(.title2)
-                .disabled(currentSizeIndex == range.count - 1)
+                .disabled(currentSizeIndex >= range.count - 1)
             }
-            .padding(.vertical, defaultSpacing)
+            .frame(height: 32)
             .background(
                 RoundedRectangle(cornerRadius: cornerRadius)
-                    .fill(Color.systemGray5)
+                    .fill(Color(uiColor: .tertiarySystemFill))
             )
             .fixedSize(horizontal: false, vertical: true)
-            .overlay(alignment: .bottom) {
-                HStack(spacing: dotsSpacing) {
-                    ForEach(range.indices, id: \.self) { stepIndex in
-                        Circle()
-                            .fill(stepIndex <= currentSizeIndex ? Color.black : .systemGray5)
-                            .frame(width: defaultSpacing, height: defaultSpacing)
+
+            // 12-point step indicator (clearly visible in both light & dark mode)
+            HStack(spacing: 6) {
+                ForEach(range.indices, id: \.self) { stepIndex in
+                    let isActive = stepIndex <= currentSizeIndex
+                    let isCurrent = stepIndex == currentSizeIndex
+
+                    Button {
+                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                        fontSize = range[stepIndex]
+                    } label: {
+                        ZStack {
+                            if isActive {
+                                Circle()
+                                    .fill(Color.appIdentity)
+                                    .frame(width: isCurrent ? 7.5 : 5.5, height: isCurrent ? 7.5 : 5.5)
+                            } else {
+                                Circle()
+                                    .fill(Color.primary.opacity(0.25))
+                                    .frame(width: 5.5, height: 5.5)
+                                    .overlay(
+                                        Circle()
+                                            .strokeBorder(Color.primary.opacity(0.20), lineWidth: 0.5)
+                                    )
+                            }
+                        }
+                        .frame(width: 10, height: 12)
+                        .contentShape(Rectangle())
                     }
+                    .buttonStyle(.plain)
                 }
-                .opacity(showDots ? 1 : 0)
-                .animation(.bouncy, value: showDots)
-                .onSizeChange { dotsSize = $0 }
-                .offset(y: dotsOffset)
             }
-        }
-        .onDisappear {
-            hideTimer?.invalidate()
-            hideTimer = nil
+            .padding(.top, 2)
+            .animation(.easeInOut(duration: 0.18), value: currentSizeIndex)
         }
     }
 
     // MARK: Private
 
-    @State private var dotsSize: CGSize = .zero
-
-    // Dots visibility
-    private let hideDelay = 2.0
-    @State private var showDots = false
-    @State private var hideTimer: Timer? = nil
-
     private var currentSizeIndex: Int {
-        let index = range.firstIndex(of: fontSize)
-        if index == nil {
-            logger.error("Couldn't find \(fontSize) in \(range)")
+        if let index = range.firstIndex(of: fontSize) {
+            return index
         }
-        return index!
-    }
-
-    private var dotsOffset: CGFloat {
-        dotsSize.height / 2 + dotsSpacing
+        let clamped = fontSize.clampedToSupported
+        if let index = range.firstIndex(of: clamped) {
+            return index
+        }
+        logger.error("Couldn't find \(fontSize) in \(range)")
+        return 0
     }
 
     @ViewBuilder
-    private func stepperButton(action: @escaping () -> Void) -> some View {
+    private func stepperButton(systemName: String, action: @escaping () -> Void) -> some View {
         Button {
             action()
-            showDotsTemporarily()
         } label: {
-            Text(l("menu.fontSizeLetter"))
+            Image(systemName: systemName)
+                .font(.system(size: 14, weight: .bold))
                 .frame(maxWidth: .infinity)
         }
         .tint(.label)
-    }
-
-    /// Shows the dots briefly, then hides them after `hideDelay` seconds.
-    private func showDotsTemporarily() {
-        showDots = true
-        // Invalidate any previous timer
-        hideTimer?.invalidate()
-
-        // Start a new one
-        hideTimer = Timer.scheduledTimer(withTimeInterval: hideDelay, repeats: false) { _ in
-            showDots = false
-            hideTimer = nil
-        }
     }
 }
 
@@ -125,7 +124,7 @@ struct FontSizeStepper: View {
 
 #Preview {
     struct FontSizeStepper_Previews: View {
-        @State var size = FontSize.medium
+        @State var size = FontSize.level1
 
         var body: some View {
             HStack {

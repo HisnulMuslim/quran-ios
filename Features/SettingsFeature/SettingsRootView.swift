@@ -26,6 +26,7 @@ struct SettingsRootView: View {
             navigateToReadingSelector: { viewModel.navigateToReadingSelectors() },
             navigateToHelp: { viewModel.navigateToHelp() },
             navigateToAboutUs: { viewModel.navigateToAboutUs() },
+            openOtherApps: { viewModel.openOtherApps() },
             writeAReview: { viewModel.writeAReview() },
             loginAction: { await viewModel.loginToQuranCom() }
         )
@@ -44,6 +45,7 @@ private struct SettingsRootViewUI: View {
     let navigateToReadingSelector: AsyncAction
     let navigateToHelp: AsyncAction
     let navigateToAboutUs: AsyncAction
+    let openOtherApps: AsyncAction
     let writeAReview: AsyncAction
     let loginAction: AsyncAction
 
@@ -121,7 +123,14 @@ private struct SettingsRootViewUI: View {
                 )
 
                 NoorListItem(
-                    image: .init(.info), // Assuming .info exists, else we can change it later.
+                    image: .init(.otherApps),
+                    title: .text(lAndroid("menu_other_apps")),
+                    accessory: .disclosureIndicator,
+                    action: openOtherApps
+                )
+
+                NoorListItem(
+                    image: .init(.info),
                     title: .text(AppLanguage == .kannada ? "ನಮ್ಮ ಬಗ್ಗೆ" : "About Us"),
                     accessory: .disclosureIndicator,
                     action: navigateToAboutUs
@@ -157,6 +166,7 @@ struct SettingsRootView_Previews: PreviewProvider {
                 navigateToReadingSelector: {},
                 navigateToHelp: {},
                 navigateToAboutUs: {},
+                openOtherApps: {},
                 writeAReview: {},
                 loginAction: {}
             )

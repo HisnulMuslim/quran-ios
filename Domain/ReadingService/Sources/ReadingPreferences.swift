@@ -22,6 +22,6 @@ public struct ReadingPreferences {
 
     // MARK: Private
 
-    private static let defaultQuranReading = Reading.hafs_1405
+    private static let defaultQuranReading = Reading.tajweed
     private static let reading = PreferenceKey<Int>(key: "quranReading", defaultValue: defaultQuranReading.rawValue)
 }

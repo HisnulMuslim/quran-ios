@@ -45,6 +45,7 @@ public struct QuranTranslationTextChunk: View {
             .font(font)
             .dynamicTypeSize(fontSize.dynamicTypeSize)
             .textAlignment(follows: characterDirection)
+            .lineSpacing(max(5, fontSize.translationFontSize * 0.28))
             .padding(.top, firstChunk ? topPadding : 0)
             .readableInsetsPadding(.horizontal)
     }

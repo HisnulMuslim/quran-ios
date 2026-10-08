@@ -36,6 +36,47 @@ public struct TranslationString: Hashable {
     public let quranRanges: [Range<String.Index>]
     public let footnoteRanges: [Range<String.Index>]
     public let footnotes: [Substring]
+
+    public func strippingCombinedPrefix(_ prefixLength: Int) -> TranslationString {
+        guard prefixLength > 0, prefixLength < text.count else {
+            return self
+        }
+        let prefixEndIndex = text.index(text.startIndex, offsetBy: prefixLength)
+        let newText = String(text[prefixEndIndex...])
+
+        var newFootnoteRanges: [Range<String.Index>] = []
+        var newFootnotes: [Substring] = []
+        for (index, range) in footnoteRanges.enumerated() {
+            if range.lowerBound >= prefixEndIndex {
+                let startOffset = text.distance(from: prefixEndIndex, to: range.lowerBound)
+                let endOffset = text.distance(from: prefixEndIndex, to: range.upperBound)
+                let newLower = newText.index(newText.startIndex, offsetBy: startOffset)
+                let newUpper = newText.index(newText.startIndex, offsetBy: endOffset)
+                newFootnoteRanges.append(newLower ..< newUpper)
+                if index < footnotes.count {
+                    newFootnotes.append(footnotes[index])
+                }
+            }
+        }
+
+        var newQuranRanges: [Range<String.Index>] = []
+        for range in quranRanges {
+            if range.lowerBound >= prefixEndIndex {
+                let startOffset = text.distance(from: prefixEndIndex, to: range.lowerBound)
+                let endOffset = text.distance(from: prefixEndIndex, to: range.upperBound)
+                let newLower = newText.index(newText.startIndex, offsetBy: startOffset)
+                let newUpper = newText.index(newText.startIndex, offsetBy: endOffset)
+                newQuranRanges.append(newLower ..< newUpper)
+            }
+        }
+
+        return TranslationString(
+            text: newText,
+            quranRanges: newQuranRanges,
+            footnoteRanges: newFootnoteRanges,
+            footnotes: newFootnotes.isEmpty ? footnotes : newFootnotes
+        )
+    }
 }
 
 public enum TranslationText: Hashable {

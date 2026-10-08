@@ -59,9 +59,28 @@ public struct ReviewService {
     }
 
     public func openAppReview() {
-        let url = URL(validURL: "itms-apps://itunes.apple.com/app/id6780201059?action=write-review")
-        application.open(url)
+        let itmsURL = URL(validURL: "itms-apps://apps.apple.com/app/id6780201059?action=write-review")
+        let webURL = URL(validURL: "https://apps.apple.com/app/id6780201059?action=write-review")
+        if application.canOpenURL(itmsURL) {
+            application.open(itmsURL)
+        } else {
+            application.open(webURL)
+        }
         analytics.review(automatic: false)
+    }
+
+    public func openOtherApps() {
+        Self.openDeveloperApps(application: application)
+    }
+
+    public static func openDeveloperApps(application: UIApplication = .shared) {
+        let itmsURL = URL(validURL: "itms-apps://apps.apple.com/developer/id1544699161")
+        let webURL = URL(validURL: "https://apps.apple.com/developer/id1544699161")
+        if application.canOpenURL(itmsURL) {
+            application.open(itmsURL)
+        } else {
+            application.open(webURL)
+        }
     }
 
     // MARK: Internal
@@ -70,12 +89,25 @@ public struct ReviewService {
     let persistence = ReviewPersistence.shared
     let application: UIApplication = .shared
 
-    // MARK: Private
+    public static func requestReviewNow() {
+        let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
+        let activeScene = scenes.first(where: { $0.activationState == .foregroundActive }) ?? scenes.first
+        guard let windowScene = activeScene else {
+            print("ReviewService: No window scene found for review")
+            return
+        }
+        if #available(iOS 16.0, *) {
+            AppStore.requestReview(in: windowScene)
+        } else {
+            SKStoreReviewController.requestReview(in: windowScene)
+        }
+    }
 
     private func requestReview(in window: UIWindow) {
-        guard let windowScene = window.windowScene else { return }
-        SKStoreReviewController.requestReview(in: windowScene)
-        analytics.review(automatic: true)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+            Self.requestReviewNow()
+            self.analytics.review(automatic: true)
+        }
     }
 }
 

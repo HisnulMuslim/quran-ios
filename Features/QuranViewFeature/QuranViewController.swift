@@ -66,6 +66,10 @@ class QuranViewController: BaseViewController, QuranViewDelegate,
         statusBarHidden || traitCollection.containsTraits(in: UITraitCollection(verticalSizeClass: .compact))
     }
 
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        ThemeService.shared.themeStyle.statusBarStyle
+    }
+
     override var preferredStatusBarUpdateAnimation: UIStatusBarAnimation {
         .fade
     }
@@ -76,26 +80,37 @@ class QuranViewController: BaseViewController, QuranViewDelegate,
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Set initial background color while the pages are being loaded, no need to listen for updates.
-        view.backgroundColor = ThemeService.shared.themeStyle.backgroundColor
+        setupTheme()
         quranView?.navigationItem.largeTitleDisplayMode = .never
         quranView?.delegate = self
 
         // set the custom title view
-        quranView?.navigationItem.titleView = TwoLineNavigationTitleView(
+        let titleView = TwoLineNavigationTitleView(
             firstLineFont: .boldSystemFont(ofSize: 15),
-            secondLineFont: .systemFont(ofSize: 15, weight: .light)
+            secondLineFont: .systemFont(ofSize: 12, weight: .regular)
         )
+        titleView.showsDropdownChevron = true
+        titleView.isUserInteractionEnabled = true
+        let titleTap = UITapGestureRecognizer(target: self, action: #selector(onTitleViewTapped))
+        titleView.addGestureRecognizer(titleTap)
+        quranView?.navigationItem.titleView = titleView
+
+        if !lastVisiblePages.isEmpty {
+            updateTitle(lastVisiblePages)
+        } else if !interactor.visiblePages.isEmpty {
+            updateTitle(interactor.visiblePages)
+        }
 
         let backImage: UIImage?
         backImage = UIImage(systemName: "chevron.backward")
 
-        quranView?.navigationItem.leftBarButtonItem = UIBarButtonItem(
+        let backButton = UIBarButtonItem(
             image: backImage,
             style: .plain,
             target: self,
             action: #selector(backTapped)
         )
+        quranView?.navigationItem.leftBarButtonItem = backButton
 
         setupContentStatus()
     }
@@ -114,6 +129,22 @@ class QuranViewController: BaseViewController, QuranViewDelegate,
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         UIApplication.shared.isIdleTimerDisabled = false
+    }
+
+    // MARK: - Theme
+    private func setupTheme() {
+        let initialTheme = ThemeService.shared.themeStyle
+        view.backgroundColor = initialTheme.backgroundColor
+        quranView?.applyTheme(initialTheme)
+
+        ThemeService.shared.themeStylePublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] theme in
+                self?.view.backgroundColor = theme.backgroundColor
+                self?.quranView?.applyTheme(theme)
+                self?.setNeedsStatusBarAppearanceUpdate()
+            }
+            .store(in: &cancellables)
     }
 
     // MARK: - Content Status
@@ -141,6 +172,10 @@ class QuranViewController: BaseViewController, QuranViewDelegate,
     // MARK: - Quran View Delegate
 
     func onQuranViewTapped(_ quranView: QuranView) {
+        if let presented = presentedViewController {
+            presented.dismiss(animated: true)
+            return
+        }
         if interactor.contentStatus == nil && quranView.contentView != nil {
             setBarsHidden(!statusBarHidden)
         }
@@ -171,7 +206,17 @@ class QuranViewController: BaseViewController, QuranViewDelegate,
     }
 
     func presentMoreMenu(_ viewController: UIViewController) {
-        presentPopover(viewController, pointingTo: quranView!.navigationItem.rightBarButtonItems!.first!)
+        currentPresentedMoreMenu = viewController
+        presentPopover(viewController, pointingTo: moreNavigationButton)
+    }
+
+    func presentThemeSettings(_ viewController: UIViewController) {
+        currentPresentedAppearanceController = viewController
+        if traitCollection.userInterfaceIdiom == .pad {
+            presentPopover(viewController, pointingTo: appearanceNavigationButton)
+        } else {
+            present(viewController, animated: true)
+        }
     }
 
     func presentTranslationsSelection(_ viewController: UIViewController) {
@@ -183,6 +228,11 @@ class QuranViewController: BaseViewController, QuranViewDelegate,
             action: #selector(onTranslationsSelectionDoneTapped)
         )
         present(translationsNavigationController, animated: true, completion: nil)
+    }
+
+    func presentJumpDialog(_ viewController: UIViewController) {
+        currentPresentedJumpController = viewController
+        present(viewController, animated: true)
     }
 
     func presentAudioBanner(_ audioBanner: UIViewController) {
@@ -232,14 +282,21 @@ class QuranViewController: BaseViewController, QuranViewDelegate,
     }
 
     func dismissPresentedViewController(completion: (() -> Void)?) {
-        dismiss(animated: true, completion: completion)
+        if presentedViewController != nil {
+            dismiss(animated: true, completion: completion)
+        } else {
+            completion?()
+        }
     }
 
     func didDismissPopover() {
         interactor.didDismissPopover()
     }
 
+    private var lastVisiblePages: [Page] = []
+
     func setVisiblePages(_ pages: [Page]) {
+        lastVisiblePages = pages
         title = pages.map { $0.startSura.localizedName(withPrefix: true) }.joined(separator: " | ")
         updateTitle(pages)
     }
@@ -264,9 +321,23 @@ class QuranViewController: BaseViewController, QuranViewDelegate,
 
     // MARK: - Navigation Bar
 
+    private weak var currentPresentedAppearanceController: UIViewController?
+    private weak var currentPresentedMoreMenu: UIViewController?
+    private weak var currentPresentedJumpController: UIViewController?
+    private var lastTitleTapTime: TimeInterval = 0
+
     private lazy var moreNavigationButton: UIBarButtonItem = {
-        let moreImage = UIImage.symbol("ellipsis.circle")
+        let config = UIImage.SymbolConfiguration(pointSize: 16, weight: .regular)
+        let moreImage = UIImage.symbol("ellipsis.circle", withConfiguration: config)
         return UIBarButtonItem(image: moreImage, style: .plain, target: self, action: #selector(onMoreBarButtonTapped(_:)))
+    }()
+
+    private lazy var appearanceNavigationButton: UIBarButtonItem = {
+        let config = UIImage.SymbolConfiguration(pointSize: 16, weight: .regular)
+        let appearanceImage = UIImage.symbol("textformat.size", withConfiguration: config)
+        let button = UIBarButtonItem(image: appearanceImage, style: .plain, target: self, action: #selector(onAppearanceBarButtonTapped(_:)))
+        button.accessibilityLabel = l("menu.theme_settings")
+        return button
     }()
 
     private var titleView: TwoLineNavigationTitleView? { quranView?.navigationItem.titleView as? TwoLineNavigationTitleView }
@@ -298,11 +369,15 @@ class QuranViewController: BaseViewController, QuranViewDelegate,
             } else {
                 let contentStatusView = UIHostingController(rootView: ContentStatusView(state: newStatus))
                 self.contentStatusView = contentStatusView
-                addContent(contentStatusView)
+                addChild(contentStatusView)
+                quranView?.showStatusView(contentStatusView.view)
+                contentStatusView.didMove(toParent: self)
             }
         } else {
             if let contentStatusView {
                 removeChild(contentStatusView)
+                quranView?.hideStatusView()
+                self.contentStatusView = nil
             }
         }
     }
@@ -314,6 +389,7 @@ class QuranViewController: BaseViewController, QuranViewDelegate,
         // make it visible
         if quranView?.navigationBar.isHidden ?? true, !hidden {
             quranView?.navigationBar.isHidden = false
+            quranView?.topBarBlurView.isHidden = false
         }
 
         // animate the change
@@ -321,8 +397,10 @@ class QuranViewController: BaseViewController, QuranViewDelegate,
             self.statusBarHidden = hidden
             self.setAudioBarHidden(hidden)
             self.quranView?.navigationBar.alpha = hidden ? 0 : 1
+            self.quranView?.topBarBlurView.alpha = hidden ? 0 : 1
         }, completion: { _ in
             self.quranView?.navigationBar.isHidden = hidden
+            self.quranView?.topBarBlurView.isHidden = hidden
         })
     }
 
@@ -347,6 +425,25 @@ class QuranViewController: BaseViewController, QuranViewDelegate,
         dismiss(animated: true)
     }
 
+    @objc
+    private func onTitleViewTapped() {
+        logger.info("Quran: onTitleViewTapped")
+        let now = ProcessInfo.processInfo.systemUptime
+        guard now - lastTitleTapTime > 0.4 else {
+            return
+        }
+        lastTitleTapTime = now
+
+        if let presented = presentedViewController {
+            presented.dismiss(animated: true)
+            if presented === currentPresentedJumpController {
+                currentPresentedJumpController = nil
+                return
+            }
+        }
+        interactor.onJumpTapped()
+    }
+
     private func updateTitle(_ pages: [Page]) {
         if pages.isEmpty {
             titleView?.firstLine = ""
@@ -367,13 +464,14 @@ class QuranViewController: BaseViewController, QuranViewDelegate,
     }
 
     private func updateRightBarItems(animated: Bool, isBookmarked: Bool) {
-        let bookmarkImage = UIImage.symbol(isBookmarked ? "bookmark.fill" : "bookmark")
+        let config = UIImage.SymbolConfiguration(pointSize: 16, weight: .regular)
+        let bookmarkImage = UIImage.symbol(isBookmarked ? "bookmark.fill" : "bookmark", withConfiguration: config)
         let bookmark = UIBarButtonItem(image: bookmarkImage, style: .plain, target: self, action: #selector(onBookmarkButtonTapped))
         if isBookmarked {
             bookmark.tintColor = .systemRed
         }
 
-        quranView?.navigationItem.setRightBarButtonItems([moreNavigationButton, bookmark], animated: animated)
+        quranView?.navigationItem.setRightBarButtonItems([moreNavigationButton, appearanceNavigationButton, bookmark], animated: animated)
     }
 
     @objc
@@ -385,6 +483,25 @@ class QuranViewController: BaseViewController, QuranViewDelegate,
 
     @objc
     private func onMoreBarButtonTapped(_ barButton: UIBarButtonItem) {
+        if let presented = presentedViewController {
+            presented.dismiss(animated: true)
+            if presented === currentPresentedMoreMenu {
+                currentPresentedMoreMenu = nil
+                return
+            }
+        }
         interactor.onMoreBarButtonTapped()
+    }
+
+    @objc
+    private func onAppearanceBarButtonTapped(_ barButton: UIBarButtonItem) {
+        if let presented = presentedViewController {
+            presented.dismiss(animated: true)
+            if presented === currentPresentedAppearanceController {
+                currentPresentedAppearanceController = nil
+                return
+            }
+        }
+        interactor.onAppearanceBarButtonTapped()
     }
 }

@@ -35,16 +35,16 @@ struct MoreMenuFontSize: View {
 
     // MARK: Private
 
-    private let fonts = Array(FontSize.allCases.sorted().reversed())
+    private let fonts = FontSize.supportedRange
 
     private var fontIndex: Binding<Int> {
         Binding(
             get: {
-                let index = fonts.firstIndex(of: fontSize)
-                if index == nil {
-                    logger.error("Couldn't find \(fontSize) in \(fonts)")
+                if let index = fonts.firstIndex(of: fontSize) {
+                    return index
                 }
-                return index!
+                let clamped = fontSize.clampedToSupported
+                return fonts.firstIndex(of: clamped) ?? 0
             },
             set: { fontSize = fonts[$0] }
         )
@@ -52,6 +52,18 @@ struct MoreMenuFontSize: View {
 
     private var fontSizeInPoints: CGFloat {
         switch fontSize {
+        case .level1: return 26
+        case .level2: return 28
+        case .level3: return 31
+        case .level4: return 34
+        case .level5: return 36
+        case .level6: return 39
+        case .level7: return 43
+        case .level8: return 46
+        case .level9: return 50
+        case .level10: return 54
+        case .level11: return 59
+        case .level12: return 64
         case .accessibility5: return 61
         case .accessibility4: return 57
         case .accessibility3: return 51

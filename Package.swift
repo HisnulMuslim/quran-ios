@@ -536,6 +536,7 @@ private func featuresTargets() -> [[Target]] {
             "Localization",
             "Analytics",
             "QuranAnnotations",
+            "QuranTextKit",
             "NoorUI",
         ]),
 
@@ -598,6 +599,7 @@ private func featuresTargets() -> [[Target]] {
             "NoorUI",
             "QuranTextKit",
             "WordTextService",
+            "Localization",
         ]),
 
         target(type, name: "NoteEditorFeature", hasTests: false, dependencies: [
@@ -728,6 +730,7 @@ private func featuresTargets() -> [[Target]] {
             "AudioUpdater",
             "AppMigrationFeature",
             "TranslationService",
+            "Localization",
         ]),
     ]
 }

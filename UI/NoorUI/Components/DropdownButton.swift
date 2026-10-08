@@ -13,8 +13,8 @@ public struct DropdownButton<Item: Hashable, Content: View>: View {
     private let content: (Item) -> Content
 
     @ScaledMetric private var horizontalPadding = 12.0
-    @ScaledMetric private var verticalPadding = 6.0
-    @ScaledMetric private var cornerRadius = Dimensions.cornerRadius
+    @ScaledMetric private var verticalPadding = 7.0
+    @ScaledMetric private var cornerRadius = 10.0
 
     public init(items: [Item], selectedItem: Binding<Item>, @ViewBuilder content: @escaping (Item) -> Content) {
         self.items = items
@@ -28,22 +28,33 @@ public struct DropdownButton<Item: Hashable, Content: View>: View {
                 Button {
                     selectedItem = item
                 } label: {
-                    content(item)
+                    if item == selectedItem {
+                        Label {
+                            content(item)
+                        } icon: {
+                            Image(systemName: "checkmark")
+                        }
+                    } else {
+                        content(item)
+                    }
                 }
             }
         } label: {
-            VStack {
-                HStack {
-                    content(selectedItem)
-                    Image(systemName: "chevron.down")
-                        .font(.caption)
-                }
+            HStack(spacing: 8) {
+                content(selectedItem)
+                Image(systemName: "chevron.up.chevron.down")
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(.secondary)
             }
             .padding(.horizontal, horizontalPadding)
             .padding(.vertical, verticalPadding)
             .background(
-                RoundedRectangle(cornerRadius: cornerRadius)
-                    .stroke(Color.systemGray)
+                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                    .fill(Color(UIColor.secondarySystemFill))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                    .stroke(Color(UIColor.separator).opacity(0.3), lineWidth: 0.5)
             )
             .foregroundStyle(Color.label)
         }

@@ -19,6 +19,8 @@
 //
 
 import Analytics
+import Localization
+import SwiftUI
 import UIKit
 import WhatsNewFeature
 
@@ -72,14 +74,45 @@ class AppViewController: UITabBarController, UITabBarControllerDelegate, AppPres
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
-        // show whats new controller if needed
-        // whatsNewController.presentWhatsNewIfNeeded(from: self)
+        presentInitialLanguagePromptIfNeeded()
     }
 
     // MARK: Private
 
     private let interactor: AppInteractor
     private let whatsNewController: AppWhatsNewController
+
+    private func presentInitialLanguagePromptIfNeeded() {
+        let key = "hasSelectedInitialLanguage"
+        guard !UserDefaults.standard.bool(forKey: key) else {
+            return
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) { [weak self] in
+            guard let self = self else { return }
+            guard !UserDefaults.standard.bool(forKey: key) else { return }
+            guard self.presentedViewController == nil else { return }
+
+            let initialView = InitialLanguageView { [weak self] chosenLanguage in
+                UserDefaults.standard.set(true, forKey: key)
+                let previousLanguage = AppLanguage
+                self?.dismiss(animated: true) {
+                    if previousLanguage != chosenLanguage {
+                        AppLanguage = chosenLanguage
+                    }
+                }
+            }
+
+            let hostingController = UIHostingController(rootView: initialView)
+            hostingController.modalPresentationStyle = .pageSheet
+            if let sheet = hostingController.sheetPresentationController {
+                sheet.detents = [.medium()]
+                sheet.prefersGrabberVisible = true
+                sheet.preferredCornerRadius = 24
+            }
+            self.present(hostingController, animated: true)
+        }
+    }
 
     private var visibleViewController: UIViewController? {
         presentedViewController ?? selectedViewController

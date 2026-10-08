@@ -20,10 +20,12 @@
 
 import Foundation
 
-public enum Language: String {
+public enum Language: String, Hashable, CaseIterable, Identifiable {
     case arabic = "ar"
     case english = "en"
     case kannada = "kn"
+
+    public var id: String { rawValue }
 }
 
 public enum Table: String {

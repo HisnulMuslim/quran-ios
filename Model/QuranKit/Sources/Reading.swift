@@ -16,7 +16,7 @@ public enum Reading: Int {
     // MARK: Public
 
     public static let allReadings: [Reading] = [
-        .hafs_1405, .tajweed, // .hafs_1421, .hafs_1440, .hafs_1439, .hafs_1441,
+        .tajweed, .hafs_1405, // .hafs_1421, .hafs_1440, .hafs_1439, .hafs_1441,
     ]
 
     public var quran: Quran {

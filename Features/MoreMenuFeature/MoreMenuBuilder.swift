@@ -23,4 +23,8 @@ public struct MoreMenuBuilder {
         viewModel.listener = listener
         return viewController
     }
+
+    public func buildThemeSettings(showFontSize: Bool = true) -> UIViewController {
+        ThemeSettingsHostingController(showFontSize: showFontSize)
+    }
 }

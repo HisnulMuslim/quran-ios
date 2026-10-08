@@ -41,7 +41,7 @@ struct TranslationFootnote: View, Identifiable {
             ScrollView {
                 Text(text)
                     .font(translation.textFont(selection: translationFont.rawValue))
-                    .dynamicTypeSize(translationFontSize.dynamicTypeSize)
+                    .dynamicTypeSize(translationFontSize.translationDynamicTypeSize)
                     .padding()
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)

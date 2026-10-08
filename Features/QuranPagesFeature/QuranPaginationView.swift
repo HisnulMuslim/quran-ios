@@ -96,16 +96,14 @@ private struct QuranDoublePaginationView<Content: View>: View {
             transitionStyle: .scroll,
             navigationOrientation: .horizontal,
             interPageSpacing: ContentDimension.interPageSpacing,
-            animated: true,
+            animated: false,
             selection: doublePageSelection
         ) {
             ForEach(doublePages) { doublePage in
                 HStack(spacing: 0) {
-                    QuranSeparators.PageSideSeparator(leading: true)
                     content(doublePage.first)
                     QuranSeparators.PageMiddleSeparator()
                     content(doublePage.second)
-                    QuranSeparators.PageSideSeparator(leading: false)
                 }
             }
         }
@@ -142,14 +140,13 @@ private struct QuranSinglePaginationView<Content: View>: View {
             transitionStyle: .scroll,
             navigationOrientation: .horizontal,
             interPageSpacing: ContentDimension.interPageSpacing,
-            animated: true,
+            animated: false,
             selection: $selection
         ) {
             ForEach(pages) { page in
                 Group {
                     if isRightSide(page) {
                         HStack(spacing: 0) {
-                            QuranSeparators.PageSideSeparator(leading: true)
                             content(page)
                             QuranSeparators.PageMiddleSeparator()
                                 .offset(x: middleOffset)
@@ -158,7 +155,6 @@ private struct QuranSinglePaginationView<Content: View>: View {
                     } else {
                         HStack(spacing: 0) {
                             content(page)
-                            QuranSeparators.PageSideSeparator(leading: false)
                         }
                     }
                 }

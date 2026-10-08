@@ -1,5 +1,6 @@
 import Localization
 import NoorUI
+import SettingsService
 import SwiftUI
 import UIx
 
@@ -53,6 +54,16 @@ struct AboutUsView: View {
                     if let url = URL(string: source.url) {
                         UIApplication.shared.open(url)
                     }
+                }
+            }
+
+            NoorBasicSection {
+                NoorListItem(
+                    image: .init(.otherApps),
+                    title: .text(lAndroid("menu_other_apps")),
+                    accessory: .disclosureIndicator
+                ) {
+                    ReviewService.openDeveloperApps()
                 }
             }
 

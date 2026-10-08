@@ -5,6 +5,7 @@
 //  Created by Mohamed Afifi on 2023-07-16.
 //
 
+import FeaturesSupport
 import Localization
 import ReadingSelectorFeature
 import SwiftUI
@@ -48,12 +49,21 @@ final class HomeViewController: UIHostingController<HomeView> {
     }
 
     private func configureNavigationBarButtons() {
-        navigationItem.rightBarButtonItem = UIBarButtonItem(
+        let readingSelectorButton = UIBarButtonItem(
             image: UIImage.symbol("books.vertical.fill"),
             style: .plain,
             target: self,
             action: #selector(openReadingSelectors)
         )
+
+        let jumpButton = UIBarButtonItem(
+            image: UIImage.symbol("arrowshape.turn.up.right"),
+            style: .plain,
+            target: self,
+            action: #selector(openJumpDialog)
+        )
+
+        navigationItem.rightBarButtonItems = [readingSelectorButton, jumpButton]
 
         navigationItem.leftBarButtonItem = UIBarButtonItem(
             image: UIImage.symbol("arrow.up.arrow.down"),
@@ -61,6 +71,17 @@ final class HomeViewController: UIHostingController<HomeView> {
             target: self,
             action: #selector(toggleSort)
         )
+    }
+
+    @objc
+    private func openJumpDialog() {
+        let jumpController = JumpDestinationViewController(
+            quran: viewModel.quran,
+            initialPage: viewModel.lastPages.first?.page
+        ) { [weak self] page, ayah in
+            self?.viewModel.navigateToPageAndAyah(page: page, ayah: ayah)
+        }
+        present(jumpController, animated: true)
     }
 
     @objc

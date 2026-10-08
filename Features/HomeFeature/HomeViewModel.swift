@@ -36,13 +36,15 @@ final class HomeViewModel: ObservableObject {
         textRetriever: QuranTextDataService,
         navigateToPage: @escaping (Page) -> Void,
         navigateToSura: @escaping (Sura) -> Void,
-        navigateToQuarter: @escaping (Quarter) -> Void
+        navigateToQuarter: @escaping (Quarter) -> Void,
+        navigateToAyah: @escaping (Page, AyahNumber) -> Void = { _, _ in }
     ) {
         self.lastPageService = lastPageService
         self.textRetriever = textRetriever
         self.navigateToPage = navigateToPage
         self.navigateToSura = navigateToSura
         self.navigateToQuarter = navigateToQuarter
+        self.navigateToAyah = navigateToAyah
 
         HomePreferences.shared.$surahSortOrder
             .assign(to: &$surahSortOrder)
@@ -81,6 +83,14 @@ final class HomeViewModel: ObservableObject {
         navigateToQuarter(item.quarter)
     }
 
+    var quran: Quran {
+        readingPreferences.reading.quran
+    }
+
+    func navigateToPageAndAyah(page: Page, ayah: AyahNumber) {
+        navigateToAyah(page, ayah)
+    }
+
     func toggleSurahSortOrder() {
         HomePreferences.shared.surahSortOrder = surahSortOrder == .ascending ? .descending : .ascending
     }
@@ -92,6 +102,7 @@ final class HomeViewModel: ObservableObject {
     private let navigateToPage: (Page) -> Void
     private let navigateToSura: (Sura) -> Void
     private let navigateToQuarter: (Quarter) -> Void
+    private let navigateToAyah: (Page, AyahNumber) -> Void
     private let readingPreferences = ReadingPreferences.shared
 
     private func loadLastPages() async {

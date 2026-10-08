@@ -6,6 +6,7 @@
 //
 
 import Combine
+import Localization
 import NoorUI
 import QuranText
 import QuranTextKit
@@ -23,9 +24,11 @@ final class MoreMenuThemeSettingsViewModel: ObservableObject {
         arabicFontSize = fontSizePreferences.arabicFontSize
         translationFont = fontSizePreferences.translationFont
         translationViewMode = contentStatePreferences.translationViewMode
+        appLanguage = AppLanguage
 
         $themeStyle
             .dropFirst()
+            .removeDuplicates()
             .sink { [weak self] newValue in
                 logger.info("More Menu: set themeStyle \(newValue)")
                 self?.themeService.themeStyle = newValue
@@ -34,9 +37,30 @@ final class MoreMenuThemeSettingsViewModel: ObservableObject {
 
         $appearanceMode
             .dropFirst()
+            .removeDuplicates()
             .sink { [weak self] newValue in
                 logger.info("More Menu: set appearanceMode \(newValue)")
                 self?.themeService.appearanceMode = newValue
+            }
+            .store(in: &cancellables)
+
+        themeService.themeStylePublisher
+            .removeDuplicates()
+            .sink { [weak self] newStyle in
+                guard let self else { return }
+                if self.themeStyle != newStyle {
+                    self.themeStyle = newStyle
+                }
+            }
+            .store(in: &cancellables)
+
+        themeService.appearanceModePublisher
+            .removeDuplicates()
+            .sink { [weak self] newMode in
+                guard let self else { return }
+                if self.appearanceMode != newMode {
+                    self.appearanceMode = newMode
+                }
             }
             .store(in: &cancellables)
 
@@ -71,6 +95,14 @@ final class MoreMenuThemeSettingsViewModel: ObservableObject {
                 self?.contentStatePreferences.translationViewMode = newValue
             }
             .store(in: &cancellables)
+
+        $appLanguage
+            .dropFirst()
+            .sink { newValue in
+                logger.info("More Menu: set app language \(newValue)")
+                AppLanguage = newValue
+            }
+            .store(in: &cancellables)
     }
 
     // MARK: Internal
@@ -82,6 +114,19 @@ final class MoreMenuThemeSettingsViewModel: ObservableObject {
     @Published var translationFontSize: FontSize
     @Published var translationFont: TranslationFont
     @Published var translationViewMode: TranslationViewMode
+    @Published var appLanguage: Language
+
+    var canRestoreFontDefaults: Bool {
+        arabicFontSize != FontSizePreferences.defaultArabicValue ||
+        translationFontSize != FontSizePreferences.defaultTranslationValue ||
+        translationFont != FontSizePreferences.defaultTranslationFont
+    }
+
+    func restoreFontDefaults() {
+        arabicFontSize = FontSizePreferences.defaultArabicValue
+        translationFontSize = FontSizePreferences.defaultTranslationValue
+        translationFont = FontSizePreferences.defaultTranslationFont
+    }
 
     // MARK: Private
 

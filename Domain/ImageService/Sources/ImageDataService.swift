@@ -30,13 +30,24 @@ public struct ImageDataService {
         try await persistence.ayahNumbers(page)
     }
 
+public enum ImageDataError: LocalizedError {
+    case imageNotFound(Page)
+
+    public var errorDescription: String? {
+        switch self {
+        case .imageNotFound(let page):
+            return "No image found for page '\(page)'"
+        }
+    }
+}
+
     public func imageForPage(_ page: Page) async throws -> ImagePage {
         let imageURL = imageURLForPage(page)
         guard let image = UIImage(contentsOfFile: imageURL.path) else {
             logFiles(directory: imagesURL) // <reading>/images/width/
             logFiles(directory: imagesURL.deletingLastPathComponent()) // <reading>/images/
             logFiles(directory: imagesURL.deletingLastPathComponent().deletingLastPathComponent()) // <reading>/
-            fatalError("No image found for page '\(page)'")
+            throw ImageDataError.imageNotFound(page)
         }
 
         // preload the image

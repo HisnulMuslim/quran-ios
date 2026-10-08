@@ -26,7 +26,7 @@ public enum NoorSystemImage: String {
     case mushafs = "books.vertical.fill"
     case debug = "ant"
     case play = "play.fill"
-    case stop = "stop.fill"
+    case stop = "stop.circle"
     case pause = "pause.fill"
     case more = "ellipsis.circle"
     case sleep = "moon"
@@ -36,6 +36,7 @@ public enum NoorSystemImage: String {
     case cancel = "xmark"
     case help = "questionmark.circle"
     case info = "info.circle"
+    case otherApps = "square.stack.3d.up"
 
     // MARK: Public
 

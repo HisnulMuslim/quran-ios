@@ -21,10 +21,36 @@ public enum FontSize: Int, CaseIterable, CustomStringConvertible {
     case small = 4
     case xSmall = 5
 
+    // 12 smooth zoom levels spanning from old Dot 5 (.xLarge) to old Dot 9 (.accessibility2)
+    case level1 = 10
+    case level2 = 11
+    case level3 = 12
+    case level4 = 13
+    case level5 = 14
+    case level6 = 15
+    case level7 = 16
+    case level8 = 17
+    case level9 = 18
+    case level10 = 19
+    case level11 = 20
+    case level12 = 21
+
     // MARK: Public
 
     public var description: String {
         switch self {
+        case .level1: "level1"
+        case .level2: "level2"
+        case .level3: "level3"
+        case .level4: "level4"
+        case .level5: "level5"
+        case .level6: "level6"
+        case .level7: "level7"
+        case .level8: "level8"
+        case .level9: "level9"
+        case .level10: "level10"
+        case .level11: "level11"
+        case .level12: "level12"
         case .accessibility5: "accessibility5"
         case .accessibility4: "accessibility4"
         case .accessibility3: "accessibility3"
@@ -44,6 +70,37 @@ public enum FontSize: Int, CaseIterable, CustomStringConvertible {
 extension FontSize {
     public var dynamicTypeSize: DynamicTypeSize {
         switch self {
+        case .level1, .level2: .xLarge
+        case .level3, .level4, .level5: .xxLarge
+        case .level6, .level7, .level8: .xxxLarge
+        case .level9, .level10: .accessibility1
+        case .level11, .level12: .accessibility2
+        case .accessibility5: .accessibility5
+        case .accessibility4: .accessibility4
+        case .accessibility3: .accessibility3
+        case .accessibility2: .accessibility2
+        case .accessibility1: .accessibility1
+        case .xxxLarge: .xxxLarge
+        case .xxLarge: .xxLarge
+        case .xLarge: .xLarge
+        case .large: .large
+        case .medium: .medium
+        case .small: .small
+        case .xSmall: .xSmall
+        }
+    }
+
+    public var translationDynamicTypeSize: DynamicTypeSize {
+        switch self {
+        case .level1: .medium
+        case .level2: .large
+        case .level3: .xLarge
+        case .level4: .xxLarge
+        case .level5: .xxxLarge
+        case .level6, .level7: .accessibility1
+        case .level8, .level9: .accessibility2
+        case .level10, .level11: .accessibility3
+        case .level12: .accessibility4
         case .accessibility5: .accessibility5
         case .accessibility4: .accessibility4
         case .accessibility3: .accessibility3
@@ -66,6 +123,45 @@ extension FontSize: Strideable {
     }
 
     public func advanced(by n: Int) -> FontSize {
-        FontSize(rawValue: Stride(rawValue) + n)!
+        FontSize(rawValue: Stride(rawValue) + n) ?? self
     }
 }
+
+extension FontSize {
+    /// Supported 12-level font size range (from level1 to level12).
+    /// Bounded between old Dot 5 (.xLarge) and old Dot 9 (.accessibility2).
+    public static let supportedRange: [FontSize] = [
+        .level1,
+        .level2,
+        .level3,
+        .level4,
+        .level5,
+        .level6,
+        .level7,
+        .level8,
+        .level9,
+        .level10,
+        .level11,
+        .level12,
+    ]
+
+    /// Clamps any FontSize to the supported 12-level range.
+    public var clampedToSupported: FontSize {
+        switch self {
+        case .level1, .level2, .level3, .level4, .level5, .level6,
+             .level7, .level8, .level9, .level10, .level11, .level12:
+            return self
+        case .xSmall, .small, .medium, .large, .xLarge:
+            return .level1
+        case .xxLarge:
+            return .level4
+        case .xxxLarge:
+            return .level7
+        case .accessibility1:
+            return .level9
+        case .accessibility2, .accessibility3, .accessibility4, .accessibility5:
+            return .level12
+        }
+    }
+}
+

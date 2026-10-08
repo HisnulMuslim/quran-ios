@@ -66,6 +66,20 @@
 "menu.twoPages" = "2 pages side-by-side (in landscape)";
 "menu.verticalScrolling" = "Vertical scrolling";
 "menu.theme_settings" = "Themes & Settings";
+"menu.themes" = "Themes";
+"menu.restore_defaults" = "Restore Defaults";
+"menu.jump" = "Go to Page";
+
+// MARK: - Jump to Page / Ayah
+
+"jump.title" = "Go to Page";
+"jump.page_number" = "Page Number";
+"jump.surah_and_ayah" = "Surah & Ayah";
+"jump.go" = "Go";
+"jump.select_surah" = "Select Surah";
+"jump.search_surahs" = "Search Surah name or number...";
+"jump.preview" = "Preview";
+"jump.or" = "OR";
 
 // MARK: - Theme
 

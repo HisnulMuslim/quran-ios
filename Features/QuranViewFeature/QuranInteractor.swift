@@ -43,12 +43,14 @@ protocol QuranPresentable: UIViewController {
     func shareText(_ lines: [String], in sourceView: UIView, at point: CGPoint, completion: @escaping () -> Void)
 
     func presentMoreMenu(_ viewController: UIViewController)
+    func presentThemeSettings(_ viewController: UIViewController)
     func presentAyahMenu(_ viewController: UIViewController, in sourceView: UIView, at point: CGPoint)
     func presentTranslatedVerse(_ viewController: UIViewController, didDismiss: @escaping () -> Void)
     func presentAudioBanner(_ audioBanner: UIViewController)
     func presentWordPointer(_ viewController: UIViewController)
     func presentQuranContent(_ viewController: UIViewController)
     func presentTranslationsSelection(_ viewController: UIViewController)
+    func presentJumpDialog(_ viewController: UIViewController)
 
     func dismissWordPointer(_ viewController: UIViewController)
     func dismissPresentedViewController(completion: (() -> Void)?)
@@ -110,27 +112,17 @@ final class QuranInteractor: WordPointerListener, ContentListener, NoteEditorLis
             .store(in: &cancellables)
 
         contentStatePreferences.$quranMode
-            .sink { [weak self] _ in self?.onQuranModeUpdated() }
+            .sink { [weak self] _ in
+                self?.onQuranModeUpdated()
+                self?.updateContentStatus()
+            }
             .store(in: &cancellables)
 
         deps.resources.publisher
             .receive(on: DispatchQueue.main)
             .sink { [weak self] status in
-                switch status {
-                case .downloading(let progress):
-                    self?.contentStatus = .downloading(progress: progress)
-                case .error(let error):
-                    self?.contentStatus = .error(error, retry: { [weak self] in
-                        guard let self else { return }
-                        contentStatus = .downloading(progress: 0)
-                        Task {
-                            await self.deps.resources.retry()
-                        }
-                    })
-                case .ready:
-                    self?.contentStatus = nil
-                    self?.loadContent()
-                }
+                self?.latestResourceStatus = status
+                self?.updateContentStatus()
             }
             .store(in: &cancellables)
     }
@@ -155,6 +147,14 @@ final class QuranInteractor: WordPointerListener, ContentListener, NoteEditorLis
         presenter?.presentMoreMenu(viewController)
     }
 
+    // MARK: - Reading Appearance
+
+    func onAppearanceBarButtonTapped() {
+        logger.info("Quran: appearance bar button tapped")
+        let viewController = deps.moreMenuBuilder.buildThemeSettings(showFontSize: quranMode == .translation)
+        presenter?.presentThemeSettings(viewController)
+    }
+
     func onQuranModeUpdated() {
         let noTranslationsSelected = selectedTranslationsPreferences.selectedTranslationIds.isEmpty
         if quranMode == .translation, noTranslationsSelected {
@@ -164,6 +164,32 @@ final class QuranInteractor: WordPointerListener, ContentListener, NoteEditorLis
 
     func onTranslationsSelectionsTapped() {
         presentTranslationsSelection()
+    }
+
+    func onJumpToPageTapped() {
+        presentJumpDialog()
+    }
+
+    func onJumpTapped() {
+        presentJumpDialog()
+    }
+
+    func presentJumpDialog() {
+        presenter?.dismissPresentedViewController { [weak self] in
+            self?.presentJumpSheet()
+        }
+    }
+
+    private func presentJumpSheet() {
+        let initialPage = visiblePages.first ?? input.initialPage
+        let controller = JumpDestinationViewController(
+            quran: deps.quran,
+            initialPage: initialPage,
+            onJump: { [weak self] page, ayah in
+                self?.contentViewModel?.navigateTo(page: page, ayah: ayah)
+            }
+        )
+        presenter?.presentJumpDialog(controller)
     }
 
     func highlightReadingAyah(_ ayah: AyahNumber?) {
@@ -322,6 +348,8 @@ final class QuranInteractor: WordPointerListener, ContentListener, NoteEditorLis
     private var cancellables: Set<AnyCancellable> = []
     private var isWordPointerActive: Bool = false
     private var wordPointer: WordPointerViewController?
+    private var latestResourceStatus: ReadingResourcesService.ResourceStatus?
+    private var wasResourceReady = false
 
     private var visiblePageCancellable: AnyCancellable?
 
@@ -346,13 +374,79 @@ final class QuranInteractor: WordPointerListener, ContentListener, NoteEditorLis
         showPageBookmarkIfNeeded(for: pages)
     }
 
+    private func updateContentStatus() {
+        let isResourceReady: Bool
+        if case .ready = latestResourceStatus {
+            isResourceReady = true
+        } else {
+            isResourceReady = false
+        }
+
+        let justBecameReady = !wasResourceReady && isResourceReady
+        wasResourceReady = isResourceReady
+
+        switch quranMode {
+        case .translation:
+            // Translation mode does not require downloaded mushaf images.
+            contentStatus = nil
+            loadContent()
+
+        case .arabic:
+            // Arabic mode requires downloaded images.
+            if isResourceReady {
+                contentStatus = nil
+                if contentViewModel == nil {
+                    loadContent()
+                } else if justBecameReady {
+                    reloadContent()
+                }
+            } else {
+                switch latestResourceStatus {
+                case .downloading(let progress):
+                    contentStatus = .downloading(progress: progress)
+                case .error(let error):
+                    contentStatus = .error(error, retry: { [weak self] in
+                        guard let self else { return }
+                        contentStatus = .downloading(progress: 0)
+                        Task {
+                            await self.deps.resources.retry()
+                        }
+                    })
+                case .ready, .none:
+                    contentStatus = nil
+                }
+            }
+        }
+    }
+
     private func loadContent() {
+        guard contentViewModel == nil else { return }
         let (viewController, viewModel) = deps.audioBannerBuilder.build(withListener: self)
         audioBanner = viewModel
         presenter?.presentAudioBanner(viewController)
 
         (contentViewController, contentViewModel) = presentQuranContent(with: input)
         presenter?.startHiddenBarsTimer()
+    }
+
+    private func reloadContent() {
+        let currentPages = visiblePages
+        let currentInput: QuranInput
+        if let firstPage = currentPages.first {
+            currentInput = QuranInput(
+                initialPage: firstPage,
+                lastPage: input.lastPage,
+                highlightingSearchAyah: input.highlightingSearchAyah
+            )
+        } else {
+            currentInput = input
+        }
+        if let contentViewController {
+            presenter?.removeChild(contentViewController)
+            self.contentViewController = nil
+            self.contentViewModel = nil
+        }
+        (contentViewController, contentViewModel) = presentQuranContent(with: currentInput)
     }
 
     private func presentTranslationsSelection() {

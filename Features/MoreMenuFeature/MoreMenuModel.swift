@@ -40,4 +40,5 @@ public struct MoreMenuControlsState {
     public var twoPages = ConfigState.conditional
     public var verticalScrolling = ConfigState.conditional
     public var theme = ConfigState.conditional
+    public var jump = ConfigState.alwaysOn
 }

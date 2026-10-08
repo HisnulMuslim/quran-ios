@@ -64,6 +64,20 @@
 "menu.twoPages" = "ಲ್ಯಾಂಡ್‌ಸ್ಕೇಪ್‌ನಲ್ಲಿ 2 ಪುಟಗಳು ಅಕ್ಕಪಕ್ಕ";
 "menu.verticalScrolling" = "ಲಂಬ ಸ್ಕ್ರೋಲಿಂಗ್";
 "menu.theme_settings" = "ಥೀಮ್ ಮತ್ತು ಸೆಟ್ಟಿಂಗ್‌ಗಳು";
+"menu.themes" = "ಥೀಮ್‌ಗಳು";
+"menu.restore_defaults" = "ಡೀಫಾಲ್ಟ್‌ಗಳಿಗೆ ಮರುಹೊಂದಿಸಿ";
+"menu.jump" = "ಪುಟಕ್ಕೆ ಹೋಗಿ";
+
+// MARK: - Jump to Page / Ayah
+
+"jump.title" = "ಪುಟಕ್ಕೆ ಹೋಗಿ";
+"jump.page_number" = "ಪುಟ ಸಂಖ್ಯೆ";
+"jump.surah_and_ayah" = "ಸೂರಾ ಮತ್ತು ಆಯತ್";
+"jump.go" = "ಹೋಗಿ";
+"jump.select_surah" = "ಸೂರಾವನ್ನು ಆಯ್ಕೆಮಾಡಿ";
+"jump.search_surahs" = "ಸೂರಾ ಹೆಸರು ಅಥವಾ ಸಂಖ್ಯೆ ಹುಡುಕಿ...";
+"jump.preview" = "ಮುನ್ನೋಟ";
+"jump.or" = "ಅಥವಾ";
 
 // MARK: - Theme
 

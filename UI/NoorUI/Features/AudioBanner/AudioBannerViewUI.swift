@@ -123,10 +123,11 @@ private struct AudioPlaying: View {
     let actions: AudioBannerActions
 
     var body: some View {
-        HStack {
+        HStack(spacing: 4) {
             Button(action: actions.stop) {
                 NoorSystemImage.stop.image
-                    .padding()
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 12)
             }
 
             Menu {
@@ -141,7 +142,7 @@ private struct AudioPlaying: View {
                     .background(Color(.systemGray5))
                     .clipShape(Capsule())
             }
-            .padding(.leading, 4)
+            .fixedSize()
 
             // Sleep Timer Menu
             Menu {
@@ -178,14 +179,18 @@ private struct AudioPlaying: View {
                     .foregroundColor(.accentColor)
                 } else {
                     NoorSystemImage.sleep.image
-                        .padding()
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 12)
                 }
             }
-            .padding(.leading, 4)
+            .fixedSize()
+
+            Spacer(minLength: 4)
 
             Button(action: actions.backward) {
                 NoorSystemImage.backward.image
-                    .padding()
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 12)
             }
             Group {
                 if paused {
@@ -198,16 +203,20 @@ private struct AudioPlaying: View {
                     }
                 }
             }
-            .padding()
+            .padding(.horizontal, 8)
+            .padding(.vertical, 12)
             Button(action: actions.forward) {
                 NoorSystemImage.forward.image
-                    .padding()
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 12)
             }
 
-            Spacer()
+            Spacer(minLength: 4)
+
             Button(action: actions.more) {
                 NoorSystemImage.more.image
-                    .padding()
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 12)
             }
         }
     }

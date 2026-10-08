@@ -39,6 +39,23 @@ private struct MoreMenuRootView: View {
                         MoreMenuModeSelector(mode: $store.mode)
                     }
 
+                    viewBasedOn(state.jump) {
+                        Button {
+                            store.jumpToPage()
+                        } label: {
+                            NoorListItem(
+                                title: .text(l("menu.jump")),
+                                accessory: .disclosureIndicator
+                            )
+                            .padding()
+                            .contentShape(Rectangle())
+                        }
+                        .buttonStyle(BackgroundHighlightingStyle())
+                        .background(Color.systemBackground)
+
+                        empty
+                    }
+
                     viewBasedOn(state.translationsSelection, customCondition: store.mode == .translation) {
                         Button {
                             store.selectTranslations()

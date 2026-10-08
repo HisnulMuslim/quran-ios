@@ -377,15 +377,19 @@ Quran permission?";
 
 "help_page_title" = "Frequently Asked Questions";
 "help_q1_question" = "How do I make the text larger?";
-"help_q1_answer" = "For the Arabic pages, hold your phone in landscape. This makes the text larger. For translations,click on the 3 dots at the right corner ,  go to themes/settings and set translation text size.";
+"help_q1_answer" = "For Arabic pages, pinch with two fingers on the screen to zoom in and make the text larger, or hold your phone in landscape mode. For translations, tap the 'AA' button in the top bar (or tap the 3 dots menu > Themes & Settings) to adjust Arabic and translation font sizes and font styles.";
+"help_q6_question" = "How do I jump to a specific page, Surah, or Ayah?";
+"help_q6_answer" = "Tap the jump icon (⤴) at the top of the home screen, or tap the Surah title / Juz name (⤴) at the top bar while reading. You can also select 'Go to Page' from the 3 dots menu. Enter a page number or choose a Surah and Ayah to jump directly to it.";
 "help_q2_question" = "How do I play audio?";
 "help_q2_answer" = "Open any Quran page. Tap on the screen once. At the bottom, you will notice a play button and some text with the name of a qari. Click the name of the qari to choose a different qari. Click play to download and play the current page or sura.";
+"help_q7_question" = "How do I set a sleep timer for audio?";
+"help_q7_answer" = "While audio is playing, tap the sleep timer icon (🌙) in the bottom playback bar. You can choose to automatically stop recitation after 5 to 60 minutes, or at the end of the current Surah.";
 "help_q3_question" = "How do I view translation?";
-"help_q3_answer" = "Open any Quran page. Tap on the screen once. In the top, you will notice click an icon with three dots - click this and choose translation to view the translation. Choose and download a translation.";
+"help_q3_answer" = "Open any Quran page and tap once to reveal the top bar. Tap the 3 dots menu at the top to choose or download translations, or to switch display modes (Both, Arabic only, or Translation only).";
 "help_q4_question" = "How do I bookmark a page?";
 "help_q4_answer" = "Open any Quran page. Tap on the screen once. In the top right, you will see a bookmark icon. Tap the bookmark icon to bookmark the page (the color will turn solid white). Tap the bookmark icon again to remove the bookmark.";
-"help_q5_question" = "How do I share an ayah?";
-"help_q5_answer" = "While on any Arabic page, press and hold on any ayah to get a menu where you can choose to bookmark, tag, share or copy that ayah to the clipboard, see the translation, or listen to its recitation.";
+"help_q5_question" = "How do I share or select verses?";
+"help_q5_answer" = "While reading, press and hold on any ayah to get a menu where you can bookmark, tag, share or copy that ayah, see its translation, or listen to recitation. You can drag across multiple ayahs to select them. In Settings > Sharing Settings, you can choose whether to include translation when sharing.";
 "help_footer_contact_text" = "If your question is not answered above, you can email hmkannada@gmail.com for support. Please note that we receive lots of emails, so we may not be able to reply to all of them.";
 
 "menu_translation_font" = "Translation Font";

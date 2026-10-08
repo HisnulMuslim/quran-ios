@@ -13,34 +13,57 @@ import QuranTextKit
 import SwiftUI
 import UIx
 
-private class ThemeSettingsController<V: View>: UIHostingController<V> {
-    override func viewDidLoad() {
+public class ThemeSettingsHostingController: UIHostingController<AnyView> {
+    public init(showFontSize: Bool = true) {
+        let view = MoreMenuThemeSettingsView(showFontSize: showFontSize)
+        super.init(rootView: AnyView(view))
+    }
+
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    public override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = nil
+
+        preferredContentSize = CGSize(width: 380, height: 480)
 
         sheetPresentationController?.prefersGrabberVisible = true
         sheetPresentationController?.prefersEdgeAttachedInCompactHeight = true
         sheetPresentationController?.widthFollowsPreferredContentSizeWhenEdgeAttached = true
 
+        let detentId = UISheetPresentationController.Detent.Identifier("readingAppearance")
         if #available(iOS 16.0, *) {
-            sheetPresentationController?.detents = [.custom(resolver: { _ in 400 })]
+            let customDetent = UISheetPresentationController.Detent.custom(identifier: detentId) { [weak self] context in
+                let targetHeight = self?.preferredContentSize.height ?? 0
+                if targetHeight > 100 {
+                    return min(targetHeight, context.maximumDetentValue)
+                }
+                return min(480, context.maximumDetentValue)
+            }
+            sheetPresentationController?.detents = [customDetent, .large()]
+            sheetPresentationController?.largestUndimmedDetentIdentifier = detentId
         } else {
-            sheetPresentationController?.detents = [.medium()]
+            sheetPresentationController?.detents = [.medium(), .large()]
+            sheetPresentationController?.largestUndimmedDetentIdentifier = .medium
         }
     }
 
-    override func viewWillAppear(_ animated: Bool) {
+    public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         view.backgroundColor = nil
     }
 
-    override func preferredContentSizeDidChange(forChildContentContainer container: UIContentContainer) {
+    public override func preferredContentSizeDidChange(forChildContentContainer container: UIContentContainer) {
         super.preferredContentSizeDidChange(forChildContentContainer: container)
-        preferredContentSize = container.preferredContentSize
+        let height = container.preferredContentSize.height
+        if height > 0 {
+            preferredContentSize = CGSize(width: 380, height: height)
+        }
 
         if #available(iOS 16.0, *) {
-            let height = preferredContentSize.height
-            sheetPresentationController?.detents = [.custom(resolver: { _ in height })]
             sheetPresentationController?.invalidateDetents()
         }
     }
@@ -57,7 +80,7 @@ struct MoreMenuThemeSettingsMenuItem: View {
             // capture the window before dismissing
             let window = viewController?.view.window
             navigator?.dismiss {
-                let controller = ThemeSettingsController(rootView: themeSettingsView())
+                let controller = ThemeSettingsHostingController(showFontSize: showFontSize)
                 controller.modalPresentationStyle = .formSheet
 
                 let parentVC = window?.rootViewController?.deepPresentedViewController()
@@ -74,10 +97,6 @@ struct MoreMenuThemeSettingsMenuItem: View {
         .buttonStyle(BackgroundHighlightingStyle())
         .background(Color.systemBackground)
         UIViewControllerReader(viewController: $viewController)
-    }
-
-    private func themeSettingsView() -> some View {
-        MoreMenuThemeSettingsView(showFontSize: showFontSize)
     }
 }
 
@@ -135,11 +154,12 @@ private struct MoreMenuThemeSettingsView: View {
     @State private var translationLabelSize: CGSize = .zero
     @State private var fontLabelSize: CGSize = .zero
     @State private var displayModeLabelSize: CGSize = .zero
+    @State private var appLanguageLabelSize: CGSize = .zero
 
     @ScaledMetric var compactVerticalPadding = 3.0
 
     var fontSizeLabelWidth: CGFloat {
-        max(arabicLabelSize.width, translationLabelSize.width, fontLabelSize.width, displayModeLabelSize.width)
+        max(arabicLabelSize.width, translationLabelSize.width, fontLabelSize.width, displayModeLabelSize.width, appLanguageLabelSize.width)
     }
 
     var body: some View {
@@ -148,8 +168,8 @@ private struct MoreMenuThemeSettingsView: View {
                 VStack {
                     HStack {
                         Text(l("menu.theme_settings"))
-                            .font(.title)
-                            .fontWeight(.semibold)
+                            .font(.title2)
+                            .fontWeight(.bold)
                         Spacer()
                         CloseButton()
                     }
@@ -189,8 +209,29 @@ private struct MoreMenuThemeSettingsView: View {
                                 items: TranslationFont.allCases,
                                 selectedItem: $viewModel.translationFont
                             ) { font in
-                                Text(localizedName(for: font))
+                                fontPreviewView(for: font)
                             }
+                        }
+
+                        HStack {
+                            Spacer()
+                            Button {
+                                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                                withAnimation(.easeInOut(duration: 0.2)) {
+                                    viewModel.restoreFontDefaults()
+                                }
+                            } label: {
+                                HStack(spacing: 5) {
+                                    Image(systemName: "arrow.counterclockwise")
+                                    Text(l("menu.restore_defaults"))
+                                }
+                                .font(.footnote.weight(.medium))
+                                .foregroundColor(viewModel.canRestoreFontDefaults ? .accentColor : .secondary)
+                            }
+                            .buttonStyle(.plain)
+                            .disabled(!viewModel.canRestoreFontDefaults)
+                            .opacity(viewModel.canRestoreFontDefaults ? 1.0 : 0.5)
+                            .padding(.vertical, 2)
                         }
 
                         Divider()
@@ -213,6 +254,27 @@ private struct MoreMenuThemeSettingsView: View {
                                 Text(localizedName(for: mode))
                             }
                         }
+
+                        Divider()
+                            .padding(.vertical, compactVerticalPadding)
+
+                        HStack(spacing: 30) {
+                            Text(AppLanguage == .kannada ? "ಆ್ಯಪ್ ಭಾಷೆ" : "App Language")
+                                .fixedSize()
+                                .onSizeChange {
+                                    appLanguageLabelSize = $0
+                                }
+                                .frame(width: fontSizeLabelWidth, alignment: .leading)
+
+                            Spacer()
+
+                            DropdownButton(
+                                items: [Language.kannada, Language.english],
+                                selectedItem: $viewModel.appLanguage
+                            ) { language in
+                                Text(language == .kannada ? "ಕನ್ನಡ" : "English")
+                            }
+                        }
                     }
 
                     Divider()
@@ -220,7 +282,7 @@ private struct MoreMenuThemeSettingsView: View {
 
                     VStack(spacing: 0) {
                         HStack {
-                            SectionHeader(header: "Themes") // TODO: Localize
+                            SectionHeader(header: l("menu.themes"))
                             Spacer()
 
                             AppearanceModeSelectorButton(selectedAppearance: $viewModel.appearanceMode)
@@ -234,6 +296,22 @@ private struct MoreMenuThemeSettingsView: View {
             }
         }
         .background(.thickMaterial)
+    }
+
+    @ViewBuilder
+    private func fontPreviewView(for font: TranslationFont) -> some View {
+        let name = localizedName(for: font)
+        switch font {
+        case .kohinoor:
+            Text(name)
+                .font(.custom("KohinoorKannada-Regular", size: 15))
+        case .system:
+            Text(name)
+                .font(.system(size: 15))
+        case .notoSans:
+            Text(name)
+                .font(Font(UIFont(.kannada, size: 15)))
+        }
     }
 
     private func localizedName(for font: TranslationFont) -> String {

@@ -151,6 +151,11 @@ final class SettingsRootViewModel: ObservableObject {
         reviewService.openAppReview()
     }
 
+    func openOtherApps() {
+        logger.info("Settings: openOtherApps")
+        reviewService.openOtherApps()
+    }
+
     func loginToQuranCom() async {
         logger.info("Settings: Login to Quran.com")
         guard let viewController = navigationController else {

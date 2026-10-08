@@ -43,7 +43,21 @@ public final class ContentViewController: UIViewController, UIGestureRecognizerD
         _ gestureRecognizer: UIGestureRecognizer,
         shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer
     ) -> Bool {
-        true
+        if (gestureRecognizer is UILongPressGestureRecognizer && otherGestureRecognizer is UITapGestureRecognizer) ||
+            (otherGestureRecognizer is UILongPressGestureRecognizer && gestureRecognizer is UITapGestureRecognizer) {
+            return false
+        }
+        return true
+    }
+
+    public func gestureRecognizer(
+        _ gestureRecognizer: UIGestureRecognizer,
+        shouldRequireFailureOf otherGestureRecognizer: UIGestureRecognizer
+    ) -> Bool {
+        if gestureRecognizer is UITapGestureRecognizer && otherGestureRecognizer is UILongPressGestureRecognizer {
+            return true
+        }
+        return false
     }
 
     public func word(at point: CGPoint) -> Word? {
@@ -90,7 +104,9 @@ public final class ContentViewController: UIViewController, UIGestureRecognizerD
 
     private func setUpGesture() {
         // Long press gesture on verses to select
-        view.addGestureRecognizer(UILongPressGestureRecognizer(target: self, action: #selector(onLongPress(_:))))
+        let longPress = UILongPressGestureRecognizer(target: self, action: #selector(onLongPress(_:)))
+        longPress.delegate = self
+        view.addGestureRecognizer(longPress)
 
         // dismiss bars when view is panned
         let pan = UIPanGestureRecognizer(target: self, action: #selector(onViewPanned(_:)))

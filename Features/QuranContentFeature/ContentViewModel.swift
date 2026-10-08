@@ -103,6 +103,13 @@ public final class ContentViewModel: ObservableObject {
         highlights.readingVerses = [ayah].compactMap { $0 }
     }
 
+    public func navigateTo(page: Page, ayah: AyahNumber?) {
+        visiblePages = [page]
+        if let ayah {
+            highlights.searchVerses = [ayah]
+        }
+    }
+
     // MARK: Internal
 
     let deps: Deps
@@ -150,11 +157,16 @@ public final class ContentViewModel: ObservableObject {
         guard let longPressData, let selectedVerses else {
             return
         }
-        listener?.presentAyahMenu(
-            in: longPressData.sourceView,
-            at: longPressData.startPosition,
-            verses: selectedVerses
-        )
+        DispatchQueue.main.async { [weak self] in
+            guard let self, let longPressData = self.longPressData else {
+                return
+            }
+            self.listener?.presentAyahMenu(
+                in: longPressData.sourceView,
+                at: longPressData.startPosition,
+                verses: selectedVerses
+            )
+        }
     }
 
     func onViewLongPressCancelled() {

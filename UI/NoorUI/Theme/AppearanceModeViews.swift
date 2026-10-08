@@ -82,7 +82,26 @@ class SystemUserInterfaceStyleObserverWindow: UIWindow {
 
     let traitCollectionChangesPublisher = PassthroughSubject<UITraitCollection, Never>()
 
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        setupTraitTracking()
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        setupTraitTracking()
+    }
+
+    private func setupTraitTracking() {
+        if #available(iOS 17.0, *) {
+            registerForTraitChanges([UITraitUserInterfaceStyle.self]) { (target: SystemUserInterfaceStyleObserverWindow, _) in
+                target.traitCollectionChangesPublisher.send(target.traitCollection)
+            }
+        }
+    }
+
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
         traitCollectionChangesPublisher.send(traitCollection)
     }
 }

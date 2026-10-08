@@ -41,6 +41,9 @@ public struct HomeBuilder {
             },
             navigateToQuarter: { [weak listener] quarter in
                 listener?.navigateTo(page: quarter.page, lastPage: nil, highlightingSearchAyah: nil)
+            },
+            navigateToAyah: { [weak listener] page, ayah in
+                listener?.navigateTo(page: page, lastPage: nil, highlightingSearchAyah: ayah)
             }
         )
         let viewController = HomeViewController(

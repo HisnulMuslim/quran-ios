@@ -152,6 +152,17 @@ private struct _PageViewController<Element, Content>: UIViewControllerRepresenta
         let view = forEach.content(element)
         return PageContentController(rootView: view, element: element)
     }
+
+    static func dismantleUIViewController(_ uiViewController: UIPageViewController, coordinator: Coordinator) {
+        uiViewController.dataSource = nil
+        uiViewController.delegate = nil
+        for view in uiViewController.view.subviews {
+            if let scrollView = view as? UIScrollView {
+                scrollView.delegate = nil
+                break
+            }
+        }
+    }
 }
 
 // MARK: - Coordinator

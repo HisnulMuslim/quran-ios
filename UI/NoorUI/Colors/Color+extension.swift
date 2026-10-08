@@ -17,11 +17,27 @@ extension Color {
             collection.userInterfaceStyle == .dark ? UIColor(rgb: 0x039F85) : UIColor(rgb: 0x004D40)
         })
     }
+
+    public static var brandGreen: Color {
+        Color(UIColor.brandGreen)
+    }
+
+    public static var brandGold: Color {
+        Color(UIColor.brandGold)
+    }
 }
 
 public extension UIColor {
     static var appIdentity: UIColor {
         UIColor(named: "appTint", in: .module, compatibleWith: nil) ?? .systemIndigo
+    }
+
+    static var brandGreen: UIColor {
+        UIColor(rgb: 0x022B24)
+    }
+
+    static var brandGold: UIColor {
+        UIColor(rgb: 0xFFAF00)
     }
 }
 

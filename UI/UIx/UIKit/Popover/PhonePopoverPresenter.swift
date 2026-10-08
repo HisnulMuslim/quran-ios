@@ -9,13 +9,21 @@
 import UIKit
 
 public class PhonePopoverPresenter: PopoverPresenter {
-    func adaptivePresentationStyle(for controller: UIPresentationController, traitCollection: UITraitCollection) -> UIModalPresentationStyle {
+    public func adaptivePresentationStyle(for controller: UIPresentationController) -> UIModalPresentationStyle {
+        .none
+    }
+
+    public func adaptivePresentationStyle(for controller: UIPresentationController, traitCollection: UITraitCollection) -> UIModalPresentationStyle {
         .none
     }
 }
 
 public class PhoneAdapativeController: NSObject, UIAdaptivePresentationControllerDelegate, UISheetPresentationControllerDelegate {
     public static let shared = PhoneAdapativeController()
+
+    public func adaptivePresentationStyle(for controller: UIPresentationController) -> UIModalPresentationStyle {
+        .none
+    }
 
     public func adaptivePresentationStyle(for controller: UIPresentationController, traitCollection: UITraitCollection) -> UIModalPresentationStyle {
         .none

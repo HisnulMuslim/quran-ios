@@ -13,10 +13,12 @@ struct HelpView: View {
     private var faqs: [FAQ] {
         [
             FAQ(id: 1, question: lAndroid("help_q1_question"), answer: lAndroid("help_q1_answer")),
-            FAQ(id: 2, question: lAndroid("help_q2_question"), answer: lAndroid("help_q2_answer")),
-            FAQ(id: 3, question: lAndroid("help_q3_question"), answer: lAndroid("help_q3_answer")),
-            FAQ(id: 4, question: lAndroid("help_q4_question"), answer: lAndroid("help_q4_answer")),
-            FAQ(id: 5, question: lAndroid("help_q5_question"), answer: lAndroid("help_q5_answer")),
+            FAQ(id: 2, question: lAndroid("help_q6_question"), answer: lAndroid("help_q6_answer")),
+            FAQ(id: 3, question: lAndroid("help_q2_question"), answer: lAndroid("help_q2_answer")),
+            FAQ(id: 4, question: lAndroid("help_q7_question"), answer: lAndroid("help_q7_answer")),
+            FAQ(id: 5, question: lAndroid("help_q3_question"), answer: lAndroid("help_q3_answer")),
+            FAQ(id: 6, question: lAndroid("help_q4_question"), answer: lAndroid("help_q4_answer")),
+            FAQ(id: 7, question: lAndroid("help_q5_question"), answer: lAndroid("help_q5_answer")),
         ]
     }
 

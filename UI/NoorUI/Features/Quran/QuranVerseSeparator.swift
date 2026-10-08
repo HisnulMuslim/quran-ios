@@ -10,12 +10,15 @@ import SwiftUI
 public struct QuranVerseSeparator: View {
     public init() { }
 
+    @Environment(\.themeStyle) var themeStyle
+
     public var body: some View {
-        Spacer()
-            .frame(height: 1)
-            .frame(maxWidth: .infinity, alignment: .trailing)
-            .themedSecondaryBackground()
-            .padding(.top, ContentDimension.interSpacing)
+        Rectangle()
+            .fill(Color(themeStyle.pageSeparatorLine).opacity(0.85))
+            .frame(height: 0.8)
+            .readableInsetsPadding(.horizontal)
+            .padding(.top, 10)
+            .padding(.bottom, 6)
     }
 }
 

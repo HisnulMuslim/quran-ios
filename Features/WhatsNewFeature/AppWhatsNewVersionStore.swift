@@ -14,7 +14,10 @@ final class AppWhatsNewVersionStore: WhatsNewVersionStore {
     // MARK: Public
 
     public func has(version: WhatsNew.Version) -> Bool {
-        false
+        guard let lastSeenVersion else {
+            return false
+        }
+        return version.description.compare(lastSeenVersion, options: .numeric) != .orderedDescending
     }
 
     // MARK: Internal

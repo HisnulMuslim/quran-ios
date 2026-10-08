@@ -16,8 +16,9 @@
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //  GNU General Public License for more details.
-//
+import NoorUI
 import UIKit
+import UIx
 import ViewConstrainer
 
 @MainActor
@@ -44,6 +45,7 @@ class QuranView: UIView, UIGestureRecognizerDelegate, UINavigationBarDelegate {
 
     var contentView: UIView?
 
+    let topBarBlurView = UIVisualEffectView(effect: UIBlurEffect(style: .systemMaterial))
     let navigationBar = UINavigationBar()
     let navigationItem = UINavigationItem()
 
@@ -70,6 +72,26 @@ class QuranView: UIView, UIGestureRecognizerDelegate, UINavigationBarDelegate {
         sendSubviewToBack(contentView)
     }
 
+    func showStatusView(_ statusView: UIView) {
+        self.statusView?.removeFromSuperview()
+        self.statusView = statusView
+        addAutoLayoutSubview(statusView)
+        statusView.vc
+            .verticalEdges()
+            .horizontalEdges()
+        bringSubviewToFront(statusView)
+        bringSubviewToFront(topBarBlurView)
+        bringSubviewToFront(navigationBar)
+        if let audioView {
+            bringSubviewToFront(audioView)
+        }
+    }
+
+    func hideStatusView() {
+        statusView?.removeFromSuperview()
+        statusView = nil
+    }
+
     func addAudioBannerView(_ audioBannerView: UIView) {
         audioView = audioBannerView
         addAutoLayoutSubview(audioBannerView)
@@ -81,6 +103,7 @@ class QuranView: UIView, UIGestureRecognizerDelegate, UINavigationBarDelegate {
     func setBarsHidden(_ hidden: Bool) {
         audioView?.alpha = hidden ? 0 : 1
         audioView?.isUserInteractionEnabled = !hidden
+        topBarBlurView.alpha = hidden ? 0 : 1
     }
 
     @objc
@@ -91,14 +114,61 @@ class QuranView: UIView, UIGestureRecognizerDelegate, UINavigationBarDelegate {
         delegate?.onQuranViewTapped(self)
     }
 
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
+        if gestureRecognizer == tapGesture {
+            if touch.view?.isDescendant(of: navigationBar) == true {
+                return false
+            }
+            if let audioView, touch.view?.isDescendant(of: audioView) == true {
+                return false
+            }
+        }
+        return true
+    }
+
     override func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         gestureRecognizer != tapGesture || !isFirstResponder // dismiss bars only if not first responder
+    }
+
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        if (gestureRecognizer == tapGesture && otherGestureRecognizer is UILongPressGestureRecognizer) ||
+            (otherGestureRecognizer == tapGesture && gestureRecognizer is UILongPressGestureRecognizer) {
+            return false
+        }
+        return true
+    }
+
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRequireFailureOf otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        if gestureRecognizer == tapGesture {
+            if let tap = otherGestureRecognizer as? UITapGestureRecognizer, tap.numberOfTapsRequired == 2 {
+                return true
+            }
+            if otherGestureRecognizer is UILongPressGestureRecognizer {
+                return true
+            }
+        }
+        return false
+    }
+
+    // MARK: - Theme
+
+    func applyTheme(_ theme: ThemeStyle) {
+        topBarBlurView.contentView.backgroundColor = theme.backgroundColor.withAlphaComponent(0.2)
+        separator.backgroundColor = theme.pageSeparatorLine
+        if let titleView = navigationItem.titleView as? TwoLineNavigationTitleView {
+            titleView.firstLineColor = theme.textColor
+            titleView.secondLineColor = theme.secondaryTextColor
+            titleView.chevronColor = theme.textColor
+        }
+        navigationBar.tintColor = theme.textColor
     }
 
     // MARK: Private
 
     private let tapGesture = UITapGestureRecognizer()
+    private let separator = UIView()
     private var audioView: UIView?
+    private var statusView: UIView?
 
     private func setUp() {
         clipsToBounds = true
@@ -107,10 +177,40 @@ class QuranView: UIView, UIGestureRecognizerDelegate, UINavigationBarDelegate {
         addGestureRecognizer(tapGesture)
 
         // navigation bar
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithTransparentBackground()
+        navigationBar.standardAppearance = appearance
+        navigationBar.scrollEdgeAppearance = appearance
+        navigationBar.compactAppearance = appearance
+
+        // blur background for status bar & navigation bar
+        let initialTheme = ThemeService.shared.themeStyle
+        topBarBlurView.effect = UIBlurEffect(style: .systemMaterial)
+        topBarBlurView.isUserInteractionEnabled = false
+        topBarBlurView.contentView.backgroundColor = initialTheme.backgroundColor.withAlphaComponent(0.2)
+
+        addAutoLayoutSubview(topBarBlurView)
         addAutoLayoutSubview(navigationBar)
+
+        topBarBlurView.vc.horizontalEdges()
         navigationBar.vc.horizontalEdges()
-        safeAreaLayoutGuide.topAnchor.constraint(equalTo: navigationBar.topAnchor).isActive = true
+
+        NSLayoutConstraint.activate([
+            navigationBar.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
+            topBarBlurView.topAnchor.constraint(equalTo: topAnchor),
+            topBarBlurView.bottomAnchor.constraint(equalTo: navigationBar.bottomAnchor),
+        ])
+
+        // subtle hairline separator at bottom of navigation bar
+        separator.backgroundColor = initialTheme.pageSeparatorLine
+        topBarBlurView.contentView.addAutoLayoutSubview(separator)
+        separator.vc
+            .horizontalEdges()
+            .bottom()
+            .height(by: 1.0 / UIScreen.main.scale)
+
         navigationBar.pushItem(navigationItem, animated: false)
         navigationBar.delegate = self
+        navigationBar.tintColor = initialTheme.textColor
     }
 }
