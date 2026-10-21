@@ -47,6 +47,10 @@ public final class ContentViewController: UIViewController, UIGestureRecognizerD
             (otherGestureRecognizer is UILongPressGestureRecognizer && gestureRecognizer is UITapGestureRecognizer) {
             return false
         }
+        if (gestureRecognizer is UILongPressGestureRecognizer && otherGestureRecognizer is UIPanGestureRecognizer) ||
+            (otherGestureRecognizer is UILongPressGestureRecognizer && gestureRecognizer is UIPanGestureRecognizer) {
+            return false
+        }
         return true
     }
 

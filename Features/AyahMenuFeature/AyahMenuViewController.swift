@@ -43,17 +43,11 @@ final class AyahMenuViewController: UIViewController {
             deleteNote: { [weak self] in await self?.viewModel.deleteNotes() },
             showTranslation: { [weak self] in self?.viewModel.showTranslation() },
             copy: { [weak self] in self?.viewModel.copy() },
-            share: { [weak self] in self?.viewModel.share() }
+            share: { [weak self] in self?.viewModel.share() },
+            expandSelection: { [weak self] in self?.viewModel.expandSelection() },
+            shrinkSelection: { [weak self] in self?.viewModel.shrinkSelection() }
         )
-        let highlightingColor = viewModel.highlightingColor
-        let dataObject = AyahMenuUI.DataObject(
-            highlightingColor: highlightingColor,
-            state: viewModel.noteState,
-            playSubtitle: viewModel.playSubtitle,
-            repeatSubtitle: viewModel.repeatSubtitle,
-            actions: actions,
-            isTranslationView: viewModel.isTranslationView
-        )
+        let dataObject = viewModel.makeDataObject(actions: actions)
         showAyahMenu(dataObject)
     }
 

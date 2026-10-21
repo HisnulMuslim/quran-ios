@@ -130,43 +130,49 @@ public final class AudioBannerViewModel: ObservableObject {
 
     func updateSleepTimer(to option: SleepTimerOption) {
         logger.info("AudioBanner: Setting sleep timer to \(option)")
-        sleepTimer?.invalidate()
-        sleepTimer = nil
-        sleepTimerOption = option
-        shouldPauseAfterCurrentAyah = false
+        UIView.performWithoutAnimation {
+            var transaction = Transaction()
+            transaction.disablesAnimations = true
+            withTransaction(transaction) {
+                sleepTimer?.invalidate()
+                sleepTimer = nil
+                sleepTimerOption = option
+                shouldPauseAfterCurrentAyah = false
 
-        switch option {
-        case .off:
-            sleepTimeRemaining = nil
-            lastPlayingSura = nil
-        case .minutes(let mins):
-            let seconds = TimeInterval(mins * 60)
-            sleepTimeRemaining = seconds
-            lastPlayingSura = nil
+                switch option {
+                case .off:
+                    sleepTimeRemaining = nil
+                    lastPlayingSura = nil
+                case .minutes(let mins):
+                    let seconds = TimeInterval(mins * 60)
+                    sleepTimeRemaining = seconds
+                    lastPlayingSura = nil
 
-            // Set up a repeating 1-second timer
-            sleepTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
-                Task { @MainActor [weak self] in
-                    guard let self else { return }
-                    if let remaining = sleepTimeRemaining {
-                        if remaining <= 1 {
-                            sleepTimeRemaining = nil
-                            shouldPauseAfterCurrentAyah = true
-                            sleepTimer?.invalidate()
-                            sleepTimer = nil
-                            logger.info("AudioBanner: Sleep timer duration ended. Flagged shouldPauseAfterCurrentAyah.")
-                        } else {
-                            sleepTimeRemaining = remaining - 1
+                    // Set up a repeating 1-second timer
+                    sleepTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
+                        Task { @MainActor [weak self] in
+                            guard let self else { return }
+                            if let remaining = self.sleepTimeRemaining {
+                                if remaining <= 1 {
+                                    self.sleepTimeRemaining = nil
+                                    self.shouldPauseAfterCurrentAyah = true
+                                    self.sleepTimer?.invalidate()
+                                    self.sleepTimer = nil
+                                    logger.info("AudioBanner: Sleep timer duration ended. Flagged shouldPauseAfterCurrentAyah.")
+                                } else {
+                                    self.sleepTimeRemaining = remaining - 1
+                                }
+                            }
                         }
                     }
+                case .endOfSurah:
+                    sleepTimeRemaining = nil
+                    if let currentPlayingAyah {
+                        lastPlayingSura = currentPlayingAyah.sura.suraNumber
+                    } else {
+                        lastPlayingSura = nil
+                    }
                 }
-            }
-        case .endOfSurah:
-            sleepTimeRemaining = nil
-            if let currentPlayingAyah {
-                lastPlayingSura = currentPlayingAyah.sura.suraNumber
-            } else {
-                lastPlayingSura = nil
             }
         }
     }
@@ -406,13 +412,19 @@ public final class AudioBannerViewModel: ObservableObject {
     }
 
     private func resetSleepTimer() {
-        sleepTimer?.invalidate()
-        sleepTimer = nil
-        sleepTimerOption = .off
-        sleepTimeRemaining = nil
-        shouldPauseAfterCurrentAyah = false
-        lastPlayingSura = nil
-        currentPlayingAyah = nil
+        UIView.performWithoutAnimation {
+            var transaction = Transaction()
+            transaction.disablesAnimations = true
+            withTransaction(transaction) {
+                sleepTimer?.invalidate()
+                sleepTimer = nil
+                sleepTimerOption = .off
+                sleepTimeRemaining = nil
+                shouldPauseAfterCurrentAyah = false
+                lastPlayingSura = nil
+                currentPlayingAyah = nil
+            }
+        }
     }
 
     // MARK: - State changes

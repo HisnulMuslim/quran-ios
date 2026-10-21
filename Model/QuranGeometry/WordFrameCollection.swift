@@ -34,13 +34,29 @@ public struct WordFrameCollection: Equatable {
 
     public func wordAtLocation(_ location: CGPoint, imageScale: WordFrameScale) -> Word? {
         let flattenFrames = lines.flatMap(\.frames)
+        guard !flattenFrames.isEmpty else {
+            return nil
+        }
         for frame in flattenFrames {
             let rectangle = frame.rect.scaled(by: imageScale)
             if rectangle.contains(location) {
                 return frame.word
             }
         }
-        return nil
+        // Fallback to closest word frame for margins, line gaps, and decorative headers
+        var closestWord: Word?
+        var minDistance: CGFloat = .greatestFiniteMagnitude
+        for frame in flattenFrames {
+            let rectangle = frame.rect.scaled(by: imageScale)
+            let dx = max(0, max(rectangle.minX - location.x, location.x - rectangle.maxX))
+            let dy = max(0, max(rectangle.minY - location.y, location.y - rectangle.maxY))
+            let distance = dy * 2.0 + dx
+            if distance < minDistance {
+                minDistance = distance
+                closestWord = frame.word
+            }
+        }
+        return closestWord
     }
 
     public func topPadding(atLineIndex lineIndex: Int, scale: WordFrameScale) -> CGFloat {

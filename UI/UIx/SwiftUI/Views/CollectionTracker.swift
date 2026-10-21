@@ -53,37 +53,80 @@ private struct CollectionTrackerViewRepresentable<Item: Hashable>: UIViewReprese
 
     func makeUIView(context: Context) -> CollectionTrackerView {
         let view = CollectionTrackerView()
-        updateUIView(view, context: context)
+        tracker.registerView(view)
         return view
     }
 
     func updateUIView(_ view: CollectionTrackerView, context: Context) {
-        tracker.view = view
+        tracker.registerView(view)
     }
 }
 
 public final class CollectionTracker<Item: Hashable> {
-    fileprivate weak var view: CollectionTrackerView?
+    private var trackingViews = NSHashTable<CollectionTrackerView>.weakObjects()
 
     public init() {}
 
+    fileprivate func registerView(_ view: CollectionTrackerView) {
+        trackingViews.add(view)
+    }
+
     private var visibleViews: [TrackingTargetView<Item>] {
-        for viewToTry in [view, view?.superview, view?.superview?.superview] {
-            if let visibleViews = viewToTry?.findVisibleSubviews(ofType: TrackingTargetView<Item>.self), !visibleViews.isEmpty {
-                return visibleViews
+        let activeViews = trackingViews.allObjects
+        guard !activeViews.isEmpty else {
+            return []
+        }
+        for activeView in activeViews {
+            var current: UIView? = activeView
+            var bestFound: [TrackingTargetView<Item>] = []
+            while let c = current {
+                let found = c.findVisibleSubviews(ofType: TrackingTargetView<Item>.self)
+                if found.count > bestFound.count {
+                    bestFound = found
+                }
+                current = c.superview
+            }
+            if !bestFound.isEmpty {
+                return bestFound
             }
         }
         return []
     }
 
     public func itemAtPoint(_ point: CGPoint) -> Item? {
-        for visibleView in visibleViews {
+        let views = visibleViews
+        guard !views.isEmpty else {
+            return nil
+        }
+
+        // 1. Exact hit check
+        for visibleView in views {
             let localPoint = visibleView.convert(point, from: nil)
             if visibleView.point(inside: localPoint, with: nil) {
                 return visibleView.item
             }
         }
-        return nil
+
+        // 2. Nearest view fallback (for margins, line gaps, headers/footers, and smooth drag)
+        var closestItem: Item?
+        var minDistance: CGFloat = .greatestFiniteMagnitude
+
+        for visibleView in views {
+            let windowFrame = visibleView.convert(visibleView.bounds, to: nil)
+            guard windowFrame.width > 0 && windowFrame.height > 0 else {
+                continue
+            }
+            let dx = max(0, max(windowFrame.minX - point.x, point.x - windowFrame.maxX))
+            let dy = max(0, max(windowFrame.minY - point.y, point.y - windowFrame.maxY))
+            // Vertical distance weighted more heavily for stacked text lines / verses
+            let distance = dy * 2.0 + dx
+            if distance < minDistance {
+                minDistance = distance
+                closestItem = visibleView.item
+            }
+        }
+
+        return closestItem
     }
 }
 

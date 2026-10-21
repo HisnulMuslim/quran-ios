@@ -173,6 +173,9 @@ class QuranViewController: BaseViewController, QuranViewDelegate,
 
     func onQuranViewTapped(_ quranView: QuranView) {
         if let presented = presentedViewController {
+            if presented.isBeingPresented || presented is TranslationsSelectionNavigationController {
+                return
+            }
             presented.dismiss(animated: true)
             return
         }

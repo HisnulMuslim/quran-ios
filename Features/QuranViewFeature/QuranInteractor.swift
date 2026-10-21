@@ -13,6 +13,7 @@ import AyahMenuFeature
 import Combine
 import Crashing
 import FeaturesSupport
+import Localization
 import MoreMenuFeature
 import NoorUI
 import NoteEditorFeature
@@ -123,6 +124,13 @@ final class QuranInteractor: WordPointerListener, ContentListener, NoteEditorLis
             .sink { [weak self] status in
                 self?.latestResourceStatus = status
                 self?.updateContentStatus()
+            }
+            .store(in: &cancellables)
+
+        NotificationCenter.default.publisher(for: .requestTranslationsSelection)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.presentTranslationsSelection()
             }
             .store(in: &cancellables)
     }
@@ -264,7 +272,8 @@ final class QuranInteractor: WordPointerListener, ContentListener, NoteEditorLis
             sourceView: sourceView,
             pointInView: point,
             verses: verses,
-            notes: notes
+            notes: notes,
+            visiblePages: visiblePages
         )
         let ayahMenuViewController = deps.ayahMenuBuilder.build(withListener: self, input: input)
         presenter?.presentAyahMenu(ayahMenuViewController, in: sourceView, at: point)
@@ -274,6 +283,12 @@ final class QuranInteractor: WordPointerListener, ContentListener, NoteEditorLis
         logger.info("Quran: dismiss ayah menu")
         presenter?.dismissPresentedViewController(completion: nil)
         contentViewModel?.removeAyahMenuHighlight()
+    }
+
+    @discardableResult
+    func updateAyahMenuSelectedVerses(_ verses: [AyahNumber]) -> [Note] {
+        contentViewModel?.updateAyahMenuSelectedVerses(verses)
+        return notesInteractingVerses(verses)
     }
 
     // MARK: - Word Pointer

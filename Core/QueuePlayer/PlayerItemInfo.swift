@@ -25,7 +25,8 @@ public struct PlayerItemInfo {
     public init(title: String, artist: String, image: UIImage?) {
         self.title = title
         self.artist = artist
-        artwork = (image ?? UIImage(named: "app-image")).map { image in
+        let resolvedImage = image ?? UIImage(named: "app-image") ?? Self.appIconImage()
+        artwork = resolvedImage.map { image in
             MPMediaItemArtwork(boundsSize: image.size) { _ in image }
         }
     }
@@ -35,4 +36,16 @@ public struct PlayerItemInfo {
     public let title: String
     public let artist: String
     public let artwork: MPMediaItemArtwork?
+
+    // MARK: Private
+
+    private static func appIconImage() -> UIImage? {
+        if let icons = Bundle.main.infoDictionary?["CFBundleIcons"] as? [String: Any],
+           let primaryIcon = icons["CFBundlePrimaryIcon"] as? [String: Any],
+           let iconFiles = primaryIcon["CFBundleIconFiles"] as? [String],
+           let lastIcon = iconFiles.last {
+            return UIImage(named: lastIcon)
+        }
+        return nil
+    }
 }

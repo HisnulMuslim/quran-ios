@@ -13,12 +13,17 @@ import QuranText
 import SwiftUI
 import VLogging
 
-private let arabicQuranTextFontSize: CGFloat = 21
-private let arabicTafseerTextFontSize: CGFloat = 21
+private var arabicQuranTextFontSize: CGFloat {
+    FontSize.defaultArabicMediumSize
+}
+
+private var arabicTafseerTextFontSize: CGFloat {
+    FontSize.defaultArabicMediumSize
+}
 
 public extension Font {
     static func quran(ofSize size: FontSize? = nil) -> Font {
-        custom(.quran, size: size?.fontSize(forMediumSize: arabicQuranTextFontSize) ?? arabicQuranTextFontSize)
+        custom(.quran, size: size?.arabicFontSize() ?? arabicQuranTextFontSize)
     }
 
     static func arabicTafseer() -> Font {
@@ -26,19 +31,20 @@ public extension Font {
     }
 
     static func kannada(for textStyle: Font.TextStyle, selection: String = UserDefaults.standard.string(forKey: "translationFontSelection") ?? "notoSans", isBold: Bool = false) -> Font {
+        let padScale = FontSize.padScale
         let size: CGFloat = switch textStyle {
-        case .largeTitle: 36
-        case .title: 30
-        case .title2: 24
-        case .title3: 22
-        case .headline: 19
-        case .body: 19
-        case .callout: 18
-        case .subheadline: 17
-        case .footnote: 16
-        case .caption: 14
-        case .caption2: 13
-        @unknown default: 19
+        case .largeTitle: 36 * padScale
+        case .title: 30 * padScale
+        case .title2: 24 * padScale
+        case .title3: 22 * padScale
+        case .headline: 19 * padScale
+        case .body: 19 * padScale
+        case .callout: 18 * padScale
+        case .subheadline: 17 * padScale
+        case .footnote: 16 * padScale
+        case .caption: 14 * padScale
+        case .caption2: 13 * padScale
+        @unknown default: 19 * padScale
         }
 
         switch selection {
@@ -53,6 +59,22 @@ public extension Font {
             }
         default: // "notoSans"
             return .custom(isBold ? .kannadaBold : .kannada, size: size, relativeTo: textStyle)
+        }
+    }
+
+    static func kannada(size: CGFloat, selection: String = UserDefaults.standard.string(forKey: "translationFontSelection") ?? "notoSans", isBold: Bool = false) -> Font {
+        switch selection {
+        case "kohinoor":
+            let fontName = isBold ? "KohinoorKannada-SemiBold" : "KohinoorKannada-Regular"
+            return .custom(fontName, size: size)
+        case "system":
+            if isBold {
+                return .system(size: size, weight: .bold)
+            } else {
+                return .system(size: size)
+            }
+        default: // "notoSans"
+            return .custom(isBold ? .kannadaBold : .kannada, size: size)
         }
     }
 }

@@ -29,6 +29,9 @@ public protocol AyahMenuListener: AnyObject {
     func showTranslation(_ verses: [AyahNumber])
 
     func editNote(_ note: Note)
+
+    @discardableResult
+    func updateAyahMenuSelectedVerses(_ verses: [AyahNumber]) -> [Note]
 }
 
 // MARK: - ViewModel
@@ -40,6 +43,7 @@ final class AyahMenuViewModel {
         let pointInView: CGPoint
         let verses: [AyahNumber]
         let notes: [Note]
+        let visiblePages: [Page]
         let noteService: NoteService
         let textRetriever: ShareableVerseTextRetriever
         let quranContentStatePreferences = QuranContentStatePreferences.shared
@@ -49,20 +53,67 @@ final class AyahMenuViewModel {
 
     init(deps: Deps) {
         self.deps = deps
+        self.verses = deps.verses
+        self.notes = deps.notes
     }
 
     // MARK: Internal
 
     weak var listener: AyahMenuListener?
 
+    private(set) var verses: [AyahNumber]
+    private(set) var notes: [Note]
+    private(set) var dataObject: AyahMenuUI.DataObject?
+
     var isTranslationView: Bool {
         deps.quranContentStatePreferences.quranMode == .translation
     }
 
-    var highlightingColor: Note.Color { deps.noteService.color(from: deps.notes) }
+    var highlightingColor: Note.Color { deps.noteService.color(from: notes) }
+
+    var selectionTitle: String {
+        guard let first = verses.first else { return "" }
+        if verses.count == 1 {
+            return first.localizedName
+        }
+        guard let last = verses.last else { return "" }
+        if first.sura == last.sura {
+            let startNum = NumberFormatter.shared.format(first.ayah)
+            let endNum = NumberFormatter.shared.format(last.ayah)
+            return "\(first.sura.localizedName()), \(startNum)–\(endNum)"
+        } else {
+            let startNum = NumberFormatter.shared.format(first.ayah)
+            let endNum = NumberFormatter.shared.format(last.ayah)
+            return "\(first.sura.localizedName()) \(startNum) – \(last.sura.localizedName()) \(endNum)"
+        }
+    }
+
+    var selectionSubtitle: String? {
+        if verses.count == 1 {
+            return l("ayah.menu.selected-verse")
+        }
+        return "\(NumberFormatter.shared.format(verses.count)) " + l("ayah.menu.selected-verses")
+    }
+
+    var canExpand: Bool {
+        guard let last = verses.last, let next = last.next else {
+            return false
+        }
+        if isTranslationView {
+            return true
+        }
+        if deps.visiblePages.isEmpty {
+            return true
+        }
+        return deps.visiblePages.contains(next.page)
+    }
+
+    var canShrink: Bool {
+        verses.count > 1
+    }
 
     var playSubtitle: String {
-        if deps.verses.count > 1 { // multiple verses selected
+        if verses.count > 1 { // multiple verses selected
             return l("ayah.menu.selected-verses")
         }
         switch audioPreferences.audioEnd {
@@ -74,49 +125,105 @@ final class AyahMenuViewModel {
     }
 
     var repeatSubtitle: String {
-        if deps.verses.count == 1 {
+        if verses.count == 1 {
             return l("ayah.menu.selected-verse")
         }
         return l("ayah.menu.selected-verses")
     }
 
     var noteState: AyahMenuUI.NoteState {
-        if deps.notes.isEmpty {
+        if notes.isEmpty {
             return .noHighlight
-        } else if containsText(deps.notes) {
+        } else if containsText(notes) {
             return .noted
         }
         return .highlighted
     }
 
+    func makeDataObject(actions: AyahMenuUI.Actions) -> AyahMenuUI.DataObject {
+        let object = AyahMenuUI.DataObject(
+            title: selectionTitle,
+            subtitle: selectionSubtitle,
+            canExpand: canExpand,
+            canShrink: canShrink,
+            highlightingColor: highlightingColor,
+            state: noteState,
+            playSubtitle: playSubtitle,
+            repeatSubtitle: repeatSubtitle,
+            actions: actions,
+            isTranslationView: isTranslationView
+        )
+        self.dataObject = object
+        return object
+    }
+
+    func expandSelection() {
+        guard let last = verses.last, let next = last.next else {
+            return
+        }
+        if !isTranslationView && !deps.visiblePages.isEmpty && !deps.visiblePages.contains(next.page) {
+            return
+        }
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        verses.append(next)
+        if let newNotes = listener?.updateAyahMenuSelectedVerses(verses) {
+            notes = newNotes
+        }
+        updateDataObject()
+    }
+
+    func shrinkSelection() {
+        guard verses.count > 1 else {
+            return
+        }
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        verses.removeLast()
+        if let newNotes = listener?.updateAyahMenuSelectedVerses(verses) {
+            notes = newNotes
+        }
+        updateDataObject()
+    }
+
+    private func updateDataObject() {
+        guard let dataObject else { return }
+        dataObject.title = selectionTitle
+        dataObject.subtitle = selectionSubtitle
+        dataObject.canExpand = canExpand
+        dataObject.canShrink = canShrink
+        dataObject.playSubtitle = playSubtitle
+        dataObject.repeatSubtitle = repeatSubtitle
+        dataObject.highlightingColor = highlightingColor
+        dataObject.state = noteState
+    }
+
     // MARK: - Items & Actions
 
     func play() {
-        logger.info("AyahMenu: play tapped. Verses: \(deps.verses)")
+        logger.info("AyahMenu: play tapped. Verses: \(verses)")
         listener?.dismissAyahMenu()
 
-        let verses = deps.verses
+        let verses = self.verses
         let lastVerse = verses.count == 1 ? nil : verses.last
-        listener?.playAudio(deps.verses[0], to: lastVerse, repeatVerses: false)
+        listener?.playAudio(verses[0], to: lastVerse, repeatVerses: false)
     }
 
     func repeatVerses() {
-        logger.info("AyahMenu: repeat verses tapped. Verses: \(deps.verses)")
+        logger.info("AyahMenu: repeat verses tapped. Verses: \(verses)")
         listener?.dismissAyahMenu()
 
-        let verses = deps.verses
+        let verses = self.verses
         listener?.playAudio(verses[0], to: verses.last, repeatVerses: true)
     }
 
     func deleteNotes() async {
-        logger.info("AyahMenu: delete notes. Verses: \(deps.verses)")
+        logger.info("AyahMenu: delete notes. Verses: \(verses)")
         listener?.dismissAyahMenu()
-        await listener?.deleteNotes(deps.notes, verses: deps.verses)
+        await listener?.deleteNotes(notes, verses: verses)
     }
 
     func editNote() async {
-        logger.info("AyahMenu: edit notes. Verses: \(deps.verses)")
-        let notes = deps.notes
+        logger.info("AyahMenu: edit notes. Verses: \(verses)")
+        let notes = self.notes
         let color = deps.noteService.color(from: notes)
         if let note = await _updateHighlight(color: color) {
             listener?.editNote(note)
@@ -124,18 +231,18 @@ final class AyahMenuViewModel {
     }
 
     func updateHighlight(color: Note.Color) async {
-        logger.info("AyahMenu: update verse highlights. Verses: \(deps.verses)")
+        logger.info("AyahMenu: update verse highlights. Verses: \(verses)")
         listener?.dismissAyahMenu()
         _ = await _updateHighlight(color: color)
     }
 
     func showTranslation() {
-        logger.info("AyahMenu: showTranslation. Verses: \(deps.verses)")
-        listener?.showTranslation(deps.verses)
+        logger.info("AyahMenu: showTranslation. Verses: \(verses)")
+        listener?.showTranslation(verses)
     }
 
     func copy() {
-        logger.info("AyahMenu: copy. Verses: \(deps.verses)")
+        logger.info("AyahMenu: copy. Verses: \(verses)")
         listener?.dismissAyahMenu()
         Task {
             if let lines = try? await retrieveSelectedAyahText() {
@@ -146,7 +253,7 @@ final class AyahMenuViewModel {
     }
 
     func share() {
-        logger.info("AyahMenu: share. Verses: \(deps.verses)")
+        logger.info("AyahMenu: share. Verses: \(verses)")
         Task {
             if let lines = try? await retrieveSelectedAyahText() {
                 let withNewLines = lines.joined(separator: "\n")
@@ -173,7 +280,7 @@ final class AyahMenuViewModel {
         let quran = ReadingPreferences.shared.reading.quran
         do {
             let updatedNote = try await deps.noteService.updateHighlight(
-                verses: deps.verses, color: color, quran: quran
+                verses: verses, color: color, quran: quran
             )
             logger.info("AyahMenu: notes updated")
             return updatedNote
@@ -185,7 +292,7 @@ final class AyahMenuViewModel {
 
     private func retrieveSelectedAyahText() async throws -> [String] {
         try await crasher.recordError("Failed to update highlights") {
-            try await deps.textRetriever.textForVerses(deps.verses)
+            try await deps.textRetriever.textForVerses(verses)
         }
     }
 }

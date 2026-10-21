@@ -15,11 +15,18 @@ import UIKit
 public struct AyahMenuInput {
     // MARK: Lifecycle
 
-    public init(sourceView: UIView, pointInView: CGPoint, verses: [AyahNumber], notes: [Note]) {
+    public init(
+        sourceView: UIView,
+        pointInView: CGPoint,
+        verses: [AyahNumber],
+        notes: [Note],
+        visiblePages: [Page] = []
+    ) {
         self.sourceView = sourceView
         self.pointInView = pointInView
         self.verses = verses
         self.notes = notes
+        self.visiblePages = visiblePages
     }
 
     // MARK: Internal
@@ -28,6 +35,7 @@ public struct AyahMenuInput {
     let pointInView: CGPoint
     let verses: [AyahNumber]
     let notes: [Note]
+    let visiblePages: [Page]
 }
 
 @MainActor
@@ -51,6 +59,7 @@ public struct AyahMenuBuilder {
             pointInView: input.pointInView,
             verses: input.verses,
             notes: input.notes,
+            visiblePages: input.visiblePages,
             noteService: noteService,
             textRetriever: textRetriever
         ))

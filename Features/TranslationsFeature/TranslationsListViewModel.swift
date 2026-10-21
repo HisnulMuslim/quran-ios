@@ -56,8 +56,8 @@ final class TranslationsListViewModel: ObservableObject {
 
     var selectedTranslations: [TranslationItem] {
         selectedTranslationIds
-            .map { id in translations.first { $0.id == id } }
-            .compactMap { $0.map(translationItem) }
+            .compactMap { id in translations.first { $0.id == id && $0.isDownloaded } }
+            .map(translationItem)
     }
 
     var downloadedTranslations: [TranslationItem] {
@@ -188,6 +188,13 @@ final class TranslationsListViewModel: ObservableObject {
     private func loadLocalTranslations() async throws {
         let translations = try await localTranslationsRetriever.getLocalTranslations()
         self.translations = translations
+
+        // Deselect any translations that are not downloaded on disk
+        let downloadedIds = Set(translations.filter(\.isDownloaded).map(\.id))
+        let uninstalledIds = selectedTranslationsPreferences.selectedTranslationIds.filter { !downloadedIds.contains($0) }
+        for id in uninstalledIds {
+            selectedTranslationsPreferences.deselect(id)
+        }
     }
 
     private func loadFromServer() async throws {

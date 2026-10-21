@@ -323,7 +323,7 @@ struct ContinuousArabicTextView: UIViewRepresentable {
 
     func configureTextView(_ uiView: BoundingBoxTextView) {
         let attributedString = NSMutableAttributedString()
-        let fontSize = arabicFontSize.fontSize(forMediumSize: 21)
+        let fontSize = arabicFontSize.arabicFontSize()
         uiView.fontSizeValue = fontSize
         let font = UIFont(.quran, size: fontSize)
 
@@ -378,8 +378,8 @@ extension TranslationContinuousArabic: View {
             self.scrollToVerse = scrollToVerse
             self.scrollTriggerCount = scrollTriggerCount
 
-            let fontSize = arabicFontSize.fontSize(forMediumSize: 21)
-            let charPerLine = max(10.0, 45.0 / (fontSize / 21.0))
+            let fontSize = arabicFontSize.arabicFontSize()
+            let charPerLine = max(10.0, 45.0 / (fontSize / FontSize.defaultArabicMediumSize))
             let lineHeight = max(32.0, fontSize * 1.5)
             let totalChars = verses.reduce(0) { $0 + $1.text.count }
             let estimatedLines = max(1, ceil(CGFloat(totalChars) / charPerLine))
@@ -428,13 +428,14 @@ extension TranslationContinuousArabic: View {
                     }
                 }
             }
+            .environment(\.layoutDirection, .leftToRight)
             .frame(height: totalHeight)
         }
     }
 
     var body: some View {
         ContentView(verses: verses, arabicFontSize: arabicFontSize, scrollToVerse: scrollToVerse, scrollTriggerCount: scrollTriggerCount)
-            .environment(\.layoutDirection, .rightToLeft)
+            .environment(\.layoutDirection, .leftToRight)
             .readableInsetsPadding(.horizontal)
     }
 }
@@ -452,7 +453,7 @@ extension TranslationFrontispieceArabic: View {
                 scrollToVerse: scrollToVerse,
                 scrollTriggerCount: scrollTriggerCount
             )
-            .environment(\.layoutDirection, .rightToLeft)
+            .environment(\.layoutDirection, .leftToRight)
         }
     }
 }
@@ -556,7 +557,8 @@ private func makeAyahBadgeImage(
     textColor: UIColor
 ) -> (UIImage, CGRect) {
     let text = (startAyah != nil && startAyah != ayah) ? "\(surah):\(startAyah!)–\(ayah)" : "\(surah):\(ayah)"
-    let badgeFontSize = max(11, min(16, font.pointSize * 0.62))
+    let maxBadgeSize: CGFloat = UIDevice.current.userInterfaceIdiom == .pad ? 26 : 16
+    let badgeFontSize = max(11, min(maxBadgeSize, font.pointSize * 0.62))
     let badgeFont = UIFont.monospacedDigitSystemFont(ofSize: badgeFontSize, weight: .semibold)
     let textSize = (text as NSString).size(withAttributes: [.font: badgeFont])
 
@@ -612,17 +614,22 @@ private struct TranslationTextChunkBody: View {
 
     var body: some View {
         let isRTL = translation.characterDirection == .rightToLeft
-        let font = translation.textFont(selection: translationFont.rawValue)
+        let font = translation.textFont(fontSize: translationFontSize, selection: translationFont.rawValue)
         let uiFont = translationUIFont(for: translation, fontSize: translationFontSize, selection: translationFont)
 
         textView(isRTL: isRTL, font: font, uiFont: uiFont)
-            .dynamicTypeSize(translationFontSize.dynamicTypeSize)
             .textAlignment(follows: translation.characterDirection)
             .environment(\.layoutDirection, isRTL ? .rightToLeft : .leftToRight)
             .lineSpacing(max(5, translationFontSize.translationFontSize * 0.28))
             .padding(.top, firstChunk ? topPadding : 0)
             .readableInsetsPadding(.horizontal)
     }
+
+    private static let translationTextColor = Color(uiColor: UIColor { trait in
+        trait.userInterfaceStyle == .dark
+            ? UIColor(white: 0.88, alpha: 1.0)
+            : UIColor.label
+    })
 
     @ViewBuilder
     private func textView(isRTL: Bool, font: Font, uiFont: UIFont) -> some View {
@@ -638,9 +645,11 @@ private struct TranslationTextChunkBody: View {
             )
             (Text(Image(uiImage: image)) + Text("  ") + Text(attributedString))
                 .font(font)
+                .foregroundColor(Self.translationTextColor)
         } else {
             (Text(verbatim: "") + Text(attributedString))
                 .font(font)
+                .foregroundColor(Self.translationTextColor)
         }
     }
 
@@ -648,11 +657,17 @@ private struct TranslationTextChunkBody: View {
         let chunkText = text[chunk]
 
         var string = AttributedString(chunkText)
+        string.foregroundColor = Self.translationTextColor
+        let bodyFontSize = translationFontSize.translationFontSize
+        let markerFontSize = max(13.0, round(bodyFontSize * 0.62))
+        let markerFont = Font.system(size: markerFontSize, weight: .semibold)
+        let markerOffset: CGFloat = max(5.0, round(bodyFontSize * 0.22))
+
         for (index, footnoteRange) in footnoteRanges.enumerated() {
             if let range = string.range(from: footnoteRange, overallRange: chunk, overallText: text) {
                 string[range].link = footnoteURL(index)
-                string[range].font = .footnote
-                string[range].baselineOffset = baselineOffset
+                string[range].font = markerFont
+                string[range].baselineOffset = markerOffset
             }
         }
 

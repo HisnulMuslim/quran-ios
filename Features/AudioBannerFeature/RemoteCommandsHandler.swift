@@ -7,6 +7,7 @@
 //
 
 import MediaPlayer
+import UIKit
 
 @MainActor
 struct RemoteCommandActions {
@@ -36,6 +37,7 @@ final class RemoteCommandsHandler {
     // MARK: Internal
 
     func startListening() {
+        UIApplication.shared.beginReceivingRemoteControlEvents()
         center.setCommandsEnabled(true)
     }
 
@@ -44,7 +46,9 @@ final class RemoteCommandsHandler {
     }
 
     func startListeningToPlayCommand() {
+        UIApplication.shared.beginReceivingRemoteControlEvents()
         center.playCommand.isEnabled = true
+        center.togglePlayPauseCommand.isEnabled = true
     }
 
     // MARK: Private

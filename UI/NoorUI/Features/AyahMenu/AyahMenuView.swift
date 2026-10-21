@@ -40,6 +40,7 @@ public struct AyahMenuView: View {
         case .highlights:
             ScrollView {
                 NoteCircles(selectedColor: existingHighlightedColor, tapped: dataObject.actions.highlight)
+                    .frame(width: 285)
             }
             .preferredContentSizeMatchesScrollView()
             .transition(AnyTransition.scale(scale: 2.0).combined(with: .opacity))
@@ -48,7 +49,7 @@ public struct AyahMenuView: View {
 
     // MARK: Internal
 
-    let dataObject: AyahMenuUI.DataObject
+    @ObservedObject var dataObject: AyahMenuUI.DataObject
 
     // MARK: Private
 
@@ -65,7 +66,7 @@ public struct AyahMenuView: View {
 }
 
 private struct AyahMenuViewList: View {
-    let dataObject: AyahMenuUI.DataObject
+    @ObservedObject var dataObject: AyahMenuUI.DataObject
     let showHighlights: AsyncAction
 
     var noteDeleteText: String {
@@ -103,8 +104,70 @@ private struct AyahMenuViewList: View {
         }
     }
 
+    private var selectionHeader: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(dataObject.title)
+                .font(.system(size: 15, weight: .semibold))
+                .foregroundColor(Color.label)
+                .lineLimit(2)
+                .minimumScaleFactor(0.85)
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+            HStack(alignment: .center) {
+                if let subtitle = dataObject.subtitle {
+                    Text(subtitle)
+                        .font(.footnote)
+                        .foregroundColor(Color.secondaryLabel)
+                        .lineLimit(1)
+                }
+
+                Spacer(minLength: 12)
+
+                HStack(spacing: 8) {
+                    Button {
+                        dataObject.actions.shrinkSelection?()
+                    } label: {
+                        Image(systemName: "minus")
+                            .font(.system(size: 13, weight: .bold))
+                            .foregroundColor(dataObject.canShrink ? Color.label : Color(UIColor.tertiaryLabel))
+                            .frame(width: 30, height: 30)
+                            .background(
+                                Circle()
+                                    .fill(Color(UIColor.tertiarySystemFill))
+                            )
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(!dataObject.canShrink)
+
+                    Button {
+                        dataObject.actions.expandSelection?()
+                    } label: {
+                        Image(systemName: "plus")
+                            .font(.system(size: 13, weight: .bold))
+                            .foregroundColor(dataObject.canExpand ? Color.label : Color(UIColor.tertiaryLabel))
+                            .frame(width: 30, height: 30)
+                            .background(
+                                Circle()
+                                    .fill(Color(UIColor.tertiarySystemFill))
+                            )
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(!dataObject.canExpand)
+                }
+            }
+        }
+        .padding(.horizontal)
+        .padding(.top, 12)
+        .padding(.bottom, 10)
+    }
+
     var body: some View {
-        VStack(alignment: .leading) {
+        VStack(alignment: .leading, spacing: 0) {
+            MenuGroup {
+                selectionHeader
+            }
+            Divider()
+
             MenuGroup {
                 Row(
                     title: lAndroid("play"),
@@ -188,7 +251,7 @@ private struct AyahMenuViewList: View {
                 }
             }
         }
-        .fixedSize(horizontal: true, vertical: false)
+        .frame(width: 285)
     }
 }
 
@@ -330,6 +393,10 @@ struct AyahMenuView_Previews: PreviewProvider {
             VStack {
                 Spacer()
                 AyahMenuView(dataObject: AyahMenuUI.DataObject(
+                    title: "Al-Baqarah, Ayah 1",
+                    subtitle: "selected verse",
+                    canExpand: true,
+                    canShrink: false,
                     highlightingColor: .green,
                     state: .noted,
                     playSubtitle: "To the end of Juz'",
@@ -344,6 +411,10 @@ struct AyahMenuView_Previews: PreviewProvider {
             VStack {
                 Spacer()
                 AyahMenuView(dataObject: AyahMenuUI.DataObject(
+                    title: "Al-Baqarah, 1–3",
+                    subtitle: "3 selected verses",
+                    canExpand: true,
+                    canShrink: true,
                     highlightingColor: .red,
                     state: .highlighted,
                     playSubtitle: "To the end of Juz'",
@@ -359,6 +430,10 @@ struct AyahMenuView_Previews: PreviewProvider {
             VStack {
                 Spacer()
                 AyahMenuView(dataObject: AyahMenuUI.DataObject(
+                    title: "Al-Falaq, Ayah 1",
+                    subtitle: "selected verse",
+                    canExpand: true,
+                    canShrink: false,
                     highlightingColor: .green,
                     state: .noHighlight,
                     playSubtitle: "To the end of Juz'",

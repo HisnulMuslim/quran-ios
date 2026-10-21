@@ -53,6 +53,7 @@ public var AppLanguage: Language {
 
 public extension Notification.Name {
     static let appLanguageDidChange = Notification.Name("AppLanguageDidChange")
+    static let requestTranslationsSelection = Notification.Name("RequestTranslationsSelection")
 }
 
 public func l(_ key: String, table: Table = .localizable, language: Language? = nil) -> String {

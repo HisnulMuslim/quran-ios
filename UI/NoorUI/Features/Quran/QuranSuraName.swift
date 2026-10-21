@@ -33,8 +33,7 @@ public struct QuranSuraName: View {
                         .minimumScaleFactor(0.3)
                 }
             Text(besmAllah)
-                .font(.quran())
-                .dynamicTypeSize(besmAllahFontSize.dynamicTypeSize)
+                .font(.quran(ofSize: besmAllahFontSize))
         }
         .padding(.bottom, bottomPadding)
         .padding(.top, topPadding)

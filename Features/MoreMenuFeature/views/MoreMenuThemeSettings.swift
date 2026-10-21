@@ -28,7 +28,9 @@ public class ThemeSettingsHostingController: UIHostingController<AnyView> {
         super.viewDidLoad()
         view.backgroundColor = nil
 
-        preferredContentSize = CGSize(width: 380, height: 480)
+        let isPad = UIDevice.current.userInterfaceIdiom == .pad
+        let defaultWidth: CGFloat = isPad ? 480 : 380
+        preferredContentSize = CGSize(width: defaultWidth, height: 480)
 
         sheetPresentationController?.prefersGrabberVisible = true
         sheetPresentationController?.prefersEdgeAttachedInCompactHeight = true
@@ -59,8 +61,10 @@ public class ThemeSettingsHostingController: UIHostingController<AnyView> {
     public override func preferredContentSizeDidChange(forChildContentContainer container: UIContentContainer) {
         super.preferredContentSizeDidChange(forChildContentContainer: container)
         let height = container.preferredContentSize.height
+        let isPad = UIDevice.current.userInterfaceIdiom == .pad
+        let targetWidth: CGFloat = isPad ? 480 : 380
         if height > 0 {
-            preferredContentSize = CGSize(width: 380, height: height)
+            preferredContentSize = CGSize(width: targetWidth, height: height)
         }
 
         if #available(iOS 16.0, *) {
@@ -132,15 +136,18 @@ private struct FontSizeView: View {
     @Binding var labelSize: CGSize
 
     var body: some View {
-        HStack(spacing: 30) {
+        HStack {
             Text(label)
                 .fixedSize()
                 .onSizeChange {
                     labelSize = $0
                 }
-                .frame(width: labelWidth, alignment: .leading)
+                .frame(width: labelWidth == 0 ? nil : labelWidth, alignment: .leading)
+
+            Spacer()
 
             FontSizeStepper(fontSize: $size)
+                .frame(width: 190)
         }
     }
 }
@@ -195,13 +202,13 @@ private struct MoreMenuThemeSettingsView: View {
                         Divider()
                             .padding(.vertical, compactVerticalPadding)
 
-                        HStack(spacing: 30) {
+                        HStack {
                             Text(lAndroid("menu_translation_font"))
                                 .fixedSize()
                                 .onSizeChange {
                                     fontLabelSize = $0
                                 }
-                                .frame(width: fontSizeLabelWidth, alignment: .leading)
+                                .frame(width: fontSizeLabelWidth == 0 ? nil : fontSizeLabelWidth, alignment: .leading)
 
                             Spacer()
 
@@ -237,34 +244,47 @@ private struct MoreMenuThemeSettingsView: View {
                         Divider()
                             .padding(.vertical, compactVerticalPadding)
 
-                        HStack(spacing: 30) {
-                            Text(l("menu.displayMode"))
-                                .fixedSize()
-                                .onSizeChange {
-                                    displayModeLabelSize = $0
+                        VStack(spacing: 4) {
+                            HStack {
+                                Text(l("menu.displayMode"))
+                                    .fixedSize()
+                                    .onSizeChange {
+                                        displayModeLabelSize = $0
+                                    }
+                                    .frame(width: fontSizeLabelWidth == 0 ? nil : fontSizeLabelWidth, alignment: .leading)
+
+                                Spacer()
+
+                                DropdownButton(
+                                    items: TranslationViewMode.allCases,
+                                    selectedItem: $viewModel.translationViewMode,
+                                    isItemDisabled: { mode in
+                                        mode == .both && !viewModel.hasDownloadedTranslations
+                                    }
+                                ) { mode in
+                                    Text(localizedName(for: mode))
                                 }
-                                .frame(width: fontSizeLabelWidth, alignment: .leading)
+                            }
 
-                            Spacer()
-
-                            DropdownButton(
-                                items: TranslationViewMode.allCases,
-                                selectedItem: $viewModel.translationViewMode
-                            ) { mode in
-                                Text(localizedName(for: mode))
+                            if viewModel.translationViewMode == .translationOnly && viewModel.hasNoTranslations {
+                                Text(l("menu.displayMode.noTranslationsWarning"))
+                                    .font(.caption2)
+                                    .foregroundColor(.orange)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .padding(.top, 2)
                             }
                         }
 
                         Divider()
                             .padding(.vertical, compactVerticalPadding)
 
-                        HStack(spacing: 30) {
+                        HStack {
                             Text(AppLanguage == .kannada ? "ಆ್ಯಪ್ ಭಾಷೆ" : "App Language")
                                 .fixedSize()
                                 .onSizeChange {
                                     appLanguageLabelSize = $0
                                 }
-                                .frame(width: fontSizeLabelWidth, alignment: .leading)
+                                .frame(width: fontSizeLabelWidth == 0 ? nil : fontSizeLabelWidth, alignment: .leading)
 
                             Spacer()
 

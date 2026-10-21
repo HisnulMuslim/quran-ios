@@ -255,4 +255,11 @@
 "menu.displayMode.both" = "Arabic & Translation";
 "menu.displayMode.arabicOnly" = "Arabic Only";
 "menu.displayMode.translationOnly" = "Translation Only";
+"menu.displayMode.noTranslationsWarning" = "No translations selected. A translation is required to read in this mode.";
+
+// Translation Only Empty State
+"translation_only_empty_title" = "No Translation Selected";
+"translation_only_empty_message" = "You are in Translation Only mode, but no translations are currently downloaded or selected.";
+"translation_only_empty_download_button" = "Download / Select Translation";
+"translation_only_empty_switch_button" = "Switch to Arabic";
 

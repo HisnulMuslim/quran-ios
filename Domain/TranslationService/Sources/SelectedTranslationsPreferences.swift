@@ -53,7 +53,7 @@ public class SelectedTranslationsPreferences {
     public func selectedTranslations(from localTranslations: [Translation]) -> [Translation] {
         let selected = selectedTranslationIds
         let translationsById = Dictionary(uniqueKeysWithValues: localTranslations.map { ($0.id, $0) })
-        return selected.compactMap { translationsById[$0] }
+        return selected.compactMap { translationsById[$0] }.filter(\.isDownloaded)
     }
 
     // MARK: Internal
@@ -64,5 +64,5 @@ public class SelectedTranslationsPreferences {
 
     // MARK: Private
 
-    private static let selectedTranslations = PreferenceKey<[Translation.ID]>(key: "selectedTranslations", defaultValue: [1])
+    private static let selectedTranslations = PreferenceKey<[Translation.ID]>(key: "selectedTranslations", defaultValue: [])
 }

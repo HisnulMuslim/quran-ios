@@ -6,10 +6,12 @@
 //
 
 import Combine
+import Foundation
 import Localization
 import NoorUI
 import QuranText
 import QuranTextKit
+import TranslationService
 import VLogging
 
 @MainActor
@@ -25,6 +27,21 @@ final class MoreMenuThemeSettingsViewModel: ObservableObject {
         translationFont = fontSizePreferences.translationFont
         translationViewMode = contentStatePreferences.translationViewMode
         appLanguage = AppLanguage
+        hasNoTranslations = selectedTranslationsPreferences.selectedTranslationIds.isEmpty
+        hasDownloadedTranslations = !selectedTranslationsPreferences.selectedTranslationIds.isEmpty
+
+        selectedTranslationsPreferences.$selectedTranslationIds
+            .sink { [weak self] ids in
+                self?.hasNoTranslations = ids.isEmpty
+                Task { [weak self] in
+                    await self?.loadDownloadedTranslationsStatus()
+                }
+            }
+            .store(in: &cancellables)
+
+        Task { [weak self] in
+            await self?.loadDownloadedTranslationsStatus()
+        }
 
         $themeStyle
             .dropFirst()
@@ -91,8 +108,13 @@ final class MoreMenuThemeSettingsViewModel: ObservableObject {
         $translationViewMode
             .dropFirst()
             .sink { [weak self] newValue in
+                guard let self else { return }
+                if newValue == .both && !self.hasDownloadedTranslations {
+                    self.translationViewMode = .arabicOnly
+                    return
+                }
                 logger.info("More Menu: set translation view mode \(newValue)")
-                self?.contentStatePreferences.translationViewMode = newValue
+                self.contentStatePreferences.translationViewMode = newValue
             }
             .store(in: &cancellables)
 
@@ -115,6 +137,8 @@ final class MoreMenuThemeSettingsViewModel: ObservableObject {
     @Published var translationFont: TranslationFont
     @Published var translationViewMode: TranslationViewMode
     @Published var appLanguage: Language
+    @Published var hasNoTranslations: Bool
+    @Published var hasDownloadedTranslations: Bool
 
     var canRestoreFontDefaults: Bool {
         arabicFontSize != FontSizePreferences.defaultArabicValue ||
@@ -128,6 +152,22 @@ final class MoreMenuThemeSettingsViewModel: ObservableObject {
         translationFont = FontSizePreferences.defaultTranslationFont
     }
 
+    private func loadDownloadedTranslationsStatus() async {
+        let databasesURL = FileManager.documentsURL.appendingPathComponent("databases", isDirectory: true)
+        let retriever = LocalTranslationsRetriever(databasesURL: databasesURL)
+        do {
+            let localTranslations = try await retriever.getLocalTranslations()
+            let hasDownloaded = localTranslations.contains { $0.isDownloaded }
+            logger.info("MoreMenuThemeSettings: localTranslations count=\(localTranslations.count), hasDownloaded=\(hasDownloaded)")
+            self.hasDownloadedTranslations = hasDownloaded
+            if !hasDownloaded && self.translationViewMode == .both {
+                self.translationViewMode = .arabicOnly
+            }
+        } catch {
+            logger.error("MoreMenuThemeSettings: loadDownloadedTranslationsStatus error: \(error)")
+        }
+    }
+
     // MARK: Private
 
     private var cancellables: Set<AnyCancellable> = []
@@ -135,4 +175,5 @@ final class MoreMenuThemeSettingsViewModel: ObservableObject {
     private let themeService = ThemeService.shared
     private let fontSizePreferences = FontSizePreferences.shared
     private let contentStatePreferences = QuranContentStatePreferences.shared
+    private let selectedTranslationsPreferences = SelectedTranslationsPreferences.shared
 }

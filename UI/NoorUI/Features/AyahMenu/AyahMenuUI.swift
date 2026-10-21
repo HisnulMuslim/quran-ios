@@ -5,7 +5,9 @@
 //  Created by Afifi, Mohamed on 7/25/21.
 //
 
+import Combine
 import QuranAnnotations
+import SwiftUI
 import UIx
 
 public enum AyahMenuUI {
@@ -20,7 +22,9 @@ public enum AyahMenuUI {
             deleteNote: @escaping AsyncAction,
             showTranslation: @escaping AsyncAction,
             copy: @escaping AsyncAction,
-            share: @escaping AsyncAction
+            share: @escaping AsyncAction,
+            expandSelection: (() -> Void)? = nil,
+            shrinkSelection: (() -> Void)? = nil
         ) {
             self.play = play
             self.repeatVerses = repeatVerses
@@ -30,6 +34,8 @@ public enum AyahMenuUI {
             self.showTranslation = showTranslation
             self.copy = copy
             self.share = share
+            self.expandSelection = expandSelection
+            self.shrinkSelection = shrinkSelection
         }
 
         // MARK: Internal
@@ -42,12 +48,19 @@ public enum AyahMenuUI {
         let showTranslation: AsyncAction
         let copy: AsyncAction
         let share: AsyncAction
+        let expandSelection: (() -> Void)?
+        let shrinkSelection: (() -> Void)?
     }
 
-    public struct DataObject {
+    @MainActor
+    public final class DataObject: ObservableObject {
         // MARK: Lifecycle
 
         public init(
+            title: String,
+            subtitle: String? = nil,
+            canExpand: Bool = true,
+            canShrink: Bool = false,
             highlightingColor: Note.Color,
             state: NoteState,
             playSubtitle: String,
@@ -55,6 +68,10 @@ public enum AyahMenuUI {
             actions: Actions,
             isTranslationView: Bool
         ) {
+            self.title = title
+            self.subtitle = subtitle
+            self.canExpand = canExpand
+            self.canShrink = canShrink
             self.highlightingColor = highlightingColor
             self.state = state
             self.playSubtitle = playSubtitle
@@ -65,12 +82,16 @@ public enum AyahMenuUI {
 
         // MARK: Internal
 
-        let highlightingColor: Note.Color
-        let state: NoteState
-        let actions: Actions
-        let playSubtitle: String
-        let repeatSubtitle: String
-        let isTranslationView: Bool
+        @Published public var title: String
+        @Published public var subtitle: String?
+        @Published public var canExpand: Bool
+        @Published public var canShrink: Bool
+        @Published public var highlightingColor: Note.Color
+        @Published public var state: NoteState
+        @Published public var playSubtitle: String
+        @Published public var repeatSubtitle: String
+        public let isTranslationView: Bool
+        public let actions: Actions
     }
 
     // MARK: Public
@@ -81,3 +102,4 @@ public enum AyahMenuUI {
         case noted
     }
 }
+

@@ -39,6 +39,8 @@ public class QueuePlayer {
     // MARK: Open
 
     open func play(request: AudioRequest, rate: Float) {
+        try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [.defaultToSpeaker, .allowBluetooth])
+        try? AVAudioSession.sharedInstance().setActive(true)
         player = AudioPlayer(request: request, rate: rate)
         player?.actions = newPlayerActions()
         player?.startPlaying()

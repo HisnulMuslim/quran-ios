@@ -9,7 +9,11 @@
 import AppDependencies
 import HomeFeature
 import Localization
+import QuranKit
+import QuranText
+import QuranTextKit
 import QuranViewFeature
+import ReadingService
 import UIKit
 
 struct HomeTabBuilder: TabBuildable {
@@ -39,6 +43,37 @@ private final class HomeTabInteractor: TabInteractor {
     override func start() {
         let rootViewController = homeBuilder.build(withListener: self)
         presenter?.setViewControllers([rootViewController], animated: false)
+
+        #if DEBUG
+        if let pageStr = ProcessInfo.processInfo.environment["OPEN_PAGE"],
+           let pageNum = Int(pageStr) {
+            if let arabicStr = ProcessInfo.processInfo.environment["SET_ARABIC_FONT"],
+               let rawVal = Int(arabicStr),
+               let size = FontSize(rawValue: rawVal) {
+                var prefs = FontSizePreferences.shared
+                prefs.arabicFontSize = size
+            }
+            if let transStr = ProcessInfo.processInfo.environment["SET_TRANS_FONT"],
+               let rawVal = Int(transStr),
+               let size = FontSize(rawValue: rawVal) {
+                var prefs = FontSizePreferences.shared
+                prefs.translationFontSize = size
+            }
+            if let modeStr = ProcessInfo.processInfo.environment["SET_VIEW_MODE"],
+               let rawMode = Int(modeStr),
+               let mode = TranslationViewMode(rawValue: rawMode) {
+                var statePrefs = QuranContentStatePreferences.shared
+                statePrefs.translationViewMode = mode
+            }
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+                let quran = ReadingPreferences.shared.reading.quran
+                if let targetPage = Page(quran: quran, pageNumber: pageNum) {
+                    self.navigateTo(page: targetPage, lastPage: nil, highlightingSearchAyah: nil)
+                }
+            }
+        }
+        #endif
     }
 
     // MARK: Private

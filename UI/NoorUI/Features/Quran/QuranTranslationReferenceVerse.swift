@@ -29,8 +29,9 @@ public struct QuranTranslationReferenceVerse: View {
     public var body: some View {
         HStack(alignment: .center, spacing: 8) {
             if let ayahNumber {
+                let maxBadgeSize: CGFloat = UIDevice.current.userInterfaceIdiom == .pad ? 26 : 16
                 Text(lFormat("translation.text.ayah-number", ayahNumber.sura.suraNumber, ayahNumber.ayah))
-                    .font(.system(size: max(11, min(16, fontSize.translationFontSize * 0.62)), weight: .semibold, design: .monospaced))
+                    .font(.system(size: max(11, min(maxBadgeSize, fontSize.translationFontSize * 0.62)), weight: .semibold, design: .monospaced))
                     .padding(.horizontal, 6)
                     .padding(.vertical, 3)
                     .themedSecondaryForeground()

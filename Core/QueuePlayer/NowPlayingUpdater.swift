@@ -23,19 +23,25 @@ public class NowPlayingUpdater {
     }
 
     public func update(duration: TimeInterval) {
+        guard duration.isFinite && !duration.isNaN else { return }
         update([MPMediaItemPropertyPlaybackDuration: duration])
     }
 
     public func update(elapsedTime: TimeInterval) {
+        guard elapsedTime.isFinite && !elapsedTime.isNaN else { return }
         update([MPNowPlayingInfoPropertyElapsedPlaybackTime: elapsedTime])
     }
 
     public func update(info: PlayerItemInfo) {
-        update([MPMediaItemPropertyTitle: info.title,
-                MPMediaItemPropertyArtist: info.artist])
+        var values: [String: Any] = [
+            MPMediaItemPropertyTitle: info.title,
+            MPMediaItemPropertyArtist: info.artist,
+            MPNowPlayingInfoPropertyMediaType: MPNowPlayingInfoMediaType.audio.rawValue,
+        ]
         if let artwork = info.artwork {
-            update([MPMediaItemPropertyArtwork: artwork])
+            values[MPMediaItemPropertyArtwork] = artwork
         }
+        update(values)
     }
 
     public func update(rate: Float) {

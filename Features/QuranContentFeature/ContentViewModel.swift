@@ -90,6 +90,19 @@ public final class ContentViewModel: ObservableObject {
         longPressData = nil
     }
 
+    public func updateAyahMenuSelectedVerses(_ verses: [AyahNumber]) {
+        guard let first = verses.first, let last = verses.last else {
+            return
+        }
+        if var data = longPressData {
+            data.startVerse = first
+            data.endVerse = last
+            longPressData = data
+        } else {
+            highlights.shareVerses = verses
+        }
+    }
+
     public func highlightTranslationVerse(_ verse: AyahNumber) {
         longPressData?.startVerse = verse
         longPressData?.endVerse = verse
@@ -154,7 +167,7 @@ public final class ContentViewModel: ObservableObject {
     }
 
     func onViewLongPressEnded() {
-        guard let longPressData, let selectedVerses else {
+        guard longPressData != nil, let selectedVerses else {
             return
         }
         DispatchQueue.main.async { [weak self] in

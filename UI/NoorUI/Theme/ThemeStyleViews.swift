@@ -199,3 +199,16 @@ extension ThemeStyle {
         }
     }
 }
+
+extension UIColor {
+    public static let quranArabicText = UIColor { traitCollection in
+        traitCollection.userInterfaceStyle == .dark
+            ? UIColor(white: 0.90, alpha: 1.0)
+            : UIColor.label
+    }
+}
+
+extension Color {
+    public static let quranArabicText = Color(uiColor: .quranArabicText)
+}
+

@@ -49,10 +49,15 @@ private struct SheetPresentationBackground<S: ShapeStyle>: ViewModifier {
 private struct SheetPresentationDetents: ViewModifier {
     let detents: [SheetPresentationDetent]
 
+    @ViewBuilder
     func body(content: Content) -> some View {
         if #available(iOS 16.0, *) {
-            content
-                .presentationDetents(presentationDetents)
+            if detents.isEmpty {
+                content
+            } else {
+                content
+                    .presentationDetents(presentationDetents)
+            }
         } else {
             content
         }

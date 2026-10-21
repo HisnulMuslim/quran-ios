@@ -12,6 +12,17 @@ import SwiftUI
 import VLogging
 
 extension Translation {
+    func textFont(fontSize: FontSize, selection: String) -> Font {
+        let size = fontSize.translationFontSize
+        if languageCode == "ar" {
+            return .custom(.arabic, size: size)
+        } else if languageCode == "kn" || languageCode == "kan" || languageCode.hasPrefix("kn") {
+            return .kannada(size: size, selection: selection)
+        } else {
+            return .system(size: size)
+        }
+    }
+
     func textFont(selection: String) -> Font {
         if languageCode == "ar" {
             return .arabicTafseer()

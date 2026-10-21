@@ -63,7 +63,22 @@ public final class ContentTranslationViewModel: ObservableObject {
             .store(in: &cancellables)
 
         selectedTranslationsPreferences.$selectedTranslationIds
-            .sink { [weak self] in self?.selectedTranslations = $0 }
+            .sink { [weak self] newIds in
+                self?.selectedTranslations = newIds
+            }
+            .store(in: &cancellables)
+
+        selectedTranslationsPreferences.$selectedTranslationIds
+            .dropFirst()
+            .sink { [weak self] newIds in
+                guard let self else { return }
+                if newIds.isEmpty {
+                    if self.quranContentStatePreferences.translationViewMode == .translationOnly ||
+                       self.quranContentStatePreferences.translationViewMode == .both {
+                        self.quranContentStatePreferences.translationViewMode = .arabicOnly
+                    }
+                }
+            }
             .store(in: &cancellables)
     }
 
@@ -78,6 +93,7 @@ public final class ContentTranslationViewModel: ObservableObject {
 
     @Published var selectedTranslations: [Translation.ID]
     @Published var translations: [Translation] = []
+    @Published var hasLoaded = false
     @Published var verseTexts: [AyahNumber: VerseText] = [:]
     @Published var lookaheadVerseTexts: [AyahNumber: VerseText] = [:]
     @Published var expandedTranslations: [AyahNumber: [Translation: [Range<String.Index>]]] = [:]
@@ -102,6 +118,15 @@ public final class ContentTranslationViewModel: ObservableObject {
             return []
         }
 
+        if translationViewMode == .translationOnly && translations.isEmpty {
+            var emptyItems: [TranslationItem] = []
+            if showHeaderAndFooter {
+                emptyItems.append(.pageHeader(TranslationPageHeader(page: page)))
+                emptyItems.append(.pageFooter(TranslationPageFooter(page: page)))
+            }
+            return emptyItems
+        }
+
         let scrollingVerse = highlightsService.highlights.firstScrollingVerse()
 
         var items: [TranslationItem] = []
@@ -113,12 +138,13 @@ public final class ContentTranslationViewModel: ObservableObject {
         let isFrontispiecePage = translationViewMode == .arabicOnly && (page.pageNumber == 1 || page.pageNumber == 2)
 
         for (verse, verseText) in verseTexts.sorted(by: { $0.key < $1.key }) {
-            var color = highlights[verse]
-            if color == nil, let rangeInfo = combinedRanges[0]?[verse] {
+            let verseHighlightColor = highlights[verse]
+            var translationColor = verseHighlightColor
+            if translationColor == nil, let rangeInfo = combinedRanges[0]?[verse] {
                 for a in rangeInfo.startAyah ..< rangeInfo.endAyah {
                     if let emptyVerse = AyahNumber(quran: verse.quran, sura: verse.sura.suraNumber, ayah: a),
                        let emptyColor = highlights[emptyVerse] {
-                        color = emptyColor
+                        translationColor = emptyColor
                         break
                     }
                 }
@@ -129,7 +155,7 @@ public final class ContentTranslationViewModel: ObservableObject {
                     currentSura = verse.sura
                     let arabicVerseNumber = NumberFormatter.arabicNumberFormatter.format(verse.ayah)
                     let arabicText = verseText.arabicText + " " + arabicVerseNumber
-                    currentSuraVerses.append(TranslationArabicText(verse: verse, text: arabicText, arabicFontSize: arabicFontSize, highlightColor: color))
+                    currentSuraVerses.append(TranslationArabicText(verse: verse, text: arabicText, arabicFontSize: arabicFontSize, highlightColor: verseHighlightColor))
                 } else {
                     if currentSura != verse.sura {
                         if let prevSura = currentSura, !currentSuraVerses.isEmpty {
@@ -139,19 +165,19 @@ public final class ContentTranslationViewModel: ObservableObject {
                         currentSura = verse.sura
                         // Add sura name, if a new sura
                         if verse.sura.firstVerse == verse {
-                            items.append(.suraName(TranslationSuraName(sura: verse.sura, arabicFontSize: arabicFontSize), color))
+                            items.append(.suraName(TranslationSuraName(sura: verse.sura, arabicFontSize: arabicFontSize), verseHighlightColor))
                         }
                     }
 
                     // Add arabic verse with number
                     let arabicVerseNumber = NumberFormatter.arabicNumberFormatter.format(verse.ayah)
                     let arabicText = verseText.arabicText + " " + arabicVerseNumber
-                    currentSuraVerses.append(TranslationArabicText(verse: verse, text: arabicText, arabicFontSize: arabicFontSize, highlightColor: color))
+                    currentSuraVerses.append(TranslationArabicText(verse: verse, text: arabicText, arabicFontSize: arabicFontSize, highlightColor: verseHighlightColor))
                 }
             } else {
                 // Add sura name, if a new sura
                 if verse.sura.firstVerse == verse {
-                    items.append(.suraName(TranslationSuraName(sura: verse.sura, arabicFontSize: arabicFontSize), color))
+                    items.append(.suraName(TranslationSuraName(sura: verse.sura, arabicFontSize: arabicFontSize), verseHighlightColor))
                 }
 
                 // In translation-only mode, if this verse has no translation of its own because it is merged
@@ -168,9 +194,9 @@ public final class ContentTranslationViewModel: ObservableObject {
                 if translationViewMode == .both {
                     let arabicVerseNumber = NumberFormatter.arabicNumberFormatter.format(verse.ayah)
                     let arabicText = verseText.arabicText + " " + arabicVerseNumber
-                    // In both mode, the entire row container already receives `color` background.
+                    // In both mode, the entire row container already receives `verseHighlightColor` background.
                     // Passing `highlightColor: nil` prevents double-layer alpha blending and inner glyph boxes.
-                    items.append(.arabicText(TranslationArabicText(verse: verse, text: arabicText, arabicFontSize: arabicFontSize, highlightColor: nil), color))
+                    items.append(.arabicText(TranslationArabicText(verse: verse, text: arabicText, arabicFontSize: arabicFontSize, highlightColor: nil), verseHighlightColor))
                 } else if translationViewMode == .translationOnly {
                     // Ayah number badge is rendered inline at the start of the translation
                 }
@@ -187,11 +213,11 @@ public final class ContentTranslationViewModel: ObservableObject {
                                 .translationReferenceVerse(
                                     TranslationReferenceVerse(
                                         verse: verse,
-                                        translation: translation,
+                                         translation: translation,
                                         reference: targetVerse,
                                         translationFontSize: translationFontSize,
                                         showAyahBadge: showAyahBadge
-                                    ), color
+                                    ), translationColor
                                 )
                             )
                         } else {
@@ -208,7 +234,7 @@ public final class ContentTranslationViewModel: ObservableObject {
                                             reference: reference,
                                             translationFontSize: translationFontSize,
                                             showAyahBadge: showAyahBadge
-                                        ), color
+                                        ), translationColor
                                     )
                                 )
                             case .string(let originalString):
@@ -248,7 +274,7 @@ public final class ContentTranslationViewModel: ObservableObject {
                                                 translationFont: translationFont,
                                                 showAyahBadge: showAyahBadge && chunkIndex == 0,
                                                 badgeStartAyah: badgeStartAyah
-                                            ), color
+                                            ), translationColor
                                         )
                                     )
                                 }
@@ -263,7 +289,7 @@ public final class ContentTranslationViewModel: ObservableObject {
                                         verse: verse,
                                         translation: translation,
                                         translationFontSize: translationFontSize
-                                    ), color
+                                    ), translationColor
                                 )
                             )
                         }
@@ -272,7 +298,7 @@ public final class ContentTranslationViewModel: ObservableObject {
 
                 let isLastVerseInTheView = verses.last == verse
                 if !isLastVerseInTheView {
-                    items.append(.verseSeparator(TranslationVerseSeparator(verse: verse), color))
+                    items.append(.verseSeparator(TranslationVerseSeparator(verse: verse), verseHighlightColor))
                 }
             }
         }
@@ -303,6 +329,17 @@ public final class ContentTranslationViewModel: ObservableObject {
             logger.info("Loading translations data; selectedTranslations='\(selectedTranslations)'; verses='\(verses)'")
             let localTranslations = try await localTranslationsRetriever.getLocalTranslations()
             translations = selectedTranslationsPreferences.selectedTranslations(from: localTranslations)
+
+            // Deselect any translations that are not downloaded on disk
+            let downloadedIds = Set(localTranslations.filter(\.isDownloaded).map(\.id))
+            let uninstalledIds = selectedTranslationsPreferences.selectedTranslationIds.filter { !downloadedIds.contains($0) }
+            for id in uninstalledIds {
+                selectedTranslationsPreferences.deselect(id)
+            }
+
+            if downloadedIds.isEmpty && quranContentStatePreferences.translationViewMode == .both {
+                quranContentStatePreferences.translationViewMode = .arabicOnly
+            }
 
             let verses = verses
             let loadedVerseTexts = try await dataService.textForVerses(verses, translations: translations)
@@ -338,11 +375,13 @@ public final class ContentTranslationViewModel: ObservableObject {
 
             lookaheadVerseTexts = extraTexts
             verseTexts = loadedVerseTexts
+            hasLoaded = true
 
             scrollToVerseIfNeeded()
         } catch {
             // TODO: should show error to the user
             crasher.recordError(error, reason: "Failed to retrieve quran page details")
+            hasLoaded = true
         }
     }
 
@@ -357,7 +396,26 @@ public final class ContentTranslationViewModel: ObservableObject {
     }
 
     func ayahAtPoint(_ point: CGPoint) -> AyahNumber? {
-        tracker.itemAtPoint(point)?.ayah
+        if let ayah = tracker.itemAtPoint(point)?.ayah {
+            return ayah
+        }
+        // Fallback for touches outside tracked regions (e.g. Surah header banner or margins on Page 1 & 2)
+        if let first = verses.first, (first.page.pageNumber == 1 || first.page.pageNumber == 2) {
+            return first
+        }
+        return nil
+    }
+
+    var isTranslationOnlyEmpty: Bool {
+        guard translationViewMode == .translationOnly else { return false }
+        if selectedTranslations.isEmpty {
+            return true
+        }
+        return hasLoaded && translations.isEmpty
+    }
+
+    func switchToArabicMode() {
+        quranContentStatePreferences.translationViewMode = .arabicOnly
     }
 
     func increaseFontSizes() {

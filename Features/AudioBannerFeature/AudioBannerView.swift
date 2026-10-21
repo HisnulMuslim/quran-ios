@@ -26,8 +26,24 @@ struct AudioBannerView: View {
             cancelDownloading: { await viewModel.cancelDownload() },
             reciters: { viewModel.presentReciterList() },
             more: { viewModel.showAdvancedAudioOptions() },
-            setPlaybackRate: { viewModel.updatePlaybackRate(to: $0) },
-            setSleepTimer: { viewModel.updateSleepTimer(to: $0) }
+            setPlaybackRate: { rate in
+                var transaction = Transaction()
+                transaction.disablesAnimations = true
+                withTransaction(transaction) {
+                    UIView.performWithoutAnimation {
+                        viewModel.updatePlaybackRate(to: rate)
+                    }
+                }
+            },
+            setSleepTimer: { option in
+                var transaction = Transaction()
+                transaction.disablesAnimations = true
+                withTransaction(transaction) {
+                    UIView.performWithoutAnimation {
+                        viewModel.updateSleepTimer(to: option)
+                    }
+                }
+            }
         )
         AudioBannerViewUI(
             state: viewModel.audioBannerState,

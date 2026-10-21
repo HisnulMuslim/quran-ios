@@ -54,12 +54,16 @@ public struct QuranTranslationTextChunk: View {
         let chunkText = text[chunk]
 
         var string = AttributedString(chunkText)
+        let bodyFontSize = fontSize.translationFontSize
+        let markerFontSize = max(13.0, round(bodyFontSize * 0.62))
+        let markerFont = Font.system(size: markerFontSize, weight: .semibold)
+        let markerOffset: CGFloat = max(5.0, round(bodyFontSize * 0.22))
+
         for (index, footnoteRange) in footnoteRanges.enumerated() {
             if let range = string.range(from: footnoteRange, overallRange: chunk, overallText: text) {
                 string[range].link = footnoteURL(index)
-                // TODO: Should get footnote from environment.
-                string[range].font = .footnote
-                string[range].baselineOffset = baselineOffset
+                string[range].font = markerFont
+                string[range].baselineOffset = markerOffset
             }
         }
 

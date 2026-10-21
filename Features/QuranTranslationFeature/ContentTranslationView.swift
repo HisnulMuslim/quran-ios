@@ -5,6 +5,7 @@
 //  Created by Mohamed Afifi on 2023-12-29.
 //
 
+import Localization
 import NoorUI
 import QuranKit
 import QuranPagesFeature
@@ -29,10 +30,12 @@ public struct ContentTranslationView: View {
             scrollToItem: viewModel.scrollToItem,
             tracker: viewModel.tracker,
             footnote: $viewModel.footnote,
+            isTranslationOnlyEmpty: viewModel.isTranslationOnlyEmpty,
             openURL: { viewModel.openURL($0) },
             onPinchOut: { viewModel.increaseFontSizes() },
             onPinchIn: { viewModel.decreaseFontSizes() },
-            onDoubleTap: { viewModel.resetFontSizesToDefault() }
+            onDoubleTap: { viewModel.resetFontSizesToDefault() },
+            onSwitchToArabic: { viewModel.switchToArabicMode() }
         )
         .geometryActions(
             PageGeometryActions(
@@ -179,11 +182,13 @@ private struct ContentTranslationViewBody: View {
     let tracker: CollectionTracker<TranslationItemId>
 
     @Binding var footnote: TranslationFootnote?
+    let isTranslationOnlyEmpty: Bool
 
     let openURL: (TranslationURL) -> Void
     let onPinchOut: () -> Void
     let onPinchIn: () -> Void
     let onDoubleTap: () -> Void
+    let onSwitchToArabic: () -> Void
 
     private var isFrontispiecePage: Bool {
         items.contains { if case .frontispieceArabic = $0 { return true }; return false }
@@ -203,7 +208,32 @@ private struct ContentTranslationViewBody: View {
 
     var body: some View {
         Group {
-            if isFrontispiecePage {
+            if isTranslationOnlyEmpty {
+                GeometryReader { geometry in
+                    ScrollView {
+                        VStack(spacing: 0) {
+                            if let header = headerItem {
+                                header
+                            }
+                            Spacer(minLength: 32)
+
+                            TranslationOnlyEmptyStateView(
+                                onDownloadTapped: {
+                                    NotificationCenter.default.post(name: .requestTranslationsSelection, object: nil)
+                                },
+                                onSwitchToArabicTapped: onSwitchToArabic
+                            )
+
+                            Spacer(minLength: 32)
+
+                            if let footer = footerItem {
+                                footer
+                            }
+                        }
+                        .frame(maxWidth: .infinity, minHeight: geometry.size.height)
+                    }
+                }
+            } else if isFrontispiecePage {
                 GeometryReader { geometry in
                     ScrollView {
                         VStack(spacing: 0) {
@@ -238,5 +268,84 @@ private struct ContentTranslationViewBody: View {
         .quranScrolling(scrollToValue: scrollToItem)
         .sheet(item: $footnote) { $0 }
         .background(PinchGestureViewRepresentable(onPinchOut: onPinchOut, onPinchIn: onPinchIn, onDoubleTap: onDoubleTap))
+    }
+}
+
+private struct TranslationOnlyEmptyStateView: View {
+    let onDownloadTapped: () -> Void
+    let onSwitchToArabicTapped: () -> Void
+
+    var body: some View {
+        VStack(spacing: 20) {
+            ZStack {
+                Circle()
+                    .fill(Color.accentColor.opacity(0.12))
+                    .frame(width: 80, height: 80)
+
+                Image(systemName: "character.book.closed.fill")
+                    .font(.system(size: 38))
+                    .foregroundColor(.accentColor)
+            }
+            .padding(.top, 8)
+
+            VStack(spacing: 8) {
+                Text(l("translation_only_empty_title"))
+                    .font(.title3)
+                    .fontWeight(.bold)
+                    .foregroundColor(.primary)
+                    .multilineTextAlignment(.center)
+
+                Text(l("translation_only_empty_message"))
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 16)
+                    .lineSpacing(3)
+            }
+
+            VStack(spacing: 12) {
+                Button(action: onDownloadTapped) {
+                    HStack(spacing: 8) {
+                        Image(systemName: "arrow.down.circle.fill")
+                            .font(.system(size: 16, weight: .semibold))
+                        Text(l("translation_only_empty_download_button"))
+                            .font(.system(size: 15, weight: .semibold))
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 14)
+                    .background(Color.accentColor)
+                    .foregroundColor(.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(PlainButtonStyle())
+
+                Button(action: onSwitchToArabicTapped) {
+                    HStack(spacing: 8) {
+                        Image(systemName: "text.alignright")
+                            .font(.system(size: 16, weight: .semibold))
+                        Text(l("translation_only_empty_switch_button"))
+                            .font(.system(size: 15, weight: .semibold))
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 14)
+                    .background(Color(uiColor: .secondarySystemBackground))
+                    .foregroundColor(.primary)
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(PlainButtonStyle())
+            }
+            .padding(.horizontal, 8)
+            .padding(.top, 4)
+            .padding(.bottom, 8)
+        }
+        .padding(24)
+        .background(
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .fill(Color(uiColor: .systemBackground))
+                .shadow(color: Color.black.opacity(0.06), radius: 16, x: 0, y: 6)
+        )
+        .padding(.horizontal, 24)
     }
 }

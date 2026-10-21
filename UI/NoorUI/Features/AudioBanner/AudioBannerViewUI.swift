@@ -7,6 +7,7 @@
 
 import Localization
 import SwiftUI
+import UIKit
 import UIx
 
 public enum SleepTimerOption: Hashable, Sendable {
@@ -122,6 +123,26 @@ private struct AudioPlaying: View {
     let sleepTimeRemaining: TimeInterval?
     let actions: AudioBannerActions
 
+    private func setPlaybackRateWithoutAnimation(_ rate: Float) {
+        var transaction = Transaction()
+        transaction.disablesAnimations = true
+        withTransaction(transaction) {
+            UIView.performWithoutAnimation {
+                actions.setPlaybackRate(rate)
+            }
+        }
+    }
+
+    private func setSleepTimerWithoutAnimation(_ option: SleepTimerOption) {
+        var transaction = Transaction()
+        transaction.disablesAnimations = true
+        withTransaction(transaction) {
+            UIView.performWithoutAnimation {
+                actions.setSleepTimer(option)
+            }
+        }
+    }
+
     var body: some View {
         HStack(spacing: 4) {
             Button(action: actions.stop) {
@@ -132,58 +153,86 @@ private struct AudioPlaying: View {
 
             Menu {
                 ForEach(speedValues, id: \.self) { value in
-                    Button(formattedSpeed(value)) { actions.setPlaybackRate(value) }
+                    Button(formattedSpeed(value)) { setPlaybackRateWithoutAnimation(value) }
                 }
             } label: {
                 Text(formattedSpeed(currentRate))
                     .font(.footnote)
+                    .lineLimit(1)
+                    .fixedSize(horizontal: true, vertical: false)
                     .padding(.horizontal, 8)
                     .padding(.vertical, 6)
                     .background(Color(.systemGray5))
                     .clipShape(Capsule())
             }
             .fixedSize()
+            .transaction { transaction in
+                transaction.animation = nil
+            }
 
             // Sleep Timer Menu
             Menu {
-                Button(l("audio.sleep_timer.off")) { actions.setSleepTimer(.off) }
-                Button(lFormat("audio.sleep_timer.minutes", 5)) { actions.setSleepTimer(.minutes(5)) }
-                Button(lFormat("audio.sleep_timer.minutes", 10)) { actions.setSleepTimer(.minutes(10)) }
-                Button(lFormat("audio.sleep_timer.minutes", 15)) { actions.setSleepTimer(.minutes(15)) }
-                Button(lFormat("audio.sleep_timer.minutes", 30)) { actions.setSleepTimer(.minutes(30)) }
-                Button(lFormat("audio.sleep_timer.minutes", 45)) { actions.setSleepTimer(.minutes(45)) }
-                Button(lFormat("audio.sleep_timer.minutes", 60)) { actions.setSleepTimer(.minutes(60)) }
-                Button(l("audio.sleep_timer.end_of_surah")) { actions.setSleepTimer(.endOfSurah) }
+                Button(l("audio.sleep_timer.off")) { setSleepTimerWithoutAnimation(.off) }
+                Button(lFormat("audio.sleep_timer.minutes", 5)) { setSleepTimerWithoutAnimation(.minutes(5)) }
+                Button(lFormat("audio.sleep_timer.minutes", 10)) { setSleepTimerWithoutAnimation(.minutes(10)) }
+                Button(lFormat("audio.sleep_timer.minutes", 15)) { setSleepTimerWithoutAnimation(.minutes(15)) }
+                Button(lFormat("audio.sleep_timer.minutes", 30)) { setSleepTimerWithoutAnimation(.minutes(30)) }
+                Button(lFormat("audio.sleep_timer.minutes", 45)) { setSleepTimerWithoutAnimation(.minutes(45)) }
+                Button(lFormat("audio.sleep_timer.minutes", 60)) { setSleepTimerWithoutAnimation(.minutes(60)) }
+                Button(l("audio.sleep_timer.end_of_surah")) { setSleepTimerWithoutAnimation(.endOfSurah) }
             } label: {
-                if let remaining = sleepTimeRemaining {
+                ZStack {
+                    // Stable footprint: retains maximum width from the start so the Menu
+                    // container never has to expand from narrow to wide on the first selection.
                     HStack(spacing: 2) {
                         NoorSystemImage.sleepActive.image
-                        Text(formatTimeRemaining(remaining))
-                            .font(.caption2.monospacedDigit())
+                        ZStack {
+                            Text(formatTimeRemaining(3600))
+                                .font(.caption2.monospacedDigit())
+                            Text(l("surah"))
+                                .font(.caption2)
+                        }
                     }
                     .padding(.horizontal, 8)
                     .padding(.vertical, 6)
-                    .background(Color.accentColor.opacity(0.15))
-                    .clipShape(Capsule())
-                    .foregroundColor(.accentColor)
-                } else if case .endOfSurah = sleepTimerOption {
-                    HStack(spacing: 2) {
-                        NoorSystemImage.sleepActive.image
-                        Text("Surah")
-                            .font(.caption2)
-                    }
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 6)
-                    .background(Color.accentColor.opacity(0.15))
-                    .clipShape(Capsule())
-                    .foregroundColor(.accentColor)
-                } else {
-                    NoorSystemImage.sleep.image
+                    .hidden()
+
+                    if let remaining = sleepTimeRemaining {
+                        HStack(spacing: 2) {
+                            NoorSystemImage.sleepActive.image
+                            Text(formatTimeRemaining(remaining))
+                                .font(.caption2.monospacedDigit())
+                                .lineLimit(1)
+                        }
                         .padding(.horizontal, 8)
-                        .padding(.vertical, 12)
+                        .padding(.vertical, 6)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .background(Color.accentColor.opacity(0.15))
+                        .clipShape(Capsule())
+                        .foregroundColor(.accentColor)
+                    } else if case .endOfSurah = sleepTimerOption {
+                        HStack(spacing: 2) {
+                            NoorSystemImage.sleepActive.image
+                            Text(l("surah"))
+                                .font(.caption2)
+                                .lineLimit(1)
+                        }
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 6)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .background(Color.accentColor.opacity(0.15))
+                        .clipShape(Capsule())
+                        .foregroundColor(.accentColor)
+                    } else {
+                        NoorSystemImage.sleep.image
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    }
                 }
             }
             .fixedSize()
+            .transaction { transaction in
+                transaction.animation = nil
+            }
 
             Spacer(minLength: 4)
 
@@ -219,6 +268,9 @@ private struct AudioPlaying: View {
                     .padding(.vertical, 12)
             }
         }
+        .animation(nil, value: sleepTimerOption)
+        .animation(nil, value: sleepTimeRemaining)
+        .animation(nil, value: currentRate)
     }
 }
 

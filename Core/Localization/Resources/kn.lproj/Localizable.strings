@@ -149,7 +149,7 @@
 
 "ayah.menu.copy" = "ನಕಲಿಸಿ";
 "ayah.menu.share" = "ಹಂಚಿಕೊಳ್ಳಿ...";
-"ayah.menu.play-end-juz" = "ಜುಜ್ ಕೊನೆಯವರೆಗೆ";
+"ayah.menu.play-end-juz" = "ಜುಝ್ ಕೊನೆಯವರೆಗೆ";
 "ayah.menu.play-end-surah" = "ಸೂರಾ ಕೊನೆಯವರೆಗೆ";
 "ayah.menu.play-end-page" = "ಪುಟದ ಕೊನೆಯವರೆಗೆ";
 "ayah.menu.play-end-quran" = "ಕುರ್‌ಆನ್‌ನ ಕೊನೆಯವರೆಗೆ";
@@ -234,7 +234,7 @@
 "new.personalization.details" = "* ಹಲವು ಥೀಮ್‌ಗಳ ಬೆಂಬಲ. ಕುರ್‌ಆನ್ ಪುಟ ತೆರೆಯಿರಿ → ಮೇಲ್ಭಾಗದ ಬಲಗಡೆಯ ಮೆನು → ಥೀಮ್ ಮತ್ತು ಸೆಟ್ಟಿಂಗ್‌ಗಳು.";
 
 "new.library_navigation" = "ಗ್ರಂಥಾಲಯ ಮತ್ತು ನ್ಯಾವಿಗೇಷನ್:";
-"new.library_navigation.details" = "* ಮುಖಪುಟದಲ್ಲಿ ಸೂರಾ ಮತ್ತು ಜುಜ್‌ಗಳನ್ನು ವಿಂಗಡಿಸಲಾಗಿದೆ ಮತ್ತು ಸೂರಾ ಸಂಖ್ಯೆಗಳನ್ನು ಪ್ರದರ್ಶಿಸಲಾಗಿದೆ.";
+"new.library_navigation.details" = "* ಮುಖಪುಟದಲ್ಲಿ ಸೂರಾ ಮತ್ತು ಜುಝ್‌ಗಳನ್ನು ವಿಂಗಡಿಸಲಾಗಿದೆ ಮತ್ತು ಸೂರಾ ಸಂಖ್ಯೆಗಳನ್ನು ಪ್ರದರ್ಶಿಸಲಾಗಿದೆ.";
 
 // Translation Update Notification
 "translation.update.notification.title" = "ಅನುವಾದವನ್ನು ನವೀಕರಿಸಲಾಗಿದೆ";
@@ -245,3 +245,10 @@
 "menu.displayMode.both" = "ಅರೇಬಿಕ್ ಮತ್ತು ಅನುವಾದ";
 "menu.displayMode.arabicOnly" = "ಅರೇಬಿಕ್ ಮಾತ್ರ";
 "menu.displayMode.translationOnly" = "ಅನುವಾದ ಮಾತ್ರ";
+"menu.displayMode.noTranslationsWarning" = "ಯಾವುದೇ ಅನುವಾದ ಆಯ್ಕೆಯಾಗಿಲ್ಲ. ಈ ಮೋಡ್‌ನಲ್ಲಿ ಓದಲು ಅನುವಾದ ಅಗತ್ಯವಿದೆ.";
+
+// Translation Only Empty State
+"translation_only_empty_title" = "ಯಾವುದೇ ಅನುವಾದ ಆಯ್ಕೆಯಾಗಿಲ್ಲ";
+"translation_only_empty_message" = "ನೀವು ಅನುವಾದ ಮಾತ್ರ ಮೋಡ್‌ನಲ್ಲಿದ್ದೀರಿ, ಆದರೆ ಯಾವುದೇ ಅನುವಾದವನ್ನು ಡೌನ್‌ಲೋಡ್ ಮಾಡಿಲ್ಲ ಅಥವಾ ಆಯ್ಕೆ ಮಾಡಿಲ್ಲ.";
+"translation_only_empty_download_button" = "ಅನುವಾದ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ / ಆಯ್ಕೆಮಾಡಿ";
+"translation_only_empty_switch_button" = "ಅರೇಬಿಕ್‌ಗೆ ಬದಲಾಯಿಸಿ";

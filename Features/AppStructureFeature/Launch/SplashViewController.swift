@@ -12,15 +12,16 @@ public final class SplashViewController: UIViewController {
 
     override public func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .black
+        let splashBackgroundColor = UIColor(red: 246 / 255.0, green: 246 / 255.0, blue: 244 / 255.0, alpha: 1.0)
+        view.backgroundColor = splashBackgroundColor
 
         let imageView = UIImageView()
         if let image = UIImage(named: "SplashScreen") {
             imageView.image = image
         } else {
-            imageView.backgroundColor = .black
+            imageView.backgroundColor = splashBackgroundColor
         }
-        imageView.contentMode = .scaleAspectFill
+        imageView.contentMode = .scaleAspectFit
         imageView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(imageView)
 

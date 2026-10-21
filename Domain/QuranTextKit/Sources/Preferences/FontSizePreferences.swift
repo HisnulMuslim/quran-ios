@@ -8,6 +8,10 @@
 import Preferences
 import QuranText
 
+#if canImport(UIKit)
+import UIKit
+#endif
+
 public enum TranslationFont: String, CaseIterable {
     case notoSans
     case kohinoor
@@ -38,8 +42,38 @@ public struct FontSizePreferences {
     @TransformedPreference(translationFontKey, transformer: .rawRepresentable(defaultValue: .notoSans))
     public var translationFont: TranslationFont
 
-    public static let defaultTranslationValue = FontSize.level3
-    public static let defaultArabicValue = FontSize.level1
+    private static var isPad13Inch: Bool {
+        #if canImport(UIKit)
+        guard UIDevice.current.userInterfaceIdiom == .pad else { return false }
+        let bounds = UIScreen.main.bounds
+        return max(bounds.width, bounds.height) >= 1300
+        #else
+        return false
+        #endif
+    }
+
+    private static var isPadNon13Inch: Bool {
+        #if canImport(UIKit)
+        guard UIDevice.current.userInterfaceIdiom == .pad else { return false }
+        let bounds = UIScreen.main.bounds
+        return max(bounds.width, bounds.height) < 1300
+        #else
+        return false
+        #endif
+    }
+
+    public static var defaultTranslationValue: FontSize {
+        isPad13Inch ? .level2 : .level3
+    }
+
+    public static var defaultArabicValue: FontSize {
+        if isPad13Inch || isPadNon13Inch {
+            return .level2
+        } else {
+            return .level1
+        }
+    }
+
     public static let defaultTranslationFont = TranslationFont.notoSans
 
     public mutating func resetToDefaults() {

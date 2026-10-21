@@ -70,12 +70,12 @@
 "import_data_error" = "ಅಮಾನ್ಯ ಬ್ಯಾಕಪ್ ಫೈಲ್";
 "import_successful" = "ಆಮದು ಯಶಸ್ವಿಯಾಗಿದೆ";
 "infinity" = "∞";
-"juz2_description" = "ಜುಜ್ %1$@";
+"juz2_description" = "ಜುಝ್ %1$@";
 "loading" = "ಲೋಡ್ ಆಗುತ್ತಿದೆ…";
-"madani" = "ಮದನಿ";
+"madani" = "ಮದೀನಾದಲ್ಲಿ";
 "madani_description" = "ಶಾಸ್ತ್ರೀಯ ಮದನಿ ಲಿಪಿ.";
 "madani_title" = "ಕ್ಲಾಸಿಕ್ ಮದನಿ ಮುಸ್ಹಫ್";
-"makki" = "ಮಕ್ಕಿ";
+"makki" = "ಮಕ್ಕಾದಲ್ಲಿ";
 "manzil_description" = "ಮಂಜಿಲ್ %1$@";
 "menu_about" = "ನಮ್ಮ ಬಗ್ಗೆ";
 "menu_back_to_page" = "ಕುರ್‌ಆನ್ ತೋರಿಸಿ";
@@ -106,7 +106,7 @@
 "notification_channel_audio" = "ಕುರ್‌ಆನ್ ಪಠಣ";
 "notification_channel_download" = "ಕುರ್‌ಆನ್ ಡೌನ್‌ಲೋಡ್‌ಗಳು";
 "notification_download_canceled" = "ಡೌನ್‌ಲೋಡ್ ರದ್ದಾಗಿದೆ";
-"page_description" = "ಪುಟ %1$@, ಜುಜ್ %2$@";
+"page_description" = "ಪುಟ %1$@, ಜುಝ್ %2$@";
 "pause" = "ವಿರಾಮ";
 "play" = "ಪ್ಲೇ";
 "play_apply" = "ಅನ್ವಯಿಸಿ";
@@ -130,9 +130,9 @@
 "qarilist_select_qari" = "ಖಾರಿ ಆಯ್ಕೆ ಮಾಡಿ";
 "qarilist_selected" = "ಆಯ್ಕೆ ಮಾಡಿದ";
 "quran_ayah" = "ಆಯತ್ %1$d";
-"quran_ayah_details" = "%1$@ - ಆಯತ್ %2$@, ಜುಜ್ %3$@";
+"quran_ayah_details" = "%1$@ - ಆಯತ್ %2$@, ಜುಝ್ %3$@";
 "quran_hizb" = "ಹಿಜ್ಬ್";
-"quran_juz2" = "ಜುಜ್";
+"quran_juz2" = "ಜುಝ್";
 "quran_nos" = "½";
 "quran_page" = "ಪುಟ";
 "quran_rob3" = "¼";
@@ -190,7 +190,7 @@
 "prefs_highlight_bookmarks_title" = "ಬುಕ್‌ಮಾರ್ಕ್‌ಗಳನ್ನು ಹೈಲೈಟ್ ಮಾಡಿ";
 "prefs_night_mode_summary" = "ಕಡು ಹಿನ್ನೆಲೆ ಮತ್ತು ತಿಳಿ ಅಕ್ಷರ ಬಳಸಿ";
 "prefs_night_mode_title" = "ರಾತ್ರಿ ಮೋಡ್";
-"prefs_overlay_page_info_summary" = "ಓದುವಾಗ ಪುಟ ಸಂಖ್ಯೆ, ಸೂರಾ ಹೆಸರು, ಜುಜ್ ಸಂಖ್ಯೆ ತೋರಿಸಿ";
+"prefs_overlay_page_info_summary" = "ಓದುವಾಗ ಪುಟ ಸಂಖ್ಯೆ, ಸೂರಾ ಹೆಸರು, ಜುಝ್ ಸಂಖ್ಯೆ ತೋರಿಸಿ";
 "prefs_overlay_page_info_title" = "ಪುಟ ಮಾಹಿತಿ ತೋರಿಸಿ";
 "prefs_sura_translated_name_summary" = "ಸೂರಾ ಹೆಸರಿನ ಅನುವಾದ ತೋರಿಸಿ";
 "prefs_sura_translated_name_title" = "ಸೂರಾ ಅನುವಾದ ಹೆಸರು";
