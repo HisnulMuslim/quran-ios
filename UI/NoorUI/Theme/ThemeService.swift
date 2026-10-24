@@ -14,18 +14,7 @@ import UIKit
 public class ThemeService {
     // MARK: Lifecycle
 
-    private var cancellables = Set<AnyCancellable>()
-
-    private init() {
-        SystemUserInterfaceStyleObserverWindow.shared
-            .traitCollectionChangesPublisher
-            .sink { [weak self] traitCollection in
-                guard let self, self.preferenceAppearanceMode == .auto else { return }
-                self.adaptToSystemInterfaceStyle(userInterfaceStyle: traitCollection.userInterfaceStyle)
-                self.updateUserInterfaceStyle(themeStyle: self.themeStyle, appearanceMode: self.appearanceMode)
-            }
-            .store(in: &cancellables)
-    }
+    private init() {}
 
     // MARK: Public
 
@@ -38,18 +27,6 @@ public class ThemeService {
                 return
             }
             preferenceAppearanceMode = newValue
-            if newValue == .dark {
-                if preferenceThemeStyle != .quiet {
-                    preferenceLastLightStyle = preferenceThemeStyle
-                    preferenceThemeStyle = .quiet
-                }
-            } else if newValue == .light {
-                if preferenceThemeStyle == .quiet {
-                    preferenceThemeStyle = preferenceLastLightStyle
-                }
-            } else if newValue == .auto {
-                adaptToSystemInterfaceStyle(userInterfaceStyle: SystemUserInterfaceStyleObserverWindow.shared.traitCollection.userInterfaceStyle)
-            }
             updateUserInterfaceStyle(themeStyle: themeStyle, appearanceMode: appearanceMode)
         }
     }
@@ -61,16 +38,6 @@ public class ThemeService {
                 return
             }
             preferenceThemeStyle = newValue
-            if newValue == .quiet {
-                if preferenceAppearanceMode != .dark {
-                    preferenceAppearanceMode = .dark
-                }
-            } else {
-                preferenceLastLightStyle = newValue
-                if preferenceAppearanceMode == .dark {
-                    preferenceAppearanceMode = .light
-                }
-            }
             updateUserInterfaceStyle(themeStyle: newValue, appearanceMode: appearanceMode)
         }
     }
@@ -101,33 +68,11 @@ public class ThemeService {
         valueToRaw: { $0.rawValue }
     )
 
-    private static let lastLightThemeStyleRaw = PreferenceKey<Int?>(key: "lastLightThemeStyle", defaultValue: nil)
-    private static let lastLightThemeStyleTransformer = PreferenceTransformer<Int?, ThemeStyle>(
-        rawToValue: { $0.flatMap { ThemeStyle(rawValue: $0) } ?? .paper },
-        valueToRaw: { $0.rawValue }
-    )
-
     @TransformedPreference(appearanceModeRaw, transformer: appearanceModeTransformer)
     private var preferenceAppearanceMode: AppearanceMode
 
     @TransformedPreference(themeStyleRaw, transformer: themeStyleTransformer)
     private var preferenceThemeStyle: ThemeStyle
-
-    @TransformedPreference(lastLightThemeStyleRaw, transformer: lastLightThemeStyleTransformer)
-    private var preferenceLastLightStyle: ThemeStyle
-
-    private func adaptToSystemInterfaceStyle(userInterfaceStyle: UIUserInterfaceStyle) {
-        if userInterfaceStyle == .dark {
-            if preferenceThemeStyle != .quiet {
-                preferenceLastLightStyle = preferenceThemeStyle
-                preferenceThemeStyle = .quiet
-            }
-        } else if userInterfaceStyle == .light {
-            if preferenceThemeStyle == .quiet {
-                preferenceThemeStyle = preferenceLastLightStyle
-            }
-        }
-    }
 
     private func updateUserInterfaceStyle(themeStyle: ThemeStyle, appearanceMode: AppearanceMode) {
         let newInterfaceStyle = userInterfaceStyle

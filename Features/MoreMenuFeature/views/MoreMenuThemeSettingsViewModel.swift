@@ -45,7 +45,6 @@ final class MoreMenuThemeSettingsViewModel: ObservableObject {
 
         $themeStyle
             .dropFirst()
-            .removeDuplicates()
             .sink { [weak self] newValue in
                 logger.info("More Menu: set themeStyle \(newValue)")
                 self?.themeService.themeStyle = newValue
@@ -54,30 +53,9 @@ final class MoreMenuThemeSettingsViewModel: ObservableObject {
 
         $appearanceMode
             .dropFirst()
-            .removeDuplicates()
             .sink { [weak self] newValue in
                 logger.info("More Menu: set appearanceMode \(newValue)")
                 self?.themeService.appearanceMode = newValue
-            }
-            .store(in: &cancellables)
-
-        themeService.themeStylePublisher
-            .removeDuplicates()
-            .sink { [weak self] newStyle in
-                guard let self else { return }
-                if self.themeStyle != newStyle {
-                    self.themeStyle = newStyle
-                }
-            }
-            .store(in: &cancellables)
-
-        themeService.appearanceModePublisher
-            .removeDuplicates()
-            .sink { [weak self] newMode in
-                guard let self else { return }
-                if self.appearanceMode != newMode {
-                    self.appearanceMode = newMode
-                }
             }
             .store(in: &cancellables)
 
