@@ -201,6 +201,19 @@ class QuranViewController: BaseViewController, QuranViewDelegate,
         present(activityViewController, animated: true, completion: nil)
     }
 
+    func presentShareImage(verses: [AyahNumber]) {
+        let shareController = AyahShareImageViewController(
+            verses: verses,
+            databasesURL: interactor.databasesURL,
+            quranFileURL: interactor.quranFileURL
+        )
+        if let sheet = shareController.sheetPresentationController {
+            sheet.detents = [.large()]
+            sheet.prefersGrabberVisible = true
+        }
+        present(shareController, animated: true)
+    }
+
     func presentWordPointer(_ viewController: UIViewController) {
         addChild(viewController)
         quranView?.addWordPointerView(viewController.view)

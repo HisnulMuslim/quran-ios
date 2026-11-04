@@ -44,6 +44,7 @@ final class AyahMenuViewController: UIViewController {
             showTranslation: { [weak self] in self?.viewModel.showTranslation() },
             copy: { [weak self] in self?.viewModel.copy() },
             share: { [weak self] in self?.viewModel.share() },
+            shareImage: { [weak self] in self?.viewModel.shareImage() },
             expandSelection: { [weak self] in self?.viewModel.expandSelection() },
             shrinkSelection: { [weak self] in self?.viewModel.shrinkSelection() }
         )

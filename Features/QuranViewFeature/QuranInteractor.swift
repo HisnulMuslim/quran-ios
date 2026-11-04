@@ -42,6 +42,7 @@ protocol QuranPresentable: UIViewController {
     func updateBookmark(_ isBookmarked: Bool)
 
     func shareText(_ lines: [String], in sourceView: UIView, at point: CGPoint, completion: @escaping () -> Void)
+    func presentShareImage(verses: [AyahNumber])
 
     func presentMoreMenu(_ viewController: UIViewController)
     func presentThemeSettings(_ viewController: UIViewController)
@@ -75,11 +76,21 @@ final class QuranInteractor: WordPointerListener, ContentListener, NoteEditorLis
         let translationsSelectionBuilder: TranslationsListBuilder
         let translationVerseBuilder: TranslationVerseBuilder
         let localTranslationsRetriever: LocalTranslationsRetriever
+        let databasesURL: URL
+        let quranFileURL: URL
         let resources: ReadingResourcesService
     }
 
     var localTranslationsRetriever: LocalTranslationsRetriever {
         deps.localTranslationsRetriever
+    }
+
+    var databasesURL: URL {
+        deps.databasesURL
+    }
+
+    var quranFileURL: URL {
+        deps.quranFileURL
     }
 
     // MARK: Lifecycle
@@ -242,6 +253,12 @@ final class QuranInteractor: WordPointerListener, ContentListener, NoteEditorLis
         logger.info("Quran: share text")
         dismissAyahMenu()
         presenter?.shareText(lines, in: sourceView, at: point, completion: {})
+    }
+
+    func shareImage(verses: [AyahNumber]) {
+        logger.info("Quran: share image for verses: \(verses)")
+        dismissAyahMenu()
+        presenter?.presentShareImage(verses: verses)
     }
 
     func editNote(_ note: Note) {

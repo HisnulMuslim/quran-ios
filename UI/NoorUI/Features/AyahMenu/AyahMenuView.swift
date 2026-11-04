@@ -94,6 +94,14 @@ private struct AyahMenuViewList: View {
         }
     }
 
+    private var shareImageTitle: String {
+        (AppLanguage == .kannada || Locale.current.languageCode == "kn") ? "ಚಿತ್ರವಾಗಿ ಹಂಚಿಕೊಳ್ಳಿ" : "Share as Image"
+    }
+
+    private var shareTextTitle: String {
+        (AppLanguage == .kannada || Locale.current.languageCode == "kn") ? "ಪಠ್ಯವಾಗಿ ಹಂಚಿಕೊಳ್ಳಿ..." : "Share as Text..."
+    }
+
     private var translationTitle: String {
         if dataObject.isTranslationView {
             return (AppLanguage == .kannada || Locale.current.languageCode == "kn") ? "ಅನುವಾದಗಳನ್ನು ಹೋಲಿಸಿ" : "Compare Translations"
@@ -249,9 +257,16 @@ private struct AyahMenuViewList: View {
                 Row(title: l("ayah.menu.copy"), action: dataObject.actions.copy) {
                     Image(systemName: "doc.on.doc")
                 }
+                if let shareImageAction = dataObject.actions.shareImage {
+                    Divider()
+                        .padding(.leading)
+                    Row(title: shareImageTitle, action: shareImageAction) {
+                        Image(systemName: "photo.artframe")
+                    }
+                }
                 Divider()
                     .padding(.leading)
-                Row(title: l("ayah.menu.share"), action: dataObject.actions.share) {
+                Row(title: shareTextTitle, action: dataObject.actions.share) {
                     Image(systemName: "square.and.arrow.up")
                 }
             }

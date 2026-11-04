@@ -25,6 +25,7 @@ public protocol AyahMenuListener: AnyObject {
     func playAudio(_ from: AyahNumber, to: AyahNumber?, repeatVerses: Bool)
 
     func shareText(_ lines: [String], in sourceView: UIView, at point: CGPoint)
+    func shareImage(verses: [AyahNumber])
     func deleteNotes(_ notes: [Note], verses: [AyahNumber]) async
     func showTranslation(_ verses: [AyahNumber])
 
@@ -263,6 +264,12 @@ final class AyahMenuViewModel {
                 listener?.shareText([withNewLines], in: self.deps.sourceView, at: self.deps.pointInView)
             }
         }
+    }
+
+    func shareImage() {
+        logger.info("AyahMenu: shareImage. Verses: \(verses)")
+        listener?.dismissAyahMenu()
+        listener?.shareImage(verses: verses)
     }
 
     // MARK: Private
