@@ -109,7 +109,7 @@ final class AyahMenuViewModel {
     }
 
     var canShrink: Bool {
-        verses.count > 1
+        true
     }
 
     var playSubtitle: String {
@@ -173,15 +173,16 @@ final class AyahMenuViewModel {
     }
 
     func shrinkSelection() {
-        guard verses.count > 1 else {
-            return
-        }
         UIImpactFeedbackGenerator(style: .light).impactOccurred()
-        verses.removeLast()
-        if let newNotes = listener?.updateAyahMenuSelectedVerses(verses) {
-            notes = newNotes
+        if verses.count > 1 {
+            verses.removeLast()
+            if let newNotes = listener?.updateAyahMenuSelectedVerses(verses) {
+                notes = newNotes
+            }
+            updateDataObject()
+        } else {
+            listener?.dismissAyahMenu()
         }
-        updateDataObject()
     }
 
     private func updateDataObject() {
@@ -217,7 +218,9 @@ final class AyahMenuViewModel {
 
     func deleteNotes() async {
         logger.info("AyahMenu: delete notes. Verses: \(verses)")
-        listener?.dismissAyahMenu()
+        if !containsText(notes) {
+            listener?.dismissAyahMenu()
+        }
         await listener?.deleteNotes(notes, verses: verses)
     }
 

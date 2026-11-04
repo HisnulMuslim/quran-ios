@@ -31,17 +31,15 @@ public class SelectedTranslationsPreferences {
     }
 
     public func toggleSelection(_ translationId: Translation.ID) {
-        if let index = selectedTranslationIds.firstIndex(of: translationId) {
-            selectedTranslationIds.remove(at: index)
+        if selectedTranslationIds == [translationId] {
+            selectedTranslationIds = []
         } else {
-            selectedTranslationIds.append(translationId)
+            selectedTranslationIds = [translationId]
         }
     }
 
     public func select(_ id: Translation.ID) {
-        if !selectedTranslationIds.contains(id) {
-            selectedTranslationIds.append(id)
-        }
+        selectedTranslationIds = [id]
     }
 
     public func deselect(_ id: Translation.ID) {

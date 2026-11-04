@@ -15,6 +15,7 @@ import NoteEditorFeature
 import QuranContentFeature
 import QuranKit
 import ReadingService
+import TranslationService
 import TranslationsFeature
 import TranslationVerseFeature
 import UIKit
@@ -48,6 +49,7 @@ public struct QuranBuilder {
             contentBuilder: ContentBuilder(container: container, highlightsService: highlightsService),
             translationsSelectionBuilder: TranslationsListBuilder(container: container),
             translationVerseBuilder: TranslationVerseBuilder(container: container),
+            localTranslationsRetriever: LocalTranslationsRetriever(databasesURL: container.databasesURL),
             resources: container.readingResources
         )
         let interactor = QuranInteractor(deps: interactorDeps, input: input)

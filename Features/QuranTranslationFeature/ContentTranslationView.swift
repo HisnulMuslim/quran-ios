@@ -44,7 +44,7 @@ public struct ContentTranslationView: View {
                 verse: { point in viewModel.ayahAtPoint(point) }
             )
         )
-        .task(id: Pair(viewModel.verses, viewModel.selectedTranslations)) {
+        .task(id: viewModel.reloadTrigger) {
             await viewModel.load()
         }
     }

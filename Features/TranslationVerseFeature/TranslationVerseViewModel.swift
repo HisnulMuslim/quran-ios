@@ -9,6 +9,7 @@
 import AnnotationsService
 import Combine
 import QuranKit
+import QuranText
 import QuranTextKit
 import QuranTranslationFeature
 import TranslationService
@@ -33,22 +34,47 @@ class TranslationVerseViewModel: ObservableObject {
     init(startingVerse: AyahNumber, localTranslationsRetriever: LocalTranslationsRetriever, dataService: QuranTextDataService, actions: TranslationVerseActions) {
         currentVerse = startingVerse
         self.dataService = dataService
+        self.localTranslationsRetriever = localTranslationsRetriever
         self.actions = actions
 
         let noOpHighlightingService = QuranHighlightsService()
-        translationViewModel = ContentTranslationViewModel(localTranslationsRetriever: localTranslationsRetriever, dataService: dataService, highlightsService: noOpHighlightingService)
-        translationViewModel.showHeaderAndFooter = false
-        translationViewModel.verses = [startingVerse]
+        let vm = ContentTranslationViewModel(localTranslationsRetriever: localTranslationsRetriever, dataService: dataService, highlightsService: noOpHighlightingService)
+        vm.showHeaderAndFooter = false
+        vm.verses = [startingVerse]
+        vm.translationViewMode = .both
+        vm.loadAllDownloadedTranslations = true
+        self.translationViewModel = vm
+
+        Task { [weak self] in
+            await self?.loadAvailableTranslations()
+        }
     }
 
     // MARK: Internal
 
     let translationViewModel: ContentTranslationViewModel
+    @Published var availableTranslations: [Translation] = []
+    @Published var selectedFilterId: Int = -1 // -1 means "All (Side-by-Side)"
 
     @Published var currentVerse: AyahNumber {
         didSet {
             translationViewModel.verses = [currentVerse]
             actions.updateCurrentVerseTo(currentVerse)
+        }
+    }
+
+    func selectFilter(_ id: Int) {
+        selectedFilterId = id
+        if id == -1 {
+            translationViewModel.customTranslationIds = nil
+        } else {
+            translationViewModel.customTranslationIds = [id]
+        }
+    }
+
+    func loadAvailableTranslations() async {
+        if let locals = try? await localTranslationsRetriever.getLocalTranslations() {
+            availableTranslations = locals.filter(\.isDownloaded)
         }
     }
 
@@ -68,6 +94,7 @@ class TranslationVerseViewModel: ObservableObject {
 
     // MARK: Private
 
+    private let localTranslationsRetriever: LocalTranslationsRetriever
     private let dataService: QuranTextDataService
     private let actions: TranslationVerseActions
 }

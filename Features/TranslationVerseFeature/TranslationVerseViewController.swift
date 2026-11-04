@@ -79,39 +79,30 @@ class TranslationVerseViewController: UIHostingController<TranslationVerseView> 
     private var firstTime = true
 
     private func configureNavigationBar() {
-        navigationItem.rightBarButtonItems?.append(
-            UIBarButtonItem(
-                image: UIImage(systemName: "ellipsis.circle"),
-                style: .plain,
-                target: self,
-                action: #selector(settingsTapped)
-            )
-        )
-
-        let next = UIBarButtonItem(
-            image: UIImage(systemName: "chevron.left"),
-            style: .plain,
-            target: self,
-            action: #selector(nextTapped)
-        )
         let previous = UIBarButtonItem(
-            image: UIImage(systemName: "chevron.right"),
+            image: UIImage(systemName: "chevron.left"),
             style: .plain,
             target: self,
             action: #selector(previousTapped)
         )
+        let next = UIBarButtonItem(
+            image: UIImage(systemName: "chevron.right"),
+            style: .plain,
+            target: self,
+            action: #selector(nextTapped)
+        )
 
         switch view.effectiveUserInterfaceLayoutDirection {
         case .leftToRight:
-            navigationItem.leftBarButtonItems = [next, previous]
-        case .rightToLeft:
             navigationItem.leftBarButtonItems = [previous, next]
+        case .rightToLeft:
+            navigationItem.leftBarButtonItems = [next, previous]
         @unknown default:
             fatalError("Unhandled case")
         }
 
-        nextButton = next
         previousButton = previous
+        nextButton = next
     }
 
     @objc

@@ -87,8 +87,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     @objc
     private func handleLanguageChange() {
         guard let window else { return }
-        let launchStartup = launchBuilder?.launchStartup()
-        self.launchStartup = launchStartup
-        launchStartup?.launch(from: window)
+        launchBuilder?.reloadApp(in: window)
     }
 }

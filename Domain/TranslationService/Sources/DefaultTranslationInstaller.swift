@@ -35,10 +35,52 @@ public struct DefaultTranslationInstaller {
         baseURL: URL,
         downloadManager: DownloadManager
     ) async {
-        // Only run once per device install.
-        guard !Self.hasInstalledDefaultTranslation else {
-            logger.info("DefaultTranslationInstaller: already installed, skipping")
+        let fileName = "quran.kannada.hamzah.db"
+        let translationsDir = FileManager.documentsURL.appendingPathComponent("translations", isDirectory: true)
+        let destinationURL = translationsDir.appendingPathComponent(fileName, isDirectory: false)
+
+        // Only skip if already installed AND the database file actually exists on disk.
+        guard !Self.hasInstalledDefaultTranslation || !FileManager.default.fileExists(atPath: destinationURL.path) else {
+            logger.info("DefaultTranslationInstaller: already installed and file exists, skipping")
             return
+        }
+
+        // 1. Try installing from bundled app resources first (zero network needed)
+        if let bundledURL = Bundle.main.url(forResource: "quran.kannada.hamzah", withExtension: "db") {
+            do {
+                if !FileManager.default.fileExists(atPath: translationsDir.path) {
+                    try FileManager.default.createDirectory(at: translationsDir, withIntermediateDirectories: true)
+                }
+                if !FileManager.default.fileExists(atPath: destinationURL.path) {
+                    try FileManager.default.copyItem(at: bundledURL, to: destinationURL)
+                    logger.info("DefaultTranslationInstaller: Copied bundled translation to \(destinationURL.path)")
+                }
+
+                let kannadaTranslation = Translation(
+                    id: 1,
+                    displayName: "ಕಿಂಗ್ ಫಹದ್ ಕುರ್ ಆನ್ ಪ್ರಿಂಟಿಂಗ್ ಕಾಂಪ್ಲೆಕ್ಸ್ . ಮದೀನಾ, ಸೌದಿ ಅರೇಬಿಯಾ",
+                    translator: "ಹಂಝಾ ಪುತ್ತೂರು ",
+                    translatorForeign: nil,
+                    fileURL: URL(validURL: "https://quran-files.hisnulmuslimdua.com/data/databases/quran.kannada.hamzah.db.zip"),
+                    fileName: fileName,
+                    languageCode: "kn",
+                    version: 15,
+                    installedVersion: 15
+                )
+
+                let persistence = GRDBActiveTranslationsPersistence(directory: databasesURL)
+                let existing = try await persistence.retrieveAll()
+                for old in existing where old.id == kannadaTranslation.id {
+                    try await persistence.remove(old)
+                }
+                try await persistence.insert(kannadaTranslation)
+                SelectedTranslationsPreferences.shared.select(kannadaTranslation.id)
+                Self.hasInstalledDefaultTranslation = true
+                logger.info("DefaultTranslationInstaller: Bundled Kannada translation installed successfully (id=\(kannadaTranslation.id))")
+                return
+            } catch {
+                logger.error("DefaultTranslationInstaller: Failed to install bundled translation: \(error)")
+            }
         }
 
         logger.info("DefaultTranslationInstaller: first launch — downloading Kannada translation")

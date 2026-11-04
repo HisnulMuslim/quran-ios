@@ -10,6 +10,7 @@ import BatchDownloader
 import Combine
 import Crashing
 import Foundation
+import Localization
 import QuranText
 import SwiftUI
 import TranslationService
@@ -137,6 +138,12 @@ final class TranslationsListViewModel: ObservableObject {
             if let index = translations.firstIndex(of: item.info) {
                 translations[index] = updatedTranslation
             }
+            if selectedTranslationsPreferences.selectedTranslationIds.isEmpty {
+                if let fallback = translations.first(where: { $0.isDownloaded }) {
+                    selectedTranslationsPreferences.select(fallback.id)
+                }
+            }
+            NotificationCenter.default.post(name: .localTranslationsDidChange, object: nil)
         } catch {
             crasher.recordError(error, reason: "Failed to delete translation \(item.id)")
             self.error = error
@@ -176,9 +183,18 @@ final class TranslationsListViewModel: ObservableObject {
     private func loadTranslations() async {
         do {
             try await loadLocalTranslations()
+        } catch {
+            crasher.recordError(error, reason: "Failed to load local translations")
+        }
+
+        do {
             try await loadFromServer()
         } catch {
-            self.error = error
+            if translations.isEmpty {
+                self.error = error
+            } else {
+                logger.warning("Translations: background sync failed — \(error)")
+            }
         }
         withAnimation {
             loading = false
@@ -233,6 +249,7 @@ final class TranslationsListViewModel: ObservableObject {
                     if let addedTranslation = addedKeys.first {
                         selectedTranslationsPreferences.select(addedTranslation.id)
                     }
+                    NotificationCenter.default.post(name: .localTranslationsDidChange, object: nil)
                 } catch {
                     crasher.recordError(error, reason: "Failed to reload local translations")
                     self.error = error

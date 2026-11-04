@@ -17,6 +17,7 @@
 		D975EDE72A4796AA009DE942 /* Analytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = D975EDE62A4796AA009DE942 /* Analytics.swift */; };
 		D975EDEA2A4799A2009DE942 /* reciters.plist in Resources */ = {isa = PBXBuildFile; fileRef = D975EDE92A4799A2009DE942 /* reciters.plist */; };
 		D98543DD2A49095800F477A2 /* words.db in Resources */ = {isa = PBXBuildFile; fileRef = D98543DC2A49095800F477A2 /* words.db */; };
+		D98543E12A49095800F477A2 /* quran.kannada.hamzah.db in Resources */ = {isa = PBXBuildFile; fileRef = D98543E02A49095800F477A2 /* quran.kannada.hamzah.db */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +33,7 @@
 		D975EDE92A4799A2009DE942 /* reciters.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = reciters.plist; sourceTree = "<group>"; };
 		D98543D42A47E14200F477A2 /* QuranEngineApp-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "QuranEngineApp-Bridging-Header.h"; sourceTree = "<group>"; };
 		D98543DC2A49095800F477A2 /* words.db */ = {isa = PBXFileReference; lastKnownFileType = file; path = words.db; sourceTree = "<group>"; };
+		D98543E02A49095800F477A2 /* quran.kannada.hamzah.db */ = {isa = PBXFileReference; lastKnownFileType = file; path = quran.kannada.hamzah.db; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -93,6 +95,7 @@
 				D975EDD02A4791D7009DE942 /* LaunchScreen.storyboard */,
 				D975EDE92A4799A2009DE942 /* reciters.plist */,
 				D98543DC2A49095800F477A2 /* words.db */,
+				D98543E02A49095800F477A2 /* quran.kannada.hamzah.db */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -174,6 +177,7 @@
 			files = (
 				D975EDD22A4791D7009DE942 /* LaunchScreen.storyboard in Resources */,
 				D98543DD2A49095800F477A2 /* words.db in Resources */,
+				D98543E12A49095800F477A2 /* quran.kannada.hamzah.db in Resources */,
 				D975EDCF2A4791D7009DE942 /* Assets.xcassets in Resources */,
 				D975EDEA2A4799A2009DE942 /* reciters.plist in Resources */,
 			);
@@ -330,7 +334,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_TEAM = 9VM9B8KX27;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -345,7 +349,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1.2;
+				MARKETING_VERSION = 1.1.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.quran.kannada;
 				PRODUCT_NAME = "Kannada Quran";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -363,7 +367,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_TEAM = 9VM9B8KX27;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -378,7 +382,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1.2;
+				MARKETING_VERSION = 1.1.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.quran.kannada;
 				PRODUCT_NAME = "Kannada Quran";
 				SWIFT_EMIT_LOC_STRINGS = YES;

@@ -94,10 +94,17 @@ private struct AyahMenuViewList: View {
         }
     }
 
+    private var translationTitle: String {
+        if dataObject.isTranslationView {
+            return (AppLanguage == .kannada || Locale.current.languageCode == "kn") ? "ಅನುವಾದಗಳನ್ನು ಹೋಲಿಸಿ" : "Compare Translations"
+        }
+        return l("menu.translation")
+    }
+
     var translation: some View {
         MenuGroup {
             Divider()
-            Row(title: l("menu.translation"), action: dataObject.actions.showTranslation) {
+            Row(title: translationTitle, action: dataObject.actions.showTranslation) {
                 Image(systemName: "globe")
             }
             Divider()
@@ -234,9 +241,7 @@ private struct AyahMenuViewList: View {
                 Divider()
             }
 
-            if !dataObject.isTranslationView {
-                translation
-            }
+            translation
 
             MenuGroup {
                 Divider()

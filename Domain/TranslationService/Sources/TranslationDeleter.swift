@@ -34,9 +34,6 @@ public struct TranslationDeleter {
     // MARK: Public
 
     public func deleteTranslation(_ translation: Translation) async throws -> Translation {
-        // update the selected translations
-        selectedTranslationsPreferences.remove(translation.id)
-
         // delete from disk
         for url in translation.localFiles {
             try? fileSystem.removeItem(at: url)
@@ -45,6 +42,12 @@ public struct TranslationDeleter {
         var translation = translation
         translation.installedVersion = nil
         try await persistence.update(translation)
+
+        // update the selected translations
+        selectedTranslationsPreferences.remove(translation.id)
+
+        NotificationCenter.default.post(name: Notification.Name("LocalTranslationsDidChange"), object: nil)
+
         return translation
     }
 

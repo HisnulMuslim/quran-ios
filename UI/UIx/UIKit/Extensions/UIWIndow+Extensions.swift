@@ -26,20 +26,28 @@
             options: UIView.AnimationOptions = .transitionFlipFromRight,
             _ completion: (() -> Void)? = nil
         ) {
-            guard animated else {
-                rootViewController = viewController
-                completion?()
-                return
+            let changeRoot = {
+                guard animated else {
+                    self.rootViewController = viewController
+                    completion?()
+                    return
+                }
+
+                UIView.transition(with: self, duration: duration, options: options, animations: {
+                    let oldState = UIView.areAnimationsEnabled
+                    UIView.setAnimationsEnabled(false)
+                    self.rootViewController = viewController
+                    UIView.setAnimationsEnabled(oldState)
+                }, completion: { _ in
+                    completion?()
+                })
             }
 
-            UIView.transition(with: self, duration: duration, options: options, animations: {
-                let oldState = UIView.areAnimationsEnabled
-                UIView.setAnimationsEnabled(false)
-                self.rootViewController = viewController
-                UIView.setAnimationsEnabled(oldState)
-            }, completion: { _ in
-                completion?()
-            })
+            if let presented = rootViewController?.presentedViewController {
+                presented.dismiss(animated: false, completion: changeRoot)
+            } else {
+                changeRoot()
+            }
         }
     }
 

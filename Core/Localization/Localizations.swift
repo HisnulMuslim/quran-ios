@@ -46,6 +46,8 @@ public var AppLanguage: Language {
         return Language(rawValue: lang) ?? .kannada
     }
     set {
+        guard newValue != AppLanguage else { return }
+        UserDefaults.standard.set(true, forKey: "hasSelectedInitialLanguage")
         UserDefaults.standard.set(newValue.rawValue, forKey: "AppLanguage")
         NotificationCenter.default.post(name: .appLanguageDidChange, object: nil)
     }
@@ -54,6 +56,7 @@ public var AppLanguage: Language {
 public extension Notification.Name {
     static let appLanguageDidChange = Notification.Name("AppLanguageDidChange")
     static let requestTranslationsSelection = Notification.Name("RequestTranslationsSelection")
+    static let localTranslationsDidChange = Notification.Name("LocalTranslationsDidChange")
 }
 
 public func l(_ key: String, table: Table = .localizable, language: Language? = nil) -> String {

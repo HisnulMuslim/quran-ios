@@ -74,7 +74,12 @@ final class QuranInteractor: WordPointerListener, ContentListener, NoteEditorLis
         let contentBuilder: ContentBuilder
         let translationsSelectionBuilder: TranslationsListBuilder
         let translationVerseBuilder: TranslationVerseBuilder
+        let localTranslationsRetriever: LocalTranslationsRetriever
         let resources: ReadingResourcesService
+    }
+
+    var localTranslationsRetriever: LocalTranslationsRetriever {
+        deps.localTranslationsRetriever
     }
 
     // MARK: Lifecycle
@@ -218,13 +223,17 @@ final class QuranInteractor: WordPointerListener, ContentListener, NoteEditorLis
             !(note.note ?? "").isEmpty
         }
         if containsText {
-            // confirm deletion first if there is text
-            presenter?.confirmNoteDelete(
-                delete: { await self.forceDeleteNotes(notes, verses: verses) },
-                cancel: { self.contentViewModel?.removeAyahMenuHighlight() }
-            )
+            // Wait for popover dismissal to complete before presenting the confirmation alert
+            presenter?.dismissPresentedViewController { [weak self] in
+                guard let self else { return }
+                self.presenter?.confirmNoteDelete(
+                    delete: { await self.forceDeleteNotes(notes, verses: verses) },
+                    cancel: { self.contentViewModel?.removeAyahMenuHighlight() }
+                )
+            }
         } else {
             // delete highlight
+            dismissAyahMenu()
             await forceDeleteNotes(notes, verses: verses)
         }
     }

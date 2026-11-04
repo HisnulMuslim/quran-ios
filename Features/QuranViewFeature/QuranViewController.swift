@@ -25,6 +25,7 @@ import QuranKit
 import QuranTextKit
 import SwiftUI
 import Timing
+import TranslationService
 import UIKit
 import UIx
 import VLogging
@@ -113,12 +114,14 @@ class QuranViewController: BaseViewController, QuranViewDelegate,
         quranView?.navigationItem.leftBarButtonItem = backButton
 
         setupContentStatus()
+        setupTranslationQuickSwitch()
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         UIApplication.shared.isIdleTimerDisabled = true
         navigationController?.setNavigationBarHidden(true, animated: animated)
+        updateTranslationQuickSwitchMenu()
     }
 
     override func viewWillDisappear(_ animated: Bool) {
@@ -224,6 +227,7 @@ class QuranViewController: BaseViewController, QuranViewDelegate,
 
     func presentTranslationsSelection(_ viewController: UIViewController) {
         let translationsNavigationController = TranslationsSelectionNavigationController(rootViewController: viewController)
+        translationsNavigationController.presentationController?.delegate = self
         viewController.navigationItem.leftBarButtonItem = UIBarButtonItem(
             image: UIImage(systemName: "x.circle"),
             style: .done,
@@ -343,6 +347,89 @@ class QuranViewController: BaseViewController, QuranViewDelegate,
         return button
     }()
 
+    private lazy var translationQuickSwitchButton: UIBarButtonItem = {
+        let config = UIImage.SymbolConfiguration(pointSize: 16, weight: .regular)
+        let globeImage = UIImage.symbol("globe", withConfiguration: config)
+        let button = UIBarButtonItem(image: globeImage, style: .plain, target: nil, action: nil)
+        button.accessibilityLabel = l("menu.translation")
+        return button
+    }()
+
+    private var isBookmarked: Bool = false
+
+    private func setupTranslationQuickSwitch() {
+        updateTranslationQuickSwitchMenu()
+
+        SelectedTranslationsPreferences.shared.$selectedTranslationIds
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.updateTranslationQuickSwitchMenu()
+            }
+            .store(in: &cancellables)
+
+        NotificationCenter.default.publisher(for: .localTranslationsDidChange)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.updateTranslationQuickSwitchMenu()
+            }
+            .store(in: &cancellables)
+
+        QuranContentStatePreferences.shared.$quranMode
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                guard let self else { return }
+                self.updateRightBarItems(animated: true, isBookmarked: self.isBookmarked)
+            }
+            .store(in: &cancellables)
+    }
+
+    private func updateTranslationQuickSwitchMenu() {
+        Task { [weak self] in
+            guard let self else { return }
+            let downloaded = (try? await self.interactor.localTranslationsRetriever.getLocalTranslations())?.filter(\.isDownloaded) ?? []
+            guard !downloaded.isEmpty else {
+                self.translationQuickSwitchButton.menu = nil
+                return
+            }
+
+            var selectedIds = SelectedTranslationsPreferences.shared.selectedTranslationIds
+            if !downloaded.contains(where: { selectedIds.contains($0.id) }), let firstDownloaded = downloaded.first {
+                SelectedTranslationsPreferences.shared.select(firstDownloaded.id)
+                selectedIds = [firstDownloaded.id]
+            }
+
+            var children: [UIMenuElement] = []
+
+            for trans in downloaded {
+                let isSelected = selectedIds.contains(trans.id)
+                let title = trans.displayName
+                let action = UIAction(
+                    title: title,
+                    state: isSelected ? .on : .off
+                ) { [weak self] _ in
+                    SelectedTranslationsPreferences.shared.select(trans.id)
+                    self?.updateTranslationQuickSwitchMenu()
+                }
+                children.append(action)
+            }
+
+            let manageAction = UIAction(
+                title: l("menu.select_translation"),
+                image: UIImage(systemName: "gearshape")
+            ) { [weak self] _ in
+                self?.interactor.onTranslationsSelectionsTapped()
+            }
+            let manageMenu = UIMenu(options: .displayInline, children: [manageAction])
+            children.append(manageMenu)
+
+            let menu = UIMenu(
+                title: l("translation.selectedTranslations"),
+                children: children
+            )
+            self.translationQuickSwitchButton.menu = menu
+        }
+    }
+
     private var titleView: TwoLineNavigationTitleView? { quranView?.navigationItem.titleView as? TwoLineNavigationTitleView }
     private var quranView: QuranView? {
         view as? QuranView
@@ -425,7 +512,9 @@ class QuranViewController: BaseViewController, QuranViewDelegate,
     @objc
     private func onTranslationsSelectionDoneTapped() {
         logger.info("Quran: translations selection dismissed")
-        dismiss(animated: true)
+        dismiss(animated: true) { [weak self] in
+            self?.updateTranslationQuickSwitchMenu()
+        }
     }
 
     @objc
@@ -467,6 +556,7 @@ class QuranViewController: BaseViewController, QuranViewDelegate,
     }
 
     private func updateRightBarItems(animated: Bool, isBookmarked: Bool) {
+        self.isBookmarked = isBookmarked
         let config = UIImage.SymbolConfiguration(pointSize: 16, weight: .regular)
         let bookmarkImage = UIImage.symbol(isBookmarked ? "bookmark.fill" : "bookmark", withConfiguration: config)
         let bookmark = UIBarButtonItem(image: bookmarkImage, style: .plain, target: self, action: #selector(onBookmarkButtonTapped))
@@ -474,7 +564,13 @@ class QuranViewController: BaseViewController, QuranViewDelegate,
             bookmark.tintColor = .systemRed
         }
 
-        quranView?.navigationItem.setRightBarButtonItems([moreNavigationButton, appearanceNavigationButton, bookmark], animated: animated)
+        var items = [moreNavigationButton, appearanceNavigationButton]
+        if QuranContentStatePreferences.shared.quranMode == .translation {
+            items.append(translationQuickSwitchButton)
+        }
+        items.append(bookmark)
+
+        quranView?.navigationItem.setRightBarButtonItems(items, animated: animated)
     }
 
     @objc
@@ -506,5 +602,11 @@ class QuranViewController: BaseViewController, QuranViewDelegate,
             }
         }
         interactor.onAppearanceBarButtonTapped()
+    }
+}
+
+extension QuranViewController: UIAdaptivePresentationControllerDelegate {
+    func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
+        updateTranslationQuickSwitchMenu()
     }
 }

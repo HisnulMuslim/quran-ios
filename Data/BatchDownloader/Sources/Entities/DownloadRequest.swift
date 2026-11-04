@@ -40,10 +40,7 @@ public struct DownloadRequest: Hashable, Sendable {
     public var request: URLRequest {
         var request = URLRequest(url: url)
         request.setValue("https://www.hisnulmuslimdua.com/", forHTTPHeaderField: "Referer")
-        request.setValue(
-            "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148",
-            forHTTPHeaderField: "User-Agent"
-        )
+        request.setValue("KannadaQuran/1.1.3 (iOS)", forHTTPHeaderField: "User-Agent")
         return request
     }
 

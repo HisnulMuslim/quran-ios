@@ -73,9 +73,17 @@ public final class ContentTranslationViewModel: ObservableObject {
             .sink { [weak self] newIds in
                 guard let self else { return }
                 if newIds.isEmpty {
-                    if self.quranContentStatePreferences.translationViewMode == .translationOnly ||
-                       self.quranContentStatePreferences.translationViewMode == .both {
-                        self.quranContentStatePreferences.translationViewMode = .arabicOnly
+                    Task { [weak self] in
+                        guard let self else { return }
+                        if let downloaded = try? await self.localTranslationsRetriever.getLocalTranslations().filter(\.isDownloaded),
+                           let fallback = downloaded.first {
+                            self.selectedTranslationsPreferences.select(fallback.id)
+                        } else {
+                            if self.quranContentStatePreferences.translationViewMode == .translationOnly ||
+                               self.quranContentStatePreferences.translationViewMode == .both {
+                                self.quranContentStatePreferences.translationViewMode = .arabicOnly
+                            }
+                        }
                     }
                 }
             }
@@ -84,8 +92,26 @@ public final class ContentTranslationViewModel: ObservableObject {
 
     // MARK: Public
 
+    public struct ReloadTrigger: Equatable {
+        let verses: [AyahNumber]
+        let selectedTranslations: [Translation.ID]
+        let customTranslationIds: [Translation.ID]?
+        let loadAllDownloadedTranslations: Bool
+    }
+
+    public var reloadTrigger: ReloadTrigger {
+        ReloadTrigger(
+            verses: verses,
+            selectedTranslations: selectedTranslations,
+            customTranslationIds: customTranslationIds,
+            loadAllDownloadedTranslations: loadAllDownloadedTranslations
+        )
+    }
+
     @Published public var showHeaderAndFooter = true
     @Published public var verses: [AyahNumber] = []
+    @Published public var loadAllDownloadedTranslations = false
+    @Published public var customTranslationIds: [Translation.ID]?
 
     // MARK: Internal
 
@@ -101,7 +127,7 @@ public final class ContentTranslationViewModel: ObservableObject {
     @Published var translationFontSize: FontSize
     @Published var translationFont: TranslationFont
     @Published var arabicFontSize: FontSize
-    @Published var translationViewMode: TranslationViewMode
+    @Published public var translationViewMode: TranslationViewMode
 
     @Published var highlights: [AyahNumber: Color]
 
@@ -328,17 +354,29 @@ public final class ContentTranslationViewModel: ObservableObject {
         do {
             logger.info("Loading translations data; selectedTranslations='\(selectedTranslations)'; verses='\(verses)'")
             let localTranslations = try await localTranslationsRetriever.getLocalTranslations()
-            translations = selectedTranslationsPreferences.selectedTranslations(from: localTranslations)
+            let downloaded = localTranslations.filter(\.isDownloaded)
 
-            // Deselect any translations that are not downloaded on disk
-            let downloadedIds = Set(localTranslations.filter(\.isDownloaded).map(\.id))
-            let uninstalledIds = selectedTranslationsPreferences.selectedTranslationIds.filter { !downloadedIds.contains($0) }
-            for id in uninstalledIds {
-                selectedTranslationsPreferences.deselect(id)
+            if loadAllDownloadedTranslations {
+                if let customIds = customTranslationIds {
+                    translations = downloaded.filter { customIds.contains($0.id) }
+                } else {
+                    translations = downloaded
+                }
+            } else {
+                translations = selectedTranslationsPreferences.selectedTranslations(from: localTranslations)
             }
 
-            if downloadedIds.isEmpty && quranContentStatePreferences.translationViewMode == .both {
-                quranContentStatePreferences.translationViewMode = .arabicOnly
+            if !loadAllDownloadedTranslations {
+                // Deselect any translations that are not downloaded on disk
+                let downloadedIds = Set(downloaded.map(\.id))
+                let uninstalledIds = selectedTranslationsPreferences.selectedTranslationIds.filter { !downloadedIds.contains($0) }
+                for id in uninstalledIds {
+                    selectedTranslationsPreferences.deselect(id)
+                }
+
+                if downloadedIds.isEmpty && quranContentStatePreferences.translationViewMode == .both {
+                    quranContentStatePreferences.translationViewMode = .arabicOnly
+                }
             }
 
             let verses = verses
