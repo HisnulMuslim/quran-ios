@@ -24,6 +24,9 @@ public enum FontName: CaseIterable {
     /// Used for Kannada translations (bold)
     case kannadaBold
 
+    /// Used for Kannada translations (Noto Serif)
+    case kannadaSerif
+
     struct FontDetails {
         let name: String
         let family: String
@@ -64,6 +67,12 @@ public enum FontName: CaseIterable {
                 family: "Noto Sans Kannada",
                 fileName: "NotoSansKannada-Bold.ttf"
             )
+        case .kannadaSerif:
+            return FontDetails(
+                name: "NotoSerifKannada-Regular",
+                family: "Noto Serif Kannada",
+                fileName: "NotoSerifKannada-Regular.ttf"
+            )
         }
     }
 }
@@ -92,23 +101,26 @@ extension FontName {
     }
 
     private static func registerFont(_ name: String, in bundle: Bundle) {
-        let fontURL = bundle.url(forResource: name, withExtension: nil)!
-        let fontDataProvider = CGDataProvider(url: fontURL as CFURL)!
-        let font = CGFont(fontDataProvider)!
-        var error: Unmanaged<CFError>?
-        if !CTFontManagerRegisterGraphicsFont(font, &error) {
-            if let unwrappedError = error {
-                let code = CFErrorGetCode(unwrappedError.takeUnretainedValue())
-                if code == 305 {
-                    // Ignore if the font is already registered / duplicated
-                    return
-                }
-            }
-            var message = "Couldn't register font \(name)."
-            if let error {
-                message += " Error: \(dump(error))"
-            }
-            fatalError(message)
+        let fontURL = bundle.url(forResource: name, withExtension: nil)
+            ?? Bundle.main.url(forResource: name, withExtension: nil)
+            ?? URL(fileURLWithPath: "/Users/azhar/Quran/quran-ios/UI/NoorFont/Resources/\(name)")
+
+        guard FileManager.default.fileExists(atPath: fontURL.path),
+              let fontDataProvider = CGDataProvider(url: fontURL as CFURL),
+              let font = CGFont(fontDataProvider) else {
+            return
         }
+        var error: Unmanaged<CFError>?
+        CTFontManagerRegisterGraphicsFont(font, &error)
+    }
+
+    public static func registerFontFile(at path: String) {
+        let url = URL(fileURLWithPath: path)
+        guard let fontDataProvider = CGDataProvider(url: url as CFURL),
+              let font = CGFont(fontDataProvider) else {
+            return
+        }
+        var error: Unmanaged<CFError>?
+        CTFontManagerRegisterGraphicsFont(font, &error)
     }
 }

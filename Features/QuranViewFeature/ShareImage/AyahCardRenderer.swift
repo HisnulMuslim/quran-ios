@@ -5,12 +5,13 @@
 //  Created for Kannada Quran App.
 //
 
+import CoreImage
 import SwiftUI
 import UIKit
 
 @MainActor
 public enum AyahCardRenderer {
-    public static func render<Content: View>(view: Content, targetWidth: CGFloat = 1000) -> UIImage? {
+    public static func render<Content: View>(view: Content, targetWidth: CGFloat = 1080) -> UIImage? {
         if #available(iOS 16.0, *) {
             let renderer = ImageRenderer(content: view)
             renderer.scale = 1.0
@@ -56,5 +57,26 @@ public enum AyahCardRenderer {
         } catch {
             return nil
         }
+    }
+
+    public static func generateQRCode(from string: String, size: CGFloat = 200) -> UIImage? {
+        guard let data = string.data(using: .utf8),
+              let filter = CIFilter(name: "CIQRCodeGenerator") else {
+            return nil
+        }
+        filter.setValue(data, forKey: "inputMessage")
+        filter.setValue("M", forKey: "inputCorrectionLevel")
+        guard let outputImage = filter.outputImage else {
+            return nil
+        }
+
+        let scale = size / outputImage.extent.size.width
+        let transformedImage = outputImage.transformed(by: CGAffineTransform(scaleX: scale, y: scale))
+
+        let context = CIContext()
+        guard let cgImage = context.createCGImage(transformedImage, from: transformedImage.extent) else {
+            return nil
+        }
+        return UIImage(cgImage: cgImage)
     }
 }
