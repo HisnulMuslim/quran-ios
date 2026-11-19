@@ -252,7 +252,7 @@
 
 // Display Modes
 "menu.displayMode" = "Display Mode";
-"menu.displayMode.both" = "Arabic & Translation";
+"menu.displayMode.both" = "Both";
 "menu.displayMode.arabicOnly" = "Arabic Only";
 "menu.displayMode.translationOnly" = "Translation Only";
 "menu.displayMode.noTranslationsWarning" = "No translations selected. A translation is required to read in this mode.";

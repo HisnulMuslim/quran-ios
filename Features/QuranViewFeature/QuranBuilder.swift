@@ -52,6 +52,7 @@ public struct QuranBuilder {
             localTranslationsRetriever: LocalTranslationsRetriever(databasesURL: container.databasesURL),
             databasesURL: container.databasesURL,
             quranFileURL: container.quranUthmaniV2Database,
+            appHost: container.appHost,
             resources: container.readingResources
         )
         let interactor = QuranInteractor(deps: interactorDeps, input: input)

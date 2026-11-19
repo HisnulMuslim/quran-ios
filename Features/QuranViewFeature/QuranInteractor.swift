@@ -43,6 +43,7 @@ protocol QuranPresentable: UIViewController {
 
     func shareText(_ lines: [String], in sourceView: UIView, at point: CGPoint, completion: @escaping () -> Void)
     func presentShareImage(verses: [AyahNumber])
+    func presentShareVideo(verses: [AyahNumber])
 
     func presentMoreMenu(_ viewController: UIViewController)
     func presentThemeSettings(_ viewController: UIViewController)
@@ -78,6 +79,7 @@ final class QuranInteractor: WordPointerListener, ContentListener, NoteEditorLis
         let localTranslationsRetriever: LocalTranslationsRetriever
         let databasesURL: URL
         let quranFileURL: URL
+        let appHost: URL
         let resources: ReadingResourcesService
     }
 
@@ -91,6 +93,10 @@ final class QuranInteractor: WordPointerListener, ContentListener, NoteEditorLis
 
     var quranFileURL: URL {
         deps.quranFileURL
+    }
+
+    var appHost: URL {
+        deps.appHost
     }
 
     // MARK: Lifecycle
@@ -257,8 +263,18 @@ final class QuranInteractor: WordPointerListener, ContentListener, NoteEditorLis
 
     func shareImage(verses: [AyahNumber]) {
         logger.info("Quran: share image for verses: \(verses)")
-        dismissAyahMenu()
-        presenter?.presentShareImage(verses: verses)
+        contentViewModel?.removeAyahMenuHighlight()
+        presenter?.dismissPresentedViewController { [weak self] in
+            self?.presenter?.presentShareImage(verses: verses)
+        }
+    }
+
+    func shareVideo(verses: [AyahNumber]) {
+        logger.info("Quran: share video for verses: \(verses)")
+        contentViewModel?.removeAyahMenuHighlight()
+        presenter?.dismissPresentedViewController { [weak self] in
+            self?.presenter?.presentShareVideo(verses: verses)
+        }
     }
 
     func editNote(_ note: Note) {

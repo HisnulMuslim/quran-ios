@@ -63,4 +63,8 @@ public enum Reading: Int {
             return false
         }
     }
+
+    public var preservesHueInDarkMode: Bool {
+        self == .tajweed
+    }
 }

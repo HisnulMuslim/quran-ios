@@ -94,10 +94,14 @@ public extension UIFont {
 }
 
 extension FontName {
-    public static func registerFonts() {
+    private static let registerOnce: Void = {
         for font in FontName.allCases {
             registerFont(font.details.fileName, in: .module)
         }
+    }()
+
+    public static func registerFonts() {
+        _ = registerOnce
     }
 
     private static func registerFont(_ name: String, in bundle: Bundle) {
@@ -111,7 +115,9 @@ extension FontName {
             return
         }
         var error: Unmanaged<CFError>?
-        CTFontManagerRegisterGraphicsFont(font, &error)
+        if !CTFontManagerRegisterGraphicsFont(font, &error) {
+            error?.release()
+        }
     }
 
     public static func registerFontFile(at path: String) {
@@ -121,6 +127,8 @@ extension FontName {
             return
         }
         var error: Unmanaged<CFError>?
-        CTFontManagerRegisterGraphicsFont(font, &error)
+        if !CTFontManagerRegisterGraphicsFont(font, &error) {
+            error?.release()
+        }
     }
 }

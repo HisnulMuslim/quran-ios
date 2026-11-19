@@ -704,6 +704,9 @@ private func featuresTargets() -> [[Target]] {
             "TranslationsFeature",
             "TranslationVerseFeature",
             "FeaturesSupport",
+            "ReciterService",
+            "AudioTimingService",
+            "QuranAudio",
         ]),
 
         target(type, name: "SettingsFeature", hasTests: false, dependencies: [

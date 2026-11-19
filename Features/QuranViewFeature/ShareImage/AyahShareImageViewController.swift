@@ -14,12 +14,16 @@ public final class AyahShareImageViewController: UIHostingController<AyahShareIm
         verses: [AyahNumber],
         databasesURL: URL,
         quranFileURL: URL,
+        appHost: URL = URL(string: "https://quran-files.hisnulmuslimdua.com/")!,
+        isVideoMode: Bool = false,
         onDismiss: (() -> Void)? = nil
     ) {
         let viewModel = AyahShareImageViewModel(
             verses: verses,
             databasesURL: databasesURL,
-            quranFileURL: quranFileURL
+            quranFileURL: quranFileURL,
+            appHost: appHost,
+            isVideoMode: isVideoMode
         )
 
         var dismissHandler: (() -> Void)?
@@ -30,6 +34,9 @@ public final class AyahShareImageViewController: UIHostingController<AyahShareIm
             }
         )
         super.init(rootView: rootView)
+
+        modalPresentationStyle = .pageSheet
+        preferredContentSize = CGSize(width: 920, height: 760)
 
         dismissHandler = { [weak self] in
             self?.dismiss(animated: true) {

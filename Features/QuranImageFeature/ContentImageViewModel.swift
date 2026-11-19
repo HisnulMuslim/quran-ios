@@ -51,7 +51,7 @@ class ContentImageViewModel: ObservableObject {
     @Published var imageFrame: CGRect = .zero
 
     var imageRenderingMode: QuranThemedImage.RenderingMode {
-        reading.usesInvertedQuranImageRenderingInDarkMode ? .invertInDarkMode : .tinted
+        reading.imageRenderingMode
     }
 
     var decorations: ImageDecorations {
@@ -121,5 +121,14 @@ class ContentImageViewModel: ObservableObject {
         DispatchQueue.main.async {
             self.scrollToVerseIfNeededSynchronously()
         }
+    }
+}
+
+extension Reading {
+    var imageRenderingMode: QuranThemedImage.RenderingMode {
+        if preservesHueInDarkMode {
+            return .invertPreservingHueInDarkMode
+        }
+        return usesInvertedQuranImageRenderingInDarkMode ? .invertInDarkMode : .tinted
     }
 }

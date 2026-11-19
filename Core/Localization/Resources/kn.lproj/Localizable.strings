@@ -242,7 +242,7 @@
 
 // Display Modes
 "menu.displayMode" = "ಪ್ರದರ್ಶನ ಮೋಡ್";
-"menu.displayMode.both" = "ಅರೇಬಿಕ್ ಮತ್ತು ಅನುವಾದ";
+"menu.displayMode.both" = "ಎರಡೂ";
 "menu.displayMode.arabicOnly" = "ಅರೇಬಿಕ್ ಮಾತ್ರ";
 "menu.displayMode.translationOnly" = "ಅನುವಾದ ಮಾತ್ರ";
 "menu.displayMode.noTranslationsWarning" = "ಯಾವುದೇ ಅನುವಾದ ಆಯ್ಕೆಯಾಗಿಲ್ಲ. ಈ ಮೋಡ್‌ನಲ್ಲಿ ಓದಲು ಅನುವಾದ ಅಗತ್ಯವಿದೆ.";

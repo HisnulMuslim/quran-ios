@@ -12,6 +12,14 @@ import QuranText
 import UIKit
 #endif
 
+public enum ArabicFont: String, CaseIterable {
+    case uthmanic
+    case kitab
+    case geezaPro
+    case mishafi
+    case system
+}
+
 public enum TranslationFont: String, CaseIterable {
     case notoSans
     case kohinoor
@@ -41,6 +49,9 @@ public struct FontSizePreferences {
 
     @TransformedPreference(translationFontKey, transformer: .rawRepresentable(defaultValue: .notoSans))
     public var translationFont: TranslationFont
+
+    @TransformedPreference(arabicFontKey, transformer: .rawRepresentable(defaultValue: .uthmanic))
+    public var arabicFont: ArabicFont
 
     private static var isPad13Inch: Bool {
         #if canImport(UIKit)
@@ -75,11 +86,13 @@ public struct FontSizePreferences {
     }
 
     public static let defaultTranslationFont = TranslationFont.notoSans
+    public static let defaultArabicFont = ArabicFont.uthmanic
 
     public mutating func resetToDefaults() {
         translationFontSize = Self.defaultTranslationValue
         arabicFontSize = Self.defaultArabicValue
         translationFont = Self.defaultTranslationFont
+        arabicFont = Self.defaultArabicFont
     }
 
     // MARK: Private
@@ -87,4 +100,5 @@ public struct FontSizePreferences {
     private static let translationFontSizeKey = PreferenceKey<Int>(key: "translationFontSize", defaultValue: defaultTranslationValue.rawValue)
     private static let arabicFontSizeKey = PreferenceKey<Int>(key: "arabicFont", defaultValue: defaultArabicValue.rawValue)
     private static let translationFontKey = PreferenceKey<String>(key: "translationFontSelection", defaultValue: defaultTranslationFont.rawValue)
+    private static let arabicFontKey = PreferenceKey<String>(key: "arabicFontSelection", defaultValue: defaultArabicFont.rawValue)
 }

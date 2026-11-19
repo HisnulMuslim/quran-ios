@@ -30,6 +30,7 @@ public final class ContentTranslationViewModel: ObservableObject {
         self.highlightsService = highlightsService
         self.localTranslationsRetriever = localTranslationsRetriever
         arabicFontSize = fontSizePreferences.arabicFontSize
+        arabicFont = fontSizePreferences.arabicFont
         translationFontSize = fontSizePreferences.translationFontSize
         translationFont = fontSizePreferences.translationFont
         translationViewMode = quranContentStatePreferences.translationViewMode
@@ -56,6 +57,10 @@ public final class ContentTranslationViewModel: ObservableObject {
 
         fontSizePreferences.$arabicFontSize
             .sink { [weak self] in self?.arabicFontSize = $0 }
+            .store(in: &cancellables)
+
+        fontSizePreferences.$arabicFont
+            .sink { [weak self] in self?.arabicFont = $0 }
             .store(in: &cancellables)
 
         quranContentStatePreferences.$translationViewMode
@@ -127,6 +132,7 @@ public final class ContentTranslationViewModel: ObservableObject {
     @Published var translationFontSize: FontSize
     @Published var translationFont: TranslationFont
     @Published var arabicFontSize: FontSize
+    @Published var arabicFont: ArabicFont
     @Published public var translationViewMode: TranslationViewMode
 
     @Published var highlights: [AyahNumber: Color]
@@ -181,11 +187,11 @@ public final class ContentTranslationViewModel: ObservableObject {
                     currentSura = verse.sura
                     let arabicVerseNumber = NumberFormatter.arabicNumberFormatter.format(verse.ayah)
                     let arabicText = verseText.arabicText + " " + arabicVerseNumber
-                    currentSuraVerses.append(TranslationArabicText(verse: verse, text: arabicText, arabicFontSize: arabicFontSize, highlightColor: verseHighlightColor))
+                    currentSuraVerses.append(TranslationArabicText(verse: verse, text: arabicText, arabicFontSize: arabicFontSize, arabicFont: arabicFont, highlightColor: verseHighlightColor))
                 } else {
                     if currentSura != verse.sura {
                         if let prevSura = currentSura, !currentSuraVerses.isEmpty {
-                            items.append(.continuousArabic(TranslationContinuousArabic(sura: prevSura, verses: currentSuraVerses, arabicFontSize: arabicFontSize, scrollToVerse: scrollingVerse, scrollTriggerCount: scrollTriggerCount)))
+                            items.append(.continuousArabic(TranslationContinuousArabic(sura: prevSura, verses: currentSuraVerses, arabicFontSize: arabicFontSize, arabicFont: arabicFont, scrollToVerse: scrollingVerse, scrollTriggerCount: scrollTriggerCount)))
                             currentSuraVerses = []
                         }
                         currentSura = verse.sura
@@ -198,7 +204,7 @@ public final class ContentTranslationViewModel: ObservableObject {
                     // Add arabic verse with number
                     let arabicVerseNumber = NumberFormatter.arabicNumberFormatter.format(verse.ayah)
                     let arabicText = verseText.arabicText + " " + arabicVerseNumber
-                    currentSuraVerses.append(TranslationArabicText(verse: verse, text: arabicText, arabicFontSize: arabicFontSize, highlightColor: verseHighlightColor))
+                    currentSuraVerses.append(TranslationArabicText(verse: verse, text: arabicText, arabicFontSize: arabicFontSize, arabicFont: arabicFont, highlightColor: verseHighlightColor))
                 }
             } else {
                 // Add sura name, if a new sura
@@ -222,7 +228,7 @@ public final class ContentTranslationViewModel: ObservableObject {
                     let arabicText = verseText.arabicText + " " + arabicVerseNumber
                     // In both mode, the entire row container already receives `verseHighlightColor` background.
                     // Passing `highlightColor: nil` prevents double-layer alpha blending and inner glyph boxes.
-                    items.append(.arabicText(TranslationArabicText(verse: verse, text: arabicText, arabicFontSize: arabicFontSize, highlightColor: nil), verseHighlightColor))
+                    items.append(.arabicText(TranslationArabicText(verse: verse, text: arabicText, arabicFontSize: arabicFontSize, arabicFont: arabicFont, highlightColor: nil), verseHighlightColor))
                 } else if translationViewMode == .translationOnly {
                     // Ayah number badge is rendered inline at the start of the translation
                 }
@@ -336,9 +342,9 @@ public final class ContentTranslationViewModel: ObservableObject {
         if translationViewMode == .arabicOnly, !currentSuraVerses.isEmpty {
             let scrollingVerse = highlightsService.highlights.firstScrollingVerse()
             if isFrontispiecePage, let sura = currentSura ?? verses.first?.sura {
-                items.append(.frontispieceArabic(TranslationFrontispieceArabic(page: page, sura: sura, verses: currentSuraVerses, arabicFontSize: arabicFontSize, scrollToVerse: scrollingVerse, scrollTriggerCount: scrollTriggerCount)))
+                items.append(.frontispieceArabic(TranslationFrontispieceArabic(page: page, sura: sura, verses: currentSuraVerses, arabicFontSize: arabicFontSize, arabicFont: arabicFont, scrollToVerse: scrollingVerse, scrollTriggerCount: scrollTriggerCount)))
             } else if let lastSura = currentSura {
-                items.append(.continuousArabic(TranslationContinuousArabic(sura: lastSura, verses: currentSuraVerses, arabicFontSize: arabicFontSize, scrollToVerse: scrollingVerse, scrollTriggerCount: scrollTriggerCount)))
+                items.append(.continuousArabic(TranslationContinuousArabic(sura: lastSura, verses: currentSuraVerses, arabicFontSize: arabicFontSize, arabicFont: arabicFont, scrollToVerse: scrollingVerse, scrollTriggerCount: scrollTriggerCount)))
             }
         }
 

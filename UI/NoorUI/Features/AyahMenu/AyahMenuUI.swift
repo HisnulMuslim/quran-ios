@@ -24,6 +24,7 @@ public enum AyahMenuUI {
             copy: @escaping AsyncAction,
             share: @escaping AsyncAction,
             shareImage: AsyncAction? = nil,
+            shareVideo: AsyncAction? = nil,
             expandSelection: (() -> Void)? = nil,
             shrinkSelection: (() -> Void)? = nil
         ) {
@@ -36,6 +37,7 @@ public enum AyahMenuUI {
             self.copy = copy
             self.share = share
             self.shareImage = shareImage
+            self.shareVideo = shareVideo
             self.expandSelection = expandSelection
             self.shrinkSelection = shrinkSelection
         }
@@ -51,6 +53,7 @@ public enum AyahMenuUI {
         let copy: AsyncAction
         let share: AsyncAction
         let shareImage: AsyncAction?
+        let shareVideo: AsyncAction?
         let expandSelection: (() -> Void)?
         let shrinkSelection: (() -> Void)?
     }

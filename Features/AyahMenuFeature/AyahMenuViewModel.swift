@@ -26,6 +26,7 @@ public protocol AyahMenuListener: AnyObject {
 
     func shareText(_ lines: [String], in sourceView: UIView, at point: CGPoint)
     func shareImage(verses: [AyahNumber])
+    func shareVideo(verses: [AyahNumber])
     func deleteNotes(_ notes: [Note], verses: [AyahNumber]) async
     func showTranslation(_ verses: [AyahNumber])
 
@@ -97,16 +98,10 @@ final class AyahMenuViewModel {
     }
 
     var canExpand: Bool {
-        guard let last = verses.last, let next = last.next else {
+        guard let last = verses.last else {
             return false
         }
-        if isTranslationView {
-            return true
-        }
-        if deps.visiblePages.isEmpty {
-            return true
-        }
-        return deps.visiblePages.contains(next.page)
+        return last.next != nil
     }
 
     var canShrink: Bool {
@@ -160,9 +155,6 @@ final class AyahMenuViewModel {
 
     func expandSelection() {
         guard let last = verses.last, let next = last.next else {
-            return
-        }
-        if !isTranslationView && !deps.visiblePages.isEmpty && !deps.visiblePages.contains(next.page) {
             return
         }
         UIImpactFeedbackGenerator(style: .light).impactOccurred()
@@ -268,8 +260,12 @@ final class AyahMenuViewModel {
 
     func shareImage() {
         logger.info("AyahMenu: shareImage. Verses: \(verses)")
-        listener?.dismissAyahMenu()
         listener?.shareImage(verses: verses)
+    }
+
+    func shareVideo() {
+        logger.info("AyahMenu: shareVideo. Verses: \(verses)")
+        listener?.shareVideo(verses: verses)
     }
 
     // MARK: Private

@@ -102,7 +102,7 @@ public struct QuranTextDataService {
         let versesText = try await arabicPersistence.textForVerses(verses)
         var verseTextList: [String] = []
         for verse in verses {
-            let text = versesText[verse]!
+            let text = versesText[verse] ?? ""
             verseTextList.append(text)
         }
         return verseTextList

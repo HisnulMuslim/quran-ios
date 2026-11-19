@@ -202,14 +202,40 @@ class QuranViewController: BaseViewController, QuranViewDelegate,
     }
 
     func presentShareImage(verses: [AyahNumber]) {
+        presentShareEditor(verses: verses, isVideoMode: false)
+    }
+
+    func presentShareVideo(verses: [AyahNumber]) {
+        presentShareEditor(verses: verses, isVideoMode: true)
+    }
+
+    private func presentShareEditor(verses: [AyahNumber], isVideoMode: Bool) {
+        if let presented = presentedViewController {
+            let presentNext: () -> Void = { [weak self] in
+                self?.presentShareEditor(verses: verses, isVideoMode: isVideoMode)
+            }
+            if presented.isBeingDismissed, let coordinator = presented.transitionCoordinator {
+                coordinator.animate(alongsideTransition: nil) { _ in
+                    presentNext()
+                }
+            } else {
+                dismiss(animated: true, completion: presentNext)
+            }
+            return
+        }
+
         let shareController = AyahShareImageViewController(
             verses: verses,
             databasesURL: interactor.databasesURL,
-            quranFileURL: interactor.quranFileURL
+            quranFileURL: interactor.quranFileURL,
+            appHost: interactor.appHost,
+            isVideoMode: isVideoMode
         )
         if let sheet = shareController.sheetPresentationController {
             sheet.detents = [.large()]
             sheet.prefersGrabberVisible = true
+            // Prevent _UISheetInteraction edge-scroll detent adjustment crashes inside scrollable SwiftUI sheets.
+            sheet.prefersScrollingExpandsWhenScrolledToEdge = false
         }
         present(shareController, animated: true)
     }
@@ -302,10 +328,16 @@ class QuranViewController: BaseViewController, QuranViewDelegate,
     }
 
     func dismissPresentedViewController(completion: (() -> Void)?) {
-        if presentedViewController != nil {
-            dismiss(animated: true, completion: completion)
-        } else {
+        guard let presented = presentedViewController else {
             completion?()
+            return
+        }
+        if presented.isBeingDismissed, let coordinator = presented.transitionCoordinator {
+            coordinator.animate(alongsideTransition: nil) { _ in
+                completion?()
+            }
+        } else {
+            dismiss(animated: true, completion: completion)
         }
     }
 

@@ -289,6 +289,7 @@ class BoundingBoxTextView: UITextView {
 struct ContinuousArabicTextView: UIViewRepresentable {
     let verses: [TranslationArabicText]
     let arabicFontSize: FontSize
+    var arabicFont: ArabicFont = .uthmanic
     var width: CGFloat = 0
     let scrollToVerse: AyahNumber?
     let scrollTriggerCount: Int
@@ -321,16 +322,34 @@ struct ContinuousArabicTextView: UIViewRepresentable {
         uiView.setNeedsLayout()
     }
 
+    private func resolvedArabicUIFont(size: CGFloat) -> UIFont {
+        switch arabicFont {
+        case .uthmanic:
+            return UIFont(.quran, size: size)
+        case .kitab:
+            return UIFont(.arabic, size: size)
+        case .geezaPro:
+            return UIFont(name: "GeezaPro", size: size) ?? UIFont.systemFont(ofSize: size)
+        case .mishafi:
+            return UIFont(name: "DiwanMishafi", size: size) ?? UIFont.systemFont(ofSize: size)
+        case .system:
+            return UIFont.systemFont(ofSize: size)
+        }
+    }
+
     func configureTextView(_ uiView: BoundingBoxTextView) {
         let attributedString = NSMutableAttributedString()
         let fontSize = arabicFontSize.arabicFontSize()
         uiView.fontSizeValue = fontSize
-        let font = UIFont(.quran, size: fontSize)
+        let font = resolvedArabicUIFont(size: fontSize)
+        let rosetteFont = UIFont(.quran, size: fontSize)
 
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.alignment = .right
         paragraphStyle.baseWritingDirection = .rightToLeft
         paragraphStyle.lineSpacing = max(6, fontSize * 0.16)
+
+        let numberRegex = arabicFont == .uthmanic ? nil : (try? NSRegularExpression(pattern: "([٠-٩]+)\\s*$"))
 
         for verse in verses {
             let verseText = verse.text + " "
@@ -343,7 +362,14 @@ struct ContinuousArabicTextView: UIViewRepresentable {
             if let highlightColor = verse.highlightColor {
                 attrs[.backgroundColor] = UIColor(highlightColor)
             }
-            attributedString.append(NSAttributedString(string: verseText, attributes: attrs))
+            let verseAttributed = NSMutableAttributedString(string: verseText, attributes: attrs)
+            if let numberRegex {
+                let fullRange = NSRange(location: 0, length: (verseText as NSString).length)
+                if let match = numberRegex.firstMatch(in: verseText, range: fullRange) {
+                    verseAttributed.addAttribute(.font, value: rosetteFont, range: match.range(at: 1))
+                }
+            }
+            attributedString.append(verseAttributed)
         }
 
         uiView.textAlignment = .right
@@ -366,15 +392,17 @@ extension TranslationContinuousArabic: View {
     struct ContentView: View {
         let verses: [TranslationArabicText]
         let arabicFontSize: FontSize
+        let arabicFont: ArabicFont
         let scrollToVerse: AyahNumber?
         let scrollTriggerCount: Int
 
         @State private var verseFrames: [AyahNumber: [CGRect]] = [:]
         @State private var totalHeight: CGFloat
 
-        init(verses: [TranslationArabicText], arabicFontSize: FontSize, scrollToVerse: AyahNumber?, scrollTriggerCount: Int) {
+        init(verses: [TranslationArabicText], arabicFontSize: FontSize, arabicFont: ArabicFont = .uthmanic, scrollToVerse: AyahNumber?, scrollTriggerCount: Int) {
             self.verses = verses
             self.arabicFontSize = arabicFontSize
+            self.arabicFont = arabicFont
             self.scrollToVerse = scrollToVerse
             self.scrollTriggerCount = scrollTriggerCount
 
@@ -394,6 +422,7 @@ extension TranslationContinuousArabic: View {
                     ContinuousArabicTextView(
                         verses: verses,
                         arabicFontSize: arabicFontSize,
+                        arabicFont: arabicFont,
                         width: availableWidth,
                         scrollToVerse: scrollToVerse,
                         scrollTriggerCount: scrollTriggerCount
@@ -434,7 +463,7 @@ extension TranslationContinuousArabic: View {
     }
 
     var body: some View {
-        ContentView(verses: verses, arabicFontSize: arabicFontSize, scrollToVerse: scrollToVerse, scrollTriggerCount: scrollTriggerCount)
+        ContentView(verses: verses, arabicFontSize: arabicFontSize, arabicFont: arabicFont, scrollToVerse: scrollToVerse, scrollTriggerCount: scrollTriggerCount)
             .environment(\.layoutDirection, .leftToRight)
             .readableInsetsPadding(.horizontal)
     }
@@ -450,6 +479,7 @@ extension TranslationFrontispieceArabic: View {
             TranslationContinuousArabic.ContentView(
                 verses: verses,
                 arabicFontSize: arabicFontSize,
+                arabicFont: arabicFont,
                 scrollToVerse: scrollToVerse,
                 scrollTriggerCount: scrollTriggerCount
             )
@@ -463,6 +493,7 @@ extension TranslationArabicText: View {
         ContinuousArabicTextView(
             verses: [self],
             arabicFontSize: arabicFontSize,
+            arabicFont: arabicFont,
             scrollToVerse: nil,
             scrollTriggerCount: 0
         )

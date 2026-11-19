@@ -95,16 +95,20 @@ private struct AyahMenuViewList: View {
     }
 
     private var shareImageTitle: String {
-        (AppLanguage == .kannada || Locale.current.languageCode == "kn") ? "ಚಿತ್ರವಾಗಿ ಹಂಚಿಕೊಳ್ಳಿ" : "Share as Image"
+        lChoice(kn: "ಚಿತ್ರವಾಗಿ ಹಂಚಿಕೊಳ್ಳಿ", en: "Share as Image", ar: "مشاركة كصورة")
+    }
+
+    private var shareVideoTitle: String {
+        lChoice(kn: "ವೀಡಿಯೊ ಆಗಿ ಹಂಚಿಕೊಳ್ಳಿ", en: "Share as Video", ar: "مشاركة كفيديو")
     }
 
     private var shareTextTitle: String {
-        (AppLanguage == .kannada || Locale.current.languageCode == "kn") ? "ಪಠ್ಯವಾಗಿ ಹಂಚಿಕೊಳ್ಳಿ..." : "Share as Text..."
+        lChoice(kn: "ಪಠ್ಯವಾಗಿ ಹಂಚಿಕೊಳ್ಳಿ...", en: "Share as Text...", ar: "مشاركة كنص...")
     }
 
     private var translationTitle: String {
         if dataObject.isTranslationView {
-            return (AppLanguage == .kannada || Locale.current.languageCode == "kn") ? "ಅನುವಾದಗಳನ್ನು ಹೋಲಿಸಿ" : "Compare Translations"
+            return lChoice(kn: "ಅನುವಾದಗಳನ್ನು ಹೋಲಿಸಿ", en: "Compare Translations", ar: "مقارنة التراجم")
         }
         return l("menu.translation")
     }
@@ -262,6 +266,13 @@ private struct AyahMenuViewList: View {
                         .padding(.leading)
                     Row(title: shareImageTitle, action: shareImageAction) {
                         Image(systemName: "photo.artframe")
+                    }
+                }
+                if let shareVideoAction = dataObject.actions.shareVideo {
+                    Divider()
+                        .padding(.leading)
+                    Row(title: shareVideoTitle, action: shareVideoAction) {
+                        Image(systemName: "video.badge.plus")
                     }
                 }
                 Divider()

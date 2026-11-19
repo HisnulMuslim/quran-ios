@@ -60,8 +60,8 @@ private struct SettingsRootViewUI: View {
             NoorBasicSection {
                 NoorListItem(
                     image: .init(.translation),
-                    title: .text(AppLanguage == .kannada ? "ಆ್ಯಪ್ ಭಾಷೆ" : "App Language"),
-                    subtitle: .init(text: AppLanguage == .kannada ? "ಕನ್ನಡ" : "English", location: .trailing),
+                    title: .text(lChoice(kn: "ಆ್ಯಪ್ ಭಾಷೆ", en: "App Language", ar: "لغة التطبيق")),
+                    subtitle: .init(text: lChoice(kn: "ಕನ್ನಡ", en: "English", ar: "العربية"), location: .trailing),
                     accessory: .disclosureIndicator,
                     action: navigateToLanguageSelector
                 )
@@ -110,14 +110,14 @@ private struct SettingsRootViewUI: View {
             NoorBasicSection {
                 NoorListItem(
                     image: .init(.help), // Need an appropriate icon, like .questionmark or similar, let's use a standard SF Symbol if needed, but since it's NoorListItem, maybe .help or similar exists. Wait, I will use a generic SF Symbol image if needed.
-                    title: .text(AppLanguage == .kannada ? "ಸಹಾಯ" : "Help"),
+                    title: .text(lChoice(kn: "ಸಹಾಯ", en: "Help", ar: "المساعدة")),
                     accessory: .disclosureIndicator,
                     action: navigateToHelp
                 )
 
                 NoorListItem(
                     image: .init(.star),
-                    title: .text(AppLanguage == .kannada ? "ರೇಟ್ ಮಾಡಿ" : "Rate the App"),
+                    title: .text(lChoice(kn: "ರೇಟ್ ಮಾಡಿ", en: "Rate the App", ar: "تقييم التطبيق")),
                     accessory: .disclosureIndicator,
                     action: writeAReview
                 )
@@ -131,7 +131,7 @@ private struct SettingsRootViewUI: View {
 
                 NoorListItem(
                     image: .init(.info),
-                    title: .text(AppLanguage == .kannada ? "ನಮ್ಮ ಬಗ್ಗೆ" : "About Us"),
+                    title: .text(lChoice(kn: "ನಮ್ಮ ಬಗ್ಗೆ", en: "About Us", ar: "من نحن")),
                     accessory: .disclosureIndicator,
                     action: navigateToAboutUs
                 )

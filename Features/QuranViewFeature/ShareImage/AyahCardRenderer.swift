@@ -11,10 +11,18 @@ import UIKit
 
 @MainActor
 public enum AyahCardRenderer {
-    public static func render<Content: View>(view: Content, targetWidth: CGFloat = 1080) -> UIImage? {
+    private static let sharedCIContext = CIContext()
+    private static var qrCache: [String: UIImage] = [:]
+
+    public static func render<Content: View>(
+        view: Content,
+        targetWidth: CGFloat = 1080,
+        isOpaque: Bool = true
+    ) -> UIImage? {
         if #available(iOS 16.0, *) {
             let renderer = ImageRenderer(content: view)
             renderer.scale = 1.0
+            renderer.isOpaque = isOpaque
             if let image = renderer.uiImage {
                 return image
             }
@@ -38,6 +46,7 @@ public enum AyahCardRenderer {
 
         let format = UIGraphicsImageRendererFormat()
         format.scale = 1.0
+        format.opaque = isOpaque
         let renderer = UIGraphicsImageRenderer(size: finalSize, format: format)
         let image = renderer.image { ctx in
             targetView.layer.render(in: ctx.cgContext)
@@ -52,7 +61,7 @@ public enum AyahCardRenderer {
         let tempDirectory = FileManager.default.temporaryDirectory
         let fileURL = tempDirectory.appendingPathComponent(fileName)
         do {
-            try data.write(to: fileURL)
+            try data.write(to: fileURL, options: .atomic)
             return fileURL
         } catch {
             return nil
@@ -60,23 +69,28 @@ public enum AyahCardRenderer {
     }
 
     public static func generateQRCode(from string: String, size: CGFloat = 200) -> UIImage? {
+        let cacheKey = "\(string)#\(Int(round(size)))"
+        if let cached = qrCache[cacheKey] {
+            return cached
+        }
         guard let data = string.data(using: .utf8),
               let filter = CIFilter(name: "CIQRCodeGenerator") else {
             return nil
         }
         filter.setValue(data, forKey: "inputMessage")
         filter.setValue("M", forKey: "inputCorrectionLevel")
-        guard let outputImage = filter.outputImage else {
+        guard let outputImage = filter.outputImage, outputImage.extent.size.width > 0 else {
             return nil
         }
 
         let scale = size / outputImage.extent.size.width
         let transformedImage = outputImage.transformed(by: CGAffineTransform(scaleX: scale, y: scale))
 
-        let context = CIContext()
-        guard let cgImage = context.createCGImage(transformedImage, from: transformedImage.extent) else {
+        guard let cgImage = sharedCIContext.createCGImage(transformedImage, from: transformedImage.extent) else {
             return nil
         }
-        return UIImage(cgImage: cgImage)
+        let image = UIImage(cgImage: cgImage)
+        qrCache[cacheKey] = image
+        return image
     }
 }

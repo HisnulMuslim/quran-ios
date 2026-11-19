@@ -34,7 +34,7 @@
     <key>ITSAppUsesNonExemptEncryption</key>
         <false/>
     <key>NSPhotoLibraryAddUsageDescription</key>
-    <string>Save Quran verse images to your Photos library.</string>
+    <string>Save Quran verse images and videos to your Photos library.</string>
     <key>NSAppTransportSecurity</key>
     <dict>
         <key>NSAllowsArbitraryLoads</key>

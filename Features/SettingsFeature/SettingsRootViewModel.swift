@@ -119,13 +119,19 @@ final class SettingsRootViewModel: ObservableObject {
     func navigateToLanguageSelector() {
         logger.info("Settings: presentLanguageSelector")
         showSingleChoiceSelector(
-            title: "App Language",
+            title: lChoice(kn: "ಆ್ಯಪ್ ಭಾಷೆ", en: "App Language", ar: "لغة التطبيق"),
             sections: [SingleChoiceSection(
                 header: nil,
-                items: [Language.kannada, Language.english]
+                items: [Language.kannada, Language.english, Language.arabic]
             )],
             selected: AppLanguage,
-            itemText: { $0 == .kannada ? "ಕನ್ನಡ (Kannada)" : "English" },
+            itemText: {
+                switch $0 {
+                case .kannada: return "ಕನ್ನಡ (Kannada)"
+                case .english: return "English"
+                case .arabic: return "العربية (Arabic)"
+                }
+            },
             onSelection: { item in
                 AppLanguage = item
             }
@@ -135,14 +141,14 @@ final class SettingsRootViewModel: ObservableObject {
     func navigateToHelp() {
         logger.info("Settings: navigateToHelp")
         let viewController = UIHostingController(rootView: HelpView())
-        viewController.title = AppLanguage == .kannada ? "ಸಹಾಯ" : "Help"
+        viewController.title = lChoice(kn: "ಸಹಾಯ", en: "Help", ar: "المساعدة")
         navigationController?.pushViewController(viewController, animated: true)
     }
 
     func navigateToAboutUs() {
         logger.info("Settings: navigateToAboutUs")
         let viewController = UIHostingController(rootView: AboutUsView())
-        viewController.title = AppLanguage == .kannada ? "ನಮ್ಮ ಬಗ್ಗೆ" : "About Us"
+        viewController.title = lChoice(kn: "ನಮ್ಮ ಬಗ್ಗೆ", en: "About Us", ar: "من نحن")
         navigationController?.pushViewController(viewController, animated: true)
     }
 

@@ -5,13 +5,16 @@
 //  Created for Kannada Quran App.
 //
 
+import AVFoundation
 import Localization
 import SwiftUI
+import UIx
 
 public struct AyahShareImageView: View {
     @ObservedObject var viewModel: AyahShareImageViewModel
-    @State private var backgroundMode: Int = 0 // 0 = Colors, 1 = Photos
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @State private var showingRemoteGallery = false
+    @State private var hostViewController: UIViewController?
     let onDismiss: () -> Void
 
     public init(viewModel: AyahShareImageViewModel, onDismiss: @escaping () -> Void) {
@@ -19,57 +22,394 @@ public struct AyahShareImageView: View {
         self.onDismiss = onDismiss
     }
 
-    private var isKannada: Bool {
-        AppLanguage == .kannada || Locale.current.languageCode == "kn"
-    }
-
     private var activeTextColorScheme: AyahCardTextColorScheme {
         viewModel.colorTarget == .arabic ? viewModel.textColorScheme : viewModel.translationTextColorScheme
     }
 
-    private func loadThumbnail(name: String) -> UIImage? {
-        if let img = UIImage(named: name) {
-            return img
+    public var body: some View {
+        Group {
+            if #available(iOS 16.0, *) {
+                NavigationStack {
+                    mainContent
+                }
+            } else {
+                NavigationView {
+                    mainContent
+                }
+                .navigationViewStyle(.stack)
+            }
         }
-        let testPath = "/Users/azhar/.gemini/antigravity/brain/bec757d9-597d-48e9-8d57-290aef403482/\(name).jpg"
-        return UIImage(contentsOfFile: testPath)
+        .background(UIViewControllerReader(viewController: $hostViewController))
     }
 
-    public var body: some View {
-        NavigationView {
-            ZStack {
+    private var mainContent: some View {
+        ZStack {
                 Color(UIColor.systemGroupedBackground)
                     .ignoresSafeArea()
 
                 if viewModel.isLoading {
                     ProgressView()
-                } else if let cardData = viewModel.cardData {
-                    ScrollView {
-                        VStack(spacing: 18) {
-                            // Live Card Preview
-                            AyahShareCardView(
-                                data: cardData,
-                                theme: viewModel.selectedTheme,
-                                aspectRatio: viewModel.selectedAspectRatio,
-                                showArabic: viewModel.showArabic,
-                                showTranslation: viewModel.showTranslation,
-                                showFootnotes: viewModel.showFootnotes,
-                                showQRCode: viewModel.showQRCode,
-                                showAppURL: viewModel.showAppURL,
-                                fontSizeScale: viewModel.fontSizeScale,
-                                textColorScheme: viewModel.textColorScheme,
-                                customTextColor: viewModel.textColorScheme == .custom ? viewModel.customTextColor : nil,
-                                translationTextColorScheme: viewModel.translationTextColorScheme,
-                                customTranslationTextColor: viewModel.translationTextColorScheme == .custom ? viewModel.customTranslationTextColor : nil,
-                                arabicFont: viewModel.arabicFont,
-                                translationFont: viewModel.translationFont,
-                                photoScale: viewModel.photoScale,
-                                customImage: viewModel.customBackgroundImage,
-                                isExport: false
-                            )
-                            .padding(.top, 8)
+                } else if let cardData = viewModel.displayedCardData ?? viewModel.cardData {
+                    if horizontalSizeClass == .regular {
+                        HStack(spacing: 0) {
+                            pinnedPreview(cardData: cardData)
+                                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                .background(Color(UIColor.systemGroupedBackground))
 
-                            // Aspect Ratio Selector (1:1, 4:5, 9:16)
+                            Divider()
+
+                            controlsScrollView
+                                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        }
+                    } else {
+                        GeometryReader { outerGeo in
+                            let previewHeight = min(max(outerGeo.size.height * 0.42, 240), 340)
+                            VStack(spacing: 0) {
+                                pinnedPreview(cardData: cardData)
+                                    .frame(height: previewHeight)
+                                    .frame(maxWidth: .infinity)
+                                    .background(Color(UIColor.systemGroupedBackground))
+
+                                Divider()
+
+                                controlsScrollView
+                            }
+                        }
+                    }
+                }
+                // Toast Banner
+                if let toast = viewModel.saveSuccessToast {
+                    VStack {
+                        Spacer()
+                        HStack(spacing: 8) {
+                            Image(systemName: "checkmark.circle.fill")
+                                .foregroundColor(.green)
+                            Text(toast)
+                                .font(.system(size: 14, weight: .medium))
+                                .foregroundColor(.white)
+                        }
+                        .padding(.horizontal, 18)
+                        .padding(.vertical, 12)
+                        .background(
+                            Capsule()
+                                .fill(Color.black.opacity(0.85))
+                        )
+                        .padding(.bottom, 24)
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                    }
+                    .animation(.spring(), value: toast)
+                }
+            }
+            .navigationTitle(
+                viewModel.isVideoMode
+                    ? lChoice(kn: "ವೀಡಿಯೊ ಹಂಚಿಕೆ", en: "Share Ayah Video", ar: "مشاركة فيديو الآية")
+                    : lChoice(kn: "ಚಿತ್ರ ಹಂಚಿಕೆ", en: "Share Ayah", ar: "مشاركة الآية")
+            )
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button {
+                        viewModel.stopAudioPreview()
+                        onDismiss()
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .foregroundColor(.secondary)
+                    }
+                }
+            }
+            .task {
+                await viewModel.loadData()
+            }
+            .onDisappear {
+                viewModel.stopAudioPreview()
+            }
+            .sheet(isPresented: $showingRemoteGallery) {
+                RemoteBackgroundPickerView(viewModel: viewModel, isPresented: $showingRemoteGallery)
+            }
+            .alert(isPresented: Binding(
+                get: { viewModel.errorAlertMessage != nil },
+                set: { if !$0 { viewModel.errorAlertMessage = nil } }
+            )) {
+                Alert(
+                    title: Text(lChoice(kn: "ದೋಷ", en: "Notice", ar: "تنبيه")),
+                    message: Text(viewModel.errorAlertMessage ?? ""),
+                    dismissButton: .default(Text(lChoice(kn: "ಸರಿ", en: "OK", ar: "حسناً")))
+                )
+            }
+            .onChange(of: viewModel.customBackgroundImage) { newImage in
+                if newImage != nil {
+                    withAnimation {
+                        viewModel.selectedTheme = .customPhoto
+                        if viewModel.backgroundMode != 1 {
+                            viewModel.backgroundMode = 1
+                        }
+                    }
+                }
+            }
+    }
+
+    @ViewBuilder
+    private func pinnedPreview(cardData: AyahCardData) -> some View {
+        GeometryReader { geo in
+            let baseSize = CGSize(
+                width: 330,
+                height: viewModel.selectedAspectRatio.height(for: 330)
+            )
+            let availW = max(1, geo.size.width - 28)
+            let availH = max(1, geo.size.height - 20)
+            let fitScale = min(availW / baseSize.width, availH / baseSize.height, 1.15)
+            let slideCount = viewModel.cardData?.ayahSlides.count ?? cardData.ayahSlides.count
+
+            ZStack {
+                if viewModel.isLiveVideoBackground {
+                    Group {
+                        if let videoURL = viewModel.selectedBackgroundVideoURL {
+                            LoopingVideoPlayerView(url: videoURL, scale: viewModel.photoScale)
+                        } else {
+                            ZStack {
+                                Color.black
+                                if viewModel.isDownloadingBackgroundVideo {
+                                    ProgressView()
+                                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                                }
+                            }
+                        }
+                    }
+                    .frame(width: baseSize.width, height: baseSize.height)
+                    .clipped()
+                    .clipShape(RoundedRectangle(cornerRadius: 0, style: .continuous))
+                }
+
+                AyahShareCardView(
+                    data: cardData,
+                    theme: viewModel.selectedTheme,
+                    aspectRatio: viewModel.selectedAspectRatio,
+                    showArabic: viewModel.showArabic,
+                    showTranslation: viewModel.showTranslation,
+                    showFootnotes: viewModel.showFootnotes,
+                    showQRCode: viewModel.showQRCode,
+                    showAppURL: viewModel.showAppURL,
+                    fontSizeScale: viewModel.fontSizeScale,
+                    textColorScheme: viewModel.textColorScheme,
+                    customTextColor: viewModel.textColorScheme == .custom ? viewModel.customTextColor : nil,
+                    translationTextColorScheme: viewModel.translationTextColorScheme,
+                    customTranslationTextColor: viewModel.translationTextColorScheme == .custom ? viewModel.customTranslationTextColor : nil,
+                    arabicFont: viewModel.arabicFont,
+                    translationFont: viewModel.translationFont,
+                    photoScale: viewModel.photoScale,
+                    customImage: viewModel.customBackgroundImage,
+                    transparentBackground: viewModel.isLiveVideoBackground,
+                    isExport: false
+                )
+                .frame(width: baseSize.width, height: baseSize.height)
+
+                if viewModel.backgroundMode == 1 && viewModel.isDownloadingBackgroundPhoto {
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 0, style: .continuous)
+                            .fill(Color.black.opacity(0.35))
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                    }
+                    .frame(width: baseSize.width, height: baseSize.height)
+                    .allowsHitTesting(false)
+                }
+
+                if viewModel.isVideoMode {
+                    // Top-right badge: MP4 (+ multi-ayah slide index when synced)
+                    HStack(spacing: 4) {
+                        Image(systemName: "video.fill")
+                            .font(.system(size: 9.5, weight: .bold))
+                        if viewModel.syncAyahWithAudio && slideCount > 1 {
+                            Text("\(viewModel.activePreviewSlideIndex + 1)/\(slideCount) · MP4")
+                                .font(.system(size: 10, weight: .bold, design: .monospaced))
+                        } else {
+                            Text("MP4")
+                                .font(.system(size: 10, weight: .bold, design: .monospaced))
+                        }
+                    }
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(Capsule().fill(Color.black.opacity(0.65)))
+                    .padding(10)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
+                    .allowsHitTesting(false)
+
+                    // Bottom-center Play/Stop reciter preview button (sits above permanent Store+QR footer)
+                    Button {
+                        viewModel.toggleAudioPreview()
+                    } label: {
+                        HStack(spacing: 6) {
+                            if viewModel.isLoadingAudioPreview {
+                                ProgressView()
+                                    .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                                    .scaleEffect(0.75)
+                            } else {
+                                Image(systemName: viewModel.isPlayingAudioPreview ? "stop.fill" : "play.fill")
+                                    .font(.system(size: 11, weight: .bold))
+                            }
+                            Text(
+                                viewModel.isPlayingAudioPreview
+                                    ? lChoice(kn: "ನಿಲ್ಲಿಸಿ", en: "Stop Preview", ar: "إيقاف المعاينة")
+                                    : lChoice(kn: "ಪಠಣ ಕೇಳಿ", en: "Preview Recitation", ar: "معاينة التلاوة")
+                            )
+                            .font(.system(size: 11.5, weight: .semibold))
+                        }
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(
+                            Capsule()
+                                .fill(Color.black.opacity(0.72))
+                        )
+                        .overlay(
+                            Capsule()
+                                .stroke(Color.white.opacity(0.28), lineWidth: 1)
+                        )
+                        .contentShape(Capsule())
+                    }
+                    .buttonStyle(.plain)
+                    .padding(.bottom, 58)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+                }
+            }
+            .frame(width: baseSize.width, height: baseSize.height)
+            .scaleEffect(fitScale)
+            .frame(width: baseSize.width * fitScale, height: baseSize.height * fitScale)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+    }
+
+
+    private var controlsScrollView: some View {
+        ScrollView {
+            VStack(spacing: 18) {
+                            if let progress = viewModel.exportProgress {
+                                VStack(spacing: 8) {
+                                    HStack(spacing: 10) {
+                                        ProgressView()
+                                        Text(progress.message)
+                                            .font(.system(size: 13, weight: .medium))
+                                            .foregroundColor(.primary)
+                                        Spacer()
+                                        if let pct = progress.percent {
+                                            Text("\(pct)%")
+                                                .font(.system(size: 12.5, weight: .semibold, design: .monospaced))
+                                                .foregroundColor(.accentColor)
+                                        }
+                                    }
+                                    if let pct = progress.percent {
+                                        ProgressView(value: Double(min(max(pct, 0), 100)), total: 100.0)
+                                    }
+                                }
+                                .padding(.horizontal, 14)
+                                .padding(.vertical, 12)
+                                .background(Color(UIColor.secondarySystemGroupedBackground))
+                                .cornerRadius(12)
+                                .padding(.horizontal, 16)
+                            }
+
+                            if viewModel.isVideoMode {
+                                VStack(spacing: 10) {
+                                    // Reciter Selector
+                                    VStack(alignment: .leading, spacing: 8) {
+                                        HStack {
+                                            HStack(spacing: 6) {
+                                                Image(systemName: "waveform")
+                                                    .font(.system(size: 13.5))
+                                                    .foregroundColor(.secondary)
+                                                Text(lChoice(kn: "ಪಠಣಕಾರರು (ಖಾರಿ)", en: "Reciter (Qari)", ar: "القارئ"))
+                                                    .font(.system(size: 13.5, weight: .medium))
+                                            }
+                                            Spacer()
+                                            if let reciterName = viewModel.selectedReciterName {
+                                                Text(reciterName)
+                                                    .font(.system(size: 12, weight: .medium))
+                                                    .foregroundColor(.secondary)
+                                                    .lineLimit(1)
+                                            }
+                                        }
+
+                                        if viewModel.availableReciters.isEmpty {
+                                            Text(lChoice(kn: "ಪಠಣಕಾರರನ್ನು ಲೋಡ್ ಮಾಡಲಾಗುತ್ತಿದೆ...", en: "Loading reciters...", ar: "جارٍ تحميل القرّاء..."))
+                                                .font(.system(size: 12))
+                                                .foregroundColor(.secondary)
+                                        } else {
+                                            ScrollView(.horizontal, showsIndicators: false) {
+                                                HStack(spacing: 8) {
+                                                    ForEach(viewModel.availableReciters) { reciter in
+                                                        let isSelected = viewModel.selectedReciterId == reciter.id
+                                                        Button {
+                                                            if viewModel.selectedReciterId != reciter.id {
+                                                                viewModel.stopAudioPreview()
+                                                                viewModel.selectedReciterId = reciter.id
+                                                            }
+                                                        } label: {
+                                                            HStack(spacing: 5) {
+                                                                if isSelected {
+                                                                    Image(systemName: "checkmark.circle.fill")
+                                                                        .font(.system(size: 11))
+                                                                }
+                                                                Text(reciter.name)
+                                                                    .font(.system(size: 12.5, weight: isSelected ? .semibold : .regular))
+                                                                    .lineLimit(1)
+                                                            }
+                                                            .padding(.horizontal, 12)
+                                                            .padding(.vertical, 7)
+                                                            .background(
+                                                                Capsule()
+                                                                    .fill(isSelected ? Color.accentColor : Color(UIColor.tertiarySystemGroupedBackground))
+                                                            )
+                                                            .foregroundColor(isSelected ? .white : .primary)
+                                                        }
+                                                        .buttonStyle(.plain)
+                                                    }
+                                                }
+                                                .padding(.vertical, 2)
+                                            }
+                                        }
+                                    }
+                                    .padding(.horizontal, 16)
+                                    .padding(.vertical, 10)
+                                    .background(Color(UIColor.secondarySystemGroupedBackground))
+                                    .cornerRadius(12)
+
+                                    if (viewModel.cardData?.ayahSlides.count ?? 0) > 1 {
+                                        Toggle(
+                                            lChoice(
+                                                kn: "ಪಠಣದೊಂದಿಗೆ ಪ್ರತಿ ಆಯತ್ ಬದಲಿಸಿ",
+                                                en: "Sync Per-Ayah Card with Recitation",
+                                                ar: "مزامنة البطاقة مع تلاوة كل آية"
+                                            ),
+                                            isOn: $viewModel.syncAyahWithAudio
+                                        )
+                                        .font(.system(size: 13.5, weight: .medium))
+                                        .padding(.horizontal, 16)
+                                        .padding(.vertical, 10)
+                                        .background(Color(UIColor.secondarySystemGroupedBackground))
+                                        .cornerRadius(12)
+                                    }
+
+                                    VStack(alignment: .leading, spacing: 8) {
+                                        Text(lChoice(kn: "ವೀಡಿಯೊ ಗುಣಮಟ್ಟ", en: "Video Quality", ar: "جودة الفيديو"))
+                                            .font(.system(size: 12.5, weight: .semibold))
+                                            .foregroundColor(.secondary)
+
+                                        Picker("", selection: $viewModel.videoExportQuality) {
+                                            ForEach(AyahVideoExportQuality.allCases) { quality in
+                                                Text(quality.displayName).tag(quality)
+                                            }
+                                        }
+                                        .pickerStyle(.segmented)
+                                    }
+                                    .padding(.horizontal, 16)
+                                    .padding(.vertical, 10)
+                                    .background(Color(UIColor.secondarySystemGroupedBackground))
+                                    .cornerRadius(12)
+                                }
+                                .padding(.horizontal, 16)
+                            }
+
                             HStack(spacing: 8) {
                                 ForEach(AyahCardAspectRatio.allCases) { ratio in
                                     Button {
@@ -96,27 +436,22 @@ public struct AyahShareImageView: View {
                             }
                             .padding(.horizontal, 16)
 
-                            // Background Mode Picker: Colors vs Photos
+                            // Background Mode Picker: Colors vs Photos (and Videos in Video Mode)
                             VStack(spacing: 12) {
-                                Picker("", selection: $backgroundMode) {
-                                    Text(isKannada ? "ಬಣ್ಣಗಳು" : "Colors").tag(0)
-                                    Text(isKannada ? "ಫೋಟೋಗಳು" : "Photos").tag(1)
+                                Picker("", selection: $viewModel.backgroundMode) {
+                                    Text(lChoice(kn: "ಬಣ್ಣಗಳು", en: "Colors", ar: "ألوان")).tag(0)
+                                    Text(lChoice(kn: "ಫೋಟೋಗಳು", en: "Photos", ar: "صور")).tag(1)
+                                    if viewModel.isVideoMode {
+                                        Text(lChoice(kn: "ವೀಡಿಯೊಗಳು", en: "Videos", ar: "فيديوهات")).tag(2)
+                                    }
                                 }
                                 .pickerStyle(.segmented)
                                 .padding(.horizontal, 16)
-                                .onChange(of: backgroundMode) { newMode in
-                                    if newMode == 1 && !viewModel.selectedTheme.isPhoto {
-                                        if viewModel.customBackgroundImage != nil {
-                                            viewModel.selectedTheme = .customPhoto
-                                        } else {
-                                            viewModel.selectedTheme = .mosqueDusk
-                                        }
-                                    } else if newMode == 0 && viewModel.selectedTheme.isPhoto {
-                                        viewModel.selectedTheme = .emerald
-                                    }
+                                .onChange(of: viewModel.backgroundMode) { newMode in
+                                    viewModel.onBackgroundModeChanged(newMode)
                                 }
 
-                                if backgroundMode == 0 {
+                                if viewModel.backgroundMode == 0 {
                                     // Color Swatches (7 Colors)
                                     HStack(spacing: 10) {
                                         Spacer(minLength: 0)
@@ -151,173 +486,56 @@ public struct AyahShareImageView: View {
                                         Spacer(minLength: 0)
                                     }
                                     .padding(.horizontal, 16)
-                                } else {
-                                    // Photo Swatches: Choose Custom Photo + All 8 Curated Presets
-                                    ScrollView(.horizontal, showsIndicators: false) {
-                                        HStack(spacing: 14) {
-                                            // 1. More Cloud Backgrounds Button
-                                            VStack(spacing: 4) {
-                                                Button {
-                                                    showingRemoteGallery = true
-                                                } label: {
-                                                    ZStack {
-                                                        Circle()
-                                                            .strokeBorder(Color.accentColor.opacity(0.7), style: StrokeStyle(lineWidth: 1.5, dash: [4, 3]))
-                                                            .frame(width: 44, height: 44)
-                                                            .background(
-                                                                Circle().fill(Color.accentColor.opacity(0.08))
-                                                            )
-
-                                                        VStack(spacing: 1) {
-                                                            Image(systemName: "cloud.fill")
-                                                                .font(.system(size: 15))
-                                                                .foregroundColor(.accentColor)
-                                                            Image(systemName: "plus")
-                                                                .font(.system(size: 8, weight: .bold))
-                                                                .foregroundColor(.accentColor)
-                                                        }
-                                                    }
-                                                    .frame(width: 52, height: 52)
-                                                }
-                                                .buttonStyle(.plain)
-
-                                                Text(isKannada ? "ಇನ್ನಷ್ಟು" : "More")
-                                                    .font(.system(size: 11, weight: .medium))
-                                                    .foregroundColor(.secondary)
-                                            }
-
-                                            // 2. Custom photo thumbnail (if user has picked one)
-                                            if let custom = viewModel.customBackgroundImage {
-                                                VStack(spacing: 4) {
-                                                    ZStack {
-                                                        Image(uiImage: custom)
-                                                            .resizable()
-                                                            .scaledToFill()
-                                                            .frame(width: 44, height: 44)
-                                                            .clipShape(Circle())
-
-                                                        if viewModel.selectedTheme == .customPhoto {
-                                                            Circle()
-                                                                .stroke(Color.accentColor, lineWidth: 2.5)
-                                                                .frame(width: 52, height: 52)
-
-                                                            Image(systemName: "checkmark")
-                                                                .font(.system(size: 13, weight: .bold))
-                                                                .foregroundColor(.white)
-                                                                .shadow(radius: 2)
-                                                        }
-                                                    }
-                                                    .frame(width: 54, height: 54)
-                                                    .contentShape(Circle())
-                                                    .onTapGesture {
-                                                        withAnimation(.easeInOut(duration: 0.2)) {
-                                                            viewModel.selectedTheme = .customPhoto
-                                                        }
-                                                    }
-
-                                                    Text(isKannada ? "ನನ್ನ ಚಿತ್ರ" : "My Photo")
-                                                        .font(.system(size: 11, weight: .medium))
-                                                        .foregroundColor(viewModel.selectedTheme == .customPhoto ? .accentColor : .secondary)
-                                                }
-                                            }
-
-                                            // 3. All 8 Curated Presets
-                                            ForEach(AyahCardTheme.photoThemes) { theme in
-                                                VStack(spacing: 4) {
-                                                    ZStack {
-                                                        if let name = theme.imageName, let img = loadThumbnail(name: name) {
-                                                            Image(uiImage: img)
-                                                                .resizable()
-                                                                .scaledToFill()
-                                                                .frame(width: 44, height: 44)
-                                                                .clipShape(Circle())
-                                                        } else {
-                                                            Circle()
-                                                                .fill(theme.iconColor)
-                                                                .frame(width: 44, height: 44)
-                                                        }
-
-                                                        if viewModel.selectedTheme == theme {
-                                                            Circle()
-                                                                .stroke(Color.accentColor, lineWidth: 2.5)
-                                                                .frame(width: 52, height: 52)
-
-                                                            Image(systemName: "checkmark")
-                                                                .font(.system(size: 13, weight: .bold))
-                                                                .foregroundColor(.white)
-                                                                .shadow(radius: 2)
-                                                        }
-                                                    }
-                                                    .frame(width: 54, height: 54)
-                                                    .contentShape(Circle())
-                                                    .onTapGesture {
-                                                        withAnimation(.easeInOut(duration: 0.2)) {
-                                                            viewModel.selectedTheme = theme
-                                                        }
-                                                    }
-
-                                                    Text(theme.displayName)
-                                                        .font(.system(size: 11, weight: .medium))
-                                                        .foregroundColor(viewModel.selectedTheme == theme ? .accentColor : .secondary)
-                                                }
+                                } else if viewModel.backgroundMode == 1 {
+                                    CloudBackgroundSwatchesRow(
+                                        items: viewModel.inlinePhotoCatalogItems,
+                                        selectedId: viewModel.selectedRemotePhotoItem?.id,
+                                        fallbackSystemImage: "photo",
+                                        browseTitle: lChoice(
+                                            kn: "ಕ್ಲೌಡ್ ಫೋಟೋಗಳನ್ನು ನೋಡಿ",
+                                            en: "Browse Cloud Photos",
+                                            ar: "تصفح صور السحابة"
+                                        ),
+                                        isDownloaded: { viewModel.isPhotoDownloaded($0) },
+                                        onBrowseMore: { showingRemoteGallery = true },
+                                        onSelectItem: { item in
+                                            withAnimation(.easeInOut(duration: 0.2)) {
+                                                viewModel.selectRemotePhoto(item)
                                             }
                                         }
-                                        .padding(.horizontal, 16)
+                                    )
+
+                                    if viewModel.customBackgroundImage != nil {
+                                        BackgroundZoomControl(
+                                            label: lChoice(kn: "ಫೋಟೋ ಜೂಮ್", en: "Photo Zoom", ar: "تكبير الصورة"),
+                                            scale: $viewModel.photoScale
+                                        )
                                     }
-
-                                    // Photo Zoom Control (for background photos)
-                                    HStack {
-                                        HStack(spacing: 6) {
-                                            Image(systemName: "arrow.up.left.and.arrow.down.right")
-                                                .font(.system(size: 13))
-                                                .foregroundColor(.secondary)
-                                            Text(isKannada ? "ಫೋಟೋ ಜೂಮ್" : "Photo Zoom")
-                                                .font(.system(size: 13, weight: .medium))
-                                        }
-
-                                        Spacer()
-
-                                        HStack(spacing: 12) {
-                                            Button {
-                                                if viewModel.photoScale > 1.05 {
-                                                    withAnimation(.easeInOut(duration: 0.15)) {
-                                                        viewModel.photoScale = max(1.0, (viewModel.photoScale * 10 - 1).rounded() / 10)
-                                                    }
-                                                }
-                                            } label: {
-                                                Image(systemName: "minus")
-                                                    .font(.system(size: 12, weight: .bold))
-                                                    .frame(width: 28, height: 28)
-                                                    .background(Color(UIColor.tertiarySystemGroupedBackground))
-                                                    .cornerRadius(6)
+                                } else if viewModel.isVideoMode {
+                                    CloudBackgroundSwatchesRow(
+                                        items: viewModel.inlineVideoCatalogItems,
+                                        selectedId: viewModel.selectedRemoteVideoItem?.id,
+                                        fallbackSystemImage: "video.fill",
+                                        browseTitle: lChoice(
+                                            kn: "ಕ್ಲೌಡ್ ವೀಡಿಯೊಗಳನ್ನು ನೋಡಿ",
+                                            en: "Browse Cloud Videos",
+                                            ar: "تصفح فيديوهات السحابة"
+                                        ),
+                                        isDownloaded: { viewModel.isVideoDownloaded($0) },
+                                        onBrowseMore: { showingRemoteGallery = true },
+                                        onSelectItem: { item in
+                                            withAnimation(.easeInOut(duration: 0.2)) {
+                                                viewModel.selectRemoteVideo(item)
                                             }
-                                            .buttonStyle(.plain)
-
-                                            Text("\(Int(round(viewModel.photoScale * 100)))%")
-                                                .font(.system(size: 12, weight: .semibold, design: .monospaced))
-                                                .frame(width: 44)
-
-                                            Button {
-                                                if viewModel.photoScale < 1.95 {
-                                                    withAnimation(.easeInOut(duration: 0.15)) {
-                                                        viewModel.photoScale = min(2.0, (viewModel.photoScale * 10 + 1).rounded() / 10)
-                                                    }
-                                                }
-                                            } label: {
-                                                Image(systemName: "plus")
-                                                    .font(.system(size: 12, weight: .bold))
-                                                    .frame(width: 28, height: 28)
-                                                    .background(Color(UIColor.tertiarySystemGroupedBackground))
-                                                    .cornerRadius(6)
-                                            }
-                                            .buttonStyle(.plain)
                                         }
+                                    )
+
+                                    if viewModel.isLiveVideoBackground {
+                                        BackgroundZoomControl(
+                                            label: lChoice(kn: "ವೀಡಿಯೊ ಜೂಮ್", en: "Video Zoom", ar: "تكبير الفيديو"),
+                                            scale: $viewModel.photoScale
+                                        )
                                     }
-                                    .padding(.horizontal, 16)
-                                    .padding(.vertical, 8)
-                                    .background(Color(UIColor.secondarySystemGroupedBackground))
-                                    .cornerRadius(10)
-                                    .padding(.horizontal, 16)
                                 }
                             }
                             .frame(maxWidth: .infinity)
@@ -328,7 +546,7 @@ public struct AyahShareImageView: View {
                                     Image(systemName: "textformat.size")
                                         .font(.system(size: 15))
                                         .foregroundColor(.secondary)
-                                    Text(isKannada ? "ಪಠ್ಯದ ಗಾತ್ರ" : "Text Size")
+                                    Text(lChoice(kn: "ಪಠ್ಯದ ಗಾತ್ರ", en: "Text Size", ar: "حجم النص"))
                                         .font(.system(size: 14, weight: .medium))
                                 }
 
@@ -336,9 +554,9 @@ public struct AyahShareImageView: View {
 
                                 HStack(spacing: 12) {
                                     Button {
-                                        if viewModel.fontSizeScale > 0.55 {
+                                        if viewModel.fontSizeScale > 0.25 {
                                             withAnimation(.easeInOut(duration: 0.15)) {
-                                                viewModel.fontSizeScale = max(0.5, (viewModel.fontSizeScale * 10 - 1).rounded() / 10)
+                                                viewModel.fontSizeScale = max(0.2, (viewModel.fontSizeScale * 10 - 1).rounded() / 10)
                                             }
                                         }
                                     } label: {
@@ -385,7 +603,7 @@ public struct AyahShareImageView: View {
                                         Image(systemName: "textformat")
                                             .font(.system(size: 14))
                                             .foregroundColor(.secondary)
-                                        Text(isKannada ? "ಫಾಂಟ್ ಶೈಲಿ" : "Font Style")
+                                        Text(lChoice(kn: "ಫಾಂಟ್ ಶೈಲಿ", en: "Font Style", ar: "نمط الخط"))
                                             .font(.system(size: 14, weight: .medium))
                                     }
 
@@ -454,11 +672,35 @@ public struct AyahShareImageView: View {
                                         Image(systemName: "paintpalette")
                                             .font(.system(size: 14))
                                             .foregroundColor(.secondary)
-                                        Text(isKannada ? "ಪಠ್ಯದ ಬಣ್ಣ" : "Text Color")
+                                        Text(lChoice(kn: "ಪಠ್ಯದ ಬಣ್ಣ", en: "Text Color", ar: "لون النص"))
                                             .font(.system(size: 14, weight: .medium))
                                     }
 
                                     Spacer()
+
+                                    if viewModel.textColorScheme != .themeDefault || viewModel.translationTextColorScheme != .themeDefault {
+                                        Button {
+                                            withAnimation(.easeInOut(duration: 0.15)) {
+                                                viewModel.textColorScheme = .themeDefault
+                                                viewModel.translationTextColorScheme = .themeDefault
+                                            }
+                                        } label: {
+                                            HStack(spacing: 3) {
+                                                Image(systemName: "arrow.counterclockwise")
+                                                    .font(.system(size: 10, weight: .semibold))
+                                                Text(lChoice(kn: "ಮರುಹೊಂದಿಸಿ", en: "Reset", ar: "إعادة ضبط"))
+                                                    .font(.system(size: 11, weight: .semibold))
+                                            }
+                                            .foregroundColor(.accentColor)
+                                            .padding(.horizontal, 8)
+                                            .padding(.vertical, 3)
+                                            .background(
+                                                Capsule()
+                                                    .fill(Color.accentColor.opacity(0.12))
+                                            )
+                                        }
+                                        .buttonStyle(.plain)
+                                    }
 
                                     HStack(spacing: 6) {
                                         Circle()
@@ -474,8 +716,8 @@ public struct AyahShareImageView: View {
 
                                 // Segmented target picker: Arabic vs Translation
                                 Picker("", selection: $viewModel.colorTarget) {
-                                    Text(isKannada ? "ಅರೇಬಿಕ್" : "Arabic").tag(AyahCardTextColorTarget.arabic)
-                                    Text(isKannada ? "ಅನುವಾದ" : "Translation").tag(AyahCardTextColorTarget.translation)
+                                    Text(lChoice(kn: "ಅರೇಬಿಕ್", en: "Arabic", ar: "العربية")).tag(AyahCardTextColorTarget.arabic)
+                                    Text(lChoice(kn: "ಅನುವಾದ", en: "Translation", ar: "الترجمة")).tag(AyahCardTextColorTarget.translation)
                                 }
                                 .pickerStyle(.segmented)
 
@@ -565,14 +807,14 @@ public struct AyahShareImageView: View {
 
                             // Customization Toggles
                             VStack(spacing: 0) {
-                                Toggle(isKannada ? "ಅರೇಬಿಕ್ ಪಠ್ಯ ತೋರಿಸಿ" : "Show Arabic Text", isOn: $viewModel.showArabic)
+                                Toggle(lChoice(kn: "ಅರೇಬಿಕ್ ಪಠ್ಯ ತೋರಿಸಿ", en: "Show Arabic Text", ar: "إظهار النص العربي"), isOn: $viewModel.showArabic)
                                     .padding(.horizontal, 16)
                                     .padding(.vertical, 12)
 
                                 Divider()
                                     .padding(.leading, 16)
 
-                                Toggle(isKannada ? "ಅನುವಾದ ತೋರಿಸಿ" : "Show Translation", isOn: $viewModel.showTranslation)
+                                Toggle(lChoice(kn: "ಅನುವಾದ ತೋರಿಸಿ", en: "Show Translation", ar: "إظهار الترجمة"), isOn: $viewModel.showTranslation)
                                     .padding(.horizontal, 16)
                                     .padding(.vertical, 12)
 
@@ -580,17 +822,10 @@ public struct AyahShareImageView: View {
                                     Divider()
                                         .padding(.leading, 16)
 
-                                    Toggle(isKannada ? "ಟಿಪ್ಪಣಿಗಳನ್ನು ಸೇರಿಸಿ" : "Include Footnotes", isOn: $viewModel.showFootnotes)
+                                    Toggle(lChoice(kn: "ಟಿಪ್ಪಣಿಗಳನ್ನು ಸೇರಿಸಿ", en: "Include Footnotes", ar: "تضمين الحواشي"), isOn: $viewModel.showFootnotes)
                                         .padding(.horizontal, 16)
                                         .padding(.vertical, 12)
                                 }
-
-                                Divider()
-                                    .padding(.leading, 16)
-
-                                Toggle(isKannada ? "QR ಕೋಡ್ ಸೇರಿಸಿ" : "Include QR Code", isOn: $viewModel.showQRCode)
-                                    .padding(.horizontal, 16)
-                                    .padding(.vertical, 12)
                             }
                             .background(Color(UIColor.secondarySystemGroupedBackground))
                             .cornerRadius(12)
@@ -602,7 +837,7 @@ public struct AyahShareImageView: View {
                                     Image(systemName: "bubble.left.and.bubble.right")
                                         .font(.system(size: 13))
                                         .foregroundColor(.secondary)
-                                    Text(isKannada ? "ಹಂಚಿಕೊಳ್ಳುವ ಸಂದೇಶ" : "Accompanying Text")
+                                    Text(lChoice(kn: "ಹಂಚಿಕೊಳ್ಳುವ ಸಂದೇಶ", en: "Accompanying Text", ar: "النص المرافق"))
                                         .font(.system(size: 13, weight: .medium))
                                         .foregroundColor(.secondary)
                                 }
@@ -610,7 +845,7 @@ public struct AyahShareImageView: View {
 
                                 Picker("", selection: $viewModel.captionMode) {
                                     ForEach(AyahShareCaptionMode.allCases) { mode in
-                                        Text(mode.displayName).tag(mode)
+                                        Text(mode.displayName(isVideoMode: viewModel.isVideoMode)).tag(mode)
                                     }
                                 }
                                 .pickerStyle(.segmented)
@@ -624,10 +859,19 @@ public struct AyahShareImageView: View {
                                     triggerShare()
                                 } label: {
                                     HStack(spacing: 8) {
-                                        Image(systemName: "square.and.arrow.up")
-                                            .font(.system(size: 16, weight: .semibold))
-                                        Text(isKannada ? "ಹಂಚಿಕೊಳ್ಳಿ" : "Share")
-                                            .font(.system(size: 16, weight: .semibold))
+                                        if viewModel.isExporting {
+                                            ProgressView()
+                                                .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                                        } else {
+                                            Image(systemName: viewModel.isVideoMode ? "video.badge.checkmark" : "square.and.arrow.up")
+                                                .font(.system(size: 16, weight: .semibold))
+                                        }
+                                        Text(
+                                            viewModel.isVideoMode
+                                                ? lChoice(kn: "ವೀಡಿಯೊ ಹಂಚಿಕೊಳ್ಳಿ", en: "Share Video", ar: "مشاركة الفيديو")
+                                                : lChoice(kn: "ಹಂಚಿಕೊಳ್ಳಿ", en: "Share", ar: "مشاركة")
+                                        )
+                                        .font(.system(size: 16, weight: .semibold))
                                     }
                                     .foregroundColor(.white)
                                     .frame(maxWidth: .infinity)
@@ -636,9 +880,11 @@ public struct AyahShareImageView: View {
                                         RoundedRectangle(cornerRadius: 12)
                                             .fill(Color(red: 0.12, green: 0.65, blue: 0.38))
                                     )
+                                    .opacity(viewModel.isExporting ? 0.65 : 1.0)
                                     .contentShape(Rectangle())
                                 }
                                 .buttonStyle(.plain)
+                                .disabled(viewModel.isExporting)
 
                                 // Save to Photos Button
                                 Button {
@@ -647,8 +893,12 @@ public struct AyahShareImageView: View {
                                     HStack(spacing: 8) {
                                         Image(systemName: "arrow.down.to.line")
                                             .font(.system(size: 15, weight: .medium))
-                                        Text(isKannada ? "ಫೋಟೋಗಳಿಗೆ ಉಳಿಸಿ" : "Save to Photos")
-                                            .font(.system(size: 15, weight: .medium))
+                                        Text(
+                                            viewModel.isVideoMode
+                                                ? lChoice(kn: "ಫೋಟೋಗಳಿಗೆ ವೀಡಿಯೊ ಉಳಿಸಿ", en: "Save Video to Photos", ar: "حفظ الفيديو في الصور")
+                                                : lChoice(kn: "ಫೋಟೋಗಳಿಗೆ ಉಳಿಸಿ", en: "Save to Photos", ar: "حفظ في الصور")
+                                        )
+                                        .font(.system(size: 15, weight: .medium))
                                     }
                                     .foregroundColor(.primary)
                                     .frame(maxWidth: .infinity)
@@ -661,78 +911,344 @@ public struct AyahShareImageView: View {
                                         RoundedRectangle(cornerRadius: 12)
                                             .stroke(Color.secondary.opacity(0.2), lineWidth: 1)
                                     )
+                                    .opacity(viewModel.isExporting ? 0.65 : 1.0)
                                     .contentShape(Rectangle())
                                 }
                                 .buttonStyle(.plain)
+                                .disabled(viewModel.isExporting)
                             }
-                            .padding(.horizontal, 16)
-                            .padding(.top, 4)
-                            .padding(.bottom, 30)
-                        }
-                    }
-                }
-
-                // Toast Banner
-                if let toast = viewModel.saveSuccessToast {
-                    VStack {
-                        Spacer()
-                        HStack(spacing: 8) {
-                            Image(systemName: "checkmark.circle.fill")
-                                .foregroundColor(.green)
-                            Text(toast)
-                                .font(.system(size: 14, weight: .medium))
-                                .foregroundColor(.white)
-                        }
-                        .padding(.horizontal, 18)
-                        .padding(.vertical, 12)
-                        .background(
-                            Capsule()
-                                .fill(Color.black.opacity(0.85))
-                        )
-                        .padding(.bottom, 24)
-                        .transition(.move(edge: .bottom).combined(with: .opacity))
-                    }
-                    .animation(.spring(), value: toast)
-                }
+                        .padding(.horizontal, 16)
+                        .padding(.top, 4)
+                        .padding(.bottom, 30)
             }
-            .navigationTitle(isKannada ? "ಚಿತ್ರ ಹಂಚಿಕೆ" : "Share Ayah")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button {
-                        onDismiss()
-                    } label: {
-                        Image(systemName: "xmark.circle.fill")
-                            .foregroundColor(.secondary)
-                    }
-                }
-            }
-            .task {
-                await viewModel.loadData()
-            }
-            .sheet(isPresented: $showingRemoteGallery) {
-                RemoteBackgroundPickerView(viewModel: viewModel, isPresented: $showingRemoteGallery)
-            }
-            .onChange(of: viewModel.customBackgroundImage) { newImage in
-                if newImage != nil {
-                    withAnimation {
-                        viewModel.selectedTheme = .customPhoto
-                        backgroundMode = 1
-                    }
-                }
-            }
+            .padding(.top, 14)
         }
     }
 
-    private func triggerShare() {
-        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-              let rootVC = windowScene.windows.first(where: \.isKeyWindow)?.rootViewController else {
-            return
+    private func resolvePresenterViewController() -> UIViewController? {
+        if let host = hostViewController, host.viewIfLoaded?.window != nil {
+            var rootHost = host
+            while let parent = rootHost.parent, !(parent is UINavigationController && parent.presentingViewController == nil) {
+                rootHost = parent
+            }
+            var top = rootHost
+            while let presented = top.presentedViewController, !presented.isBeingDismissed {
+                top = presented
+            }
+            return top
+        }
+
+        let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
+        let activeScene = scenes.first(where: { $0.activationState == .foregroundActive }) ?? scenes.first
+        guard let rootVC = (activeScene?.windows.first(where: \.isKeyWindow) ?? activeScene?.windows.first)?.rootViewController else {
+            return nil
         }
         var topVC = rootVC
-        while let presented = topVC.presentedViewController {
+        while let presented = topVC.presentedViewController, !presented.isBeingDismissed {
             topVC = presented
         }
-        viewModel.share(from: topVC, sourceView: nil)
+        return topVC
+    }
+
+    private func triggerShare() {
+        guard let presenter = resolvePresenterViewController() else {
+            return
+        }
+        viewModel.share(from: presenter, sourceView: presenter.view)
+    }
+}
+
+private final class LoopingVideoContainerView: UIView {
+    let playerLayer = AVPlayerLayer()
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        backgroundColor = .black
+        clipsToBounds = true
+        playerLayer.videoGravity = .resizeAspectFill
+        layer.addSublayer(playerLayer)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
+        playerLayer.position = CGPoint(x: bounds.midX, y: bounds.midY)
+        playerLayer.bounds = bounds
+        CATransaction.commit()
+    }
+}
+
+private struct LoopingVideoPlayerView: UIViewRepresentable {
+    let url: URL
+    let scale: CGFloat
+
+    final class Coordinator {
+        var currentURL: URL?
+        var player: AVQueuePlayer?
+        var looper: AVPlayerLooper?
+
+        deinit {
+            player?.pause()
+            player?.removeAllItems()
+            looper = nil
+            player = nil
+        }
+    }
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator()
+    }
+
+    func makeUIView(context: Context) -> LoopingVideoContainerView {
+        let view = LoopingVideoContainerView()
+        configurePlayer(for: view, coordinator: context.coordinator)
+        return view
+    }
+
+    func updateUIView(_ uiView: LoopingVideoContainerView, context: Context) {
+        if context.coordinator.currentURL != url {
+            configurePlayer(for: uiView, coordinator: context.coordinator)
+        }
+        uiView.playerLayer.setAffineTransform(
+            scale > 1.01 ? CGAffineTransform(scaleX: scale, y: scale) : .identity
+        )
+    }
+
+    static func dismantleUIView(_ uiView: LoopingVideoContainerView, coordinator: Coordinator) {
+        coordinator.player?.pause()
+        coordinator.player?.removeAllItems()
+        coordinator.looper = nil
+        coordinator.player = nil
+        uiView.playerLayer.player = nil
+    }
+
+    private func configurePlayer(for view: LoopingVideoContainerView, coordinator: Coordinator) {
+        coordinator.player?.pause()
+        coordinator.player?.removeAllItems()
+        coordinator.looper = nil
+        coordinator.player = nil
+
+        let item = AVPlayerItem(url: url)
+        let queuePlayer = AVQueuePlayer()
+        queuePlayer.isMuted = true
+        queuePlayer.preventsDisplaySleepDuringVideoPlayback = false
+        let looper = AVPlayerLooper(player: queuePlayer, templateItem: item)
+
+        coordinator.currentURL = url
+        coordinator.player = queuePlayer
+        coordinator.looper = looper
+        view.playerLayer.player = queuePlayer
+        queuePlayer.play()
+    }
+}
+
+private struct CloudBackgroundSwatchesRow: View {
+    let items: [RemoteAyahBackgroundItem]
+    let selectedId: String?
+    let fallbackSystemImage: String
+    let browseTitle: String
+    let isDownloaded: (RemoteAyahBackgroundItem) -> Bool
+    let onBrowseMore: () -> Void
+    let onSelectItem: (RemoteAyahBackgroundItem) -> Void
+
+    var body: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 14) {
+                VStack(spacing: 4) {
+                    Button(action: onBrowseMore) {
+                        ZStack {
+                            Circle()
+                                .strokeBorder(Color.accentColor.opacity(0.7), style: StrokeStyle(lineWidth: 1.5, dash: [4, 3]))
+                                .frame(width: 44, height: 44)
+                                .background(Circle().fill(Color.accentColor.opacity(0.08)))
+
+                            VStack(spacing: 1) {
+                                Image(systemName: "cloud.fill")
+                                    .font(.system(size: 15))
+                                    .foregroundColor(.accentColor)
+                                Image(systemName: "plus")
+                                    .font(.system(size: 8, weight: .bold))
+                                    .foregroundColor(.accentColor)
+                            }
+                        }
+                        .frame(width: 52, height: 52)
+                    }
+                    .buttonStyle(.plain)
+
+                    Text(lChoice(kn: "ಇನ್ನಷ್ಟು", en: "More", ar: "المزيد"))
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundColor(.secondary)
+                }
+
+                if items.isEmpty {
+                    Button(action: onBrowseMore) {
+                        HStack(spacing: 6) {
+                            Image(systemName: "cloud.and.arrow.down")
+                                .font(.system(size: 13, weight: .semibold))
+                            Text(browseTitle)
+                                .font(.system(size: 12.5, weight: .semibold))
+                        }
+                        .foregroundColor(.accentColor)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 10)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color.accentColor.opacity(0.1))
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(Color.accentColor.opacity(0.3), lineWidth: 1)
+                        )
+                    }
+                    .buttonStyle(.plain)
+                    .padding(.top, 4)
+                } else {
+                    ForEach(items) { item in
+                        let isSelected = selectedId == item.id
+                        let downloaded = isDownloaded(item)
+                        VStack(spacing: 4) {
+                            ZStack {
+                                RemoteMediaThumbnailView(item: item, fallbackSystemImage: fallbackSystemImage)
+                                    .frame(width: 44, height: 44)
+                                    .clipShape(Circle())
+
+                                if !downloaded {
+                                    Circle()
+                                        .fill(Color.black.opacity(0.28))
+                                        .frame(width: 44, height: 44)
+
+                                    Image(systemName: "arrow.down.circle.fill")
+                                        .font(.system(size: 15, weight: .semibold))
+                                        .foregroundColor(.white)
+                                        .shadow(color: .black.opacity(0.45), radius: 2, y: 1)
+                                }
+
+                                if isSelected {
+                                    Circle()
+                                        .stroke(Color.accentColor, lineWidth: 2.5)
+                                        .frame(width: 52, height: 52)
+
+                                    if downloaded {
+                                        Image(systemName: "checkmark")
+                                            .font(.system(size: 13, weight: .bold))
+                                            .foregroundColor(.white)
+                                            .shadow(radius: 2)
+                                    }
+                                }
+                            }
+                            .frame(width: 54, height: 54)
+                            .contentShape(Circle())
+                            .onTapGesture {
+                                onSelectItem(item)
+                            }
+
+                            Text(item.localizedName)
+                                .font(.system(size: 11, weight: .medium))
+                                .foregroundColor(isSelected ? .accentColor : .secondary)
+                                .lineLimit(1)
+                                .frame(maxWidth: 64)
+                        }
+                    }
+                }
+            }
+            .padding(.horizontal, 16)
+        }
+    }
+}
+
+private struct BackgroundZoomControl: View {
+    let label: String
+    @Binding var scale: CGFloat
+
+    var body: some View {
+        HStack {
+            HStack(spacing: 6) {
+                Image(systemName: "arrow.up.left.and.arrow.down.right")
+                    .font(.system(size: 13))
+                    .foregroundColor(.secondary)
+                Text(label)
+                    .font(.system(size: 13, weight: .medium))
+            }
+
+            Spacer()
+
+            HStack(spacing: 12) {
+                Button {
+                    if scale > 1.05 {
+                        withAnimation(.easeInOut(duration: 0.15)) {
+                            scale = max(1.0, (scale * 10 - 1).rounded() / 10)
+                        }
+                    }
+                } label: {
+                    Image(systemName: "minus")
+                        .font(.system(size: 12, weight: .bold))
+                        .frame(width: 28, height: 28)
+                        .background(Color(UIColor.tertiarySystemGroupedBackground))
+                        .cornerRadius(6)
+                }
+                .buttonStyle(.plain)
+
+                Text("\(Int(round(scale * 100)))%")
+                    .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                    .frame(width: 44)
+
+                Button {
+                    if scale < 1.95 {
+                        withAnimation(.easeInOut(duration: 0.15)) {
+                            scale = min(2.0, (scale * 10 + 1).rounded() / 10)
+                        }
+                    }
+                } label: {
+                    Image(systemName: "plus")
+                        .font(.system(size: 12, weight: .bold))
+                        .frame(width: 28, height: 28)
+                        .background(Color(UIColor.tertiarySystemGroupedBackground))
+                        .cornerRadius(6)
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 8)
+        .background(Color(UIColor.secondarySystemGroupedBackground))
+        .cornerRadius(10)
+        .padding(.horizontal, 16)
+    }
+}
+
+private struct RemoteMediaThumbnailView: View {
+    let item: RemoteAyahBackgroundItem
+    let fallbackSystemImage: String
+    @State private var image: UIImage?
+
+    init(item: RemoteAyahBackgroundItem, fallbackSystemImage: String) {
+        self.item = item
+        self.fallbackSystemImage = fallbackSystemImage
+        self._image = State(initialValue: RemoteBackgroundService.shared.cachedMemoryThumbnail(for: item.id))
+    }
+
+    var body: some View {
+        ZStack {
+            if let img = image {
+                Image(uiImage: img)
+                    .resizable()
+                    .scaledToFill()
+            } else {
+                Color(UIColor.tertiarySystemGroupedBackground)
+                Image(systemName: fallbackSystemImage)
+                    .font(.system(size: 16))
+                    .foregroundColor(.secondary)
+            }
+        }
+        .task(id: item.id) {
+            if image == nil {
+                image = await RemoteBackgroundService.shared.loadThumbnail(for: item)
+            }
+        }
     }
 }

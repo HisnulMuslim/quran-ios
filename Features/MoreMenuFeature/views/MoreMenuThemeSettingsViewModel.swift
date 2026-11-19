@@ -24,6 +24,7 @@ final class MoreMenuThemeSettingsViewModel: ObservableObject {
 
         translationFontSize = fontSizePreferences.translationFontSize
         arabicFontSize = fontSizePreferences.arabicFontSize
+        arabicFont = fontSizePreferences.arabicFont
         translationFont = fontSizePreferences.translationFont
         translationViewMode = contentStatePreferences.translationViewMode
         appLanguage = AppLanguage
@@ -75,6 +76,14 @@ final class MoreMenuThemeSettingsViewModel: ObservableObject {
             }
             .store(in: &cancellables)
 
+        $arabicFont
+            .dropFirst()
+            .sink { [weak self] newValue in
+                logger.info("More Menu: set arabic font \(newValue)")
+                self?.fontSizePreferences.arabicFont = newValue
+            }
+            .store(in: &cancellables)
+
         $translationFont
             .dropFirst()
             .sink { [weak self] newValue in
@@ -111,6 +120,7 @@ final class MoreMenuThemeSettingsViewModel: ObservableObject {
     @Published var appearanceMode: AppearanceMode
 
     @Published var arabicFontSize: FontSize
+    @Published var arabicFont: ArabicFont
     @Published var translationFontSize: FontSize
     @Published var translationFont: TranslationFont
     @Published var translationViewMode: TranslationViewMode
@@ -120,12 +130,14 @@ final class MoreMenuThemeSettingsViewModel: ObservableObject {
 
     var canRestoreFontDefaults: Bool {
         arabicFontSize != FontSizePreferences.defaultArabicValue ||
+        arabicFont != FontSizePreferences.defaultArabicFont ||
         translationFontSize != FontSizePreferences.defaultTranslationValue ||
         translationFont != FontSizePreferences.defaultTranslationFont
     }
 
     func restoreFontDefaults() {
         arabicFontSize = FontSizePreferences.defaultArabicValue
+        arabicFont = FontSizePreferences.defaultArabicFont
         translationFontSize = FontSizePreferences.defaultTranslationValue
         translationFont = FontSizePreferences.defaultTranslationFont
     }

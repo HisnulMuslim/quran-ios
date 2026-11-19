@@ -93,3 +93,12 @@ private func optionalLocalizedString(_ key: String, table: Table = .localizable,
 public func lAndroid(_ key: String, language: Language? = nil) -> String {
     l(key, table: .android, language: language)
 }
+
+/// Returns the matching localized string for the current `AppLanguage` across Kannada, English, and Arabic.
+public func lChoice(kn: String, en: String, ar: String) -> String {
+    switch AppLanguage {
+    case .kannada: return kn
+    case .arabic: return ar
+    case .english: return en
+    }
+}

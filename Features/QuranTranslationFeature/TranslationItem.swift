@@ -87,6 +87,7 @@ struct TranslationArabicText: Identifiable & Hashable {
     let verse: AyahNumber
     let text: String
     let arabicFontSize: FontSize
+    var arabicFont: ArabicFont = .uthmanic
     let highlightColor: Color?
 
     var id: TranslationItemId { .arabic(verse) }
@@ -96,6 +97,7 @@ struct TranslationContinuousArabic: Identifiable & Hashable {
     let sura: Sura
     let verses: [TranslationArabicText]
     let arabicFontSize: FontSize
+    var arabicFont: ArabicFont = .uthmanic
     let scrollToVerse: AyahNumber?
     let scrollTriggerCount: Int
 
@@ -107,6 +109,7 @@ struct TranslationFrontispieceArabic: Identifiable & Hashable {
     let sura: Sura
     let verses: [TranslationArabicText]
     let arabicFontSize: FontSize
+    var arabicFont: ArabicFont = .uthmanic
     let scrollToVerse: AyahNumber?
     let scrollTriggerCount: Int
 

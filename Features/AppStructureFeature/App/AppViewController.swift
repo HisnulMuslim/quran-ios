@@ -106,7 +106,14 @@ class AppViewController: UITabBarController, UITabBarControllerDelegate, AppPres
             let hostingController = UIHostingController(rootView: initialView)
             hostingController.modalPresentationStyle = .pageSheet
             if let sheet = hostingController.sheetPresentationController {
-                sheet.detents = [.medium()]
+                if #available(iOS 16.0, *) {
+                    sheet.detents = [
+                        .custom(identifier: .init("initialLanguage")) { _ in 515 },
+                        .large()
+                    ]
+                } else {
+                    sheet.detents = [.medium(), .large()]
+                }
                 sheet.prefersGrabberVisible = true
                 sheet.preferredCornerRadius = 24
             }

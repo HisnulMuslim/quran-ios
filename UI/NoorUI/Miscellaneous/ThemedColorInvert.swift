@@ -10,10 +10,17 @@ import SwiftUI
 private struct ThemedColorInvertModifier: ViewModifier {
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.themeStyle) var themeStyle
+    let preserveHue: Bool
 
     func body(content: Content) -> some View {
         if colorScheme == .dark || themeStyle == .quiet {
-            content.colorInvert()
+            if preserveHue {
+                content
+                    .colorInvert()
+                    .hueRotation(.degrees(180))
+            } else {
+                content.colorInvert()
+            }
         } else {
             content
         }
@@ -21,7 +28,7 @@ private struct ThemedColorInvertModifier: ViewModifier {
 }
 
 extension View {
-    public func invertThemedColorIfNeeded() -> some View {
-        modifier(ThemedColorInvertModifier())
+    public func invertThemedColorIfNeeded(preserveHue: Bool = false) -> some View {
+        modifier(ThemedColorInvertModifier(preserveHue: preserveHue))
     }
 }

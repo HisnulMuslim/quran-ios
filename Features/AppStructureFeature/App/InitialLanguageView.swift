@@ -73,145 +73,170 @@ public struct InitialLanguageView: View {
     }
 
     public var body: some View {
-        VStack(spacing: 18) {
-            // Luxury Header Medallion
-            ZStack {
-                // Outer subtle glowing aura ring
-                Circle()
-                    .strokeBorder(
-                        LinearGradient(
-                            colors: [
-                                LuxuryLanguageTheme.champagneGold.opacity(0.55),
-                                LuxuryLanguageTheme.accent.opacity(0.30)
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        ),
-                        lineWidth: 1.5
-                    )
-                    .frame(width: 62, height: 62)
-
-                // Inner velvet circular disc
-                Circle()
-                    .fill(LuxuryLanguageTheme.badgeSelectedBackground)
-                    .frame(width: 52, height: 52)
-
-                // Globe Icon
-                Image(systemName: "globe")
-                    .font(.system(size: 25, weight: .semibold))
-                    .foregroundColor(LuxuryLanguageTheme.accent)
-            }
-            .padding(.top, 24)
-
-            // Title & Subtitle
-            VStack(spacing: 6) {
-                Text("ಆ್ಯಪ್ ಭಾಷೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ")
-                    .font(.system(size: 21, weight: .bold, design: .rounded))
-                    .foregroundColor(.primary)
-
-                Text("Choose App Language")
-                    .font(.system(size: 14, weight: .medium))
-                    .foregroundColor(.secondary)
-                    .tracking(0.3)
-            }
-            .multilineTextAlignment(.center)
-
-            // Language Cards
-            VStack(spacing: 12) {
-                languageCard(
-                    language: .kannada,
-                    primaryTitle: "ಕನ್ನಡ",
-                    subtitle: "Kannada",
-                    badge: "ಅ ಆ ಇ"
-                )
-
-                languageCard(
-                    language: .english,
-                    primaryTitle: "English",
-                    subtitle: "ಇಂಗ್ಲಿಷ್",
-                    badge: "A B C"
-                )
-            }
-            .padding(.horizontal, 20)
-
-            // Subtitle Note
-            HStack(spacing: 6) {
-                Image(systemName: "info.circle")
-                    .font(.system(size: 12))
-                    .foregroundColor(.secondary.opacity(0.8))
-
-                Text("ನೀವು ಇದನ್ನು ಸೆಟ್ಟಿಂಗ್‌ಗಳಲ್ಲಿ ಯಾವಾಗ ಬೇಕಾದರೂ ಬದಲಾಯಿಸಬಹುದು\nYou can change this anytime in Settings")
-                    .font(.system(size: 12))
-                    .foregroundColor(.secondary)
-                    .multilineTextAlignment(.center)
-            }
-            .padding(.horizontal, 24)
-            .fixedSize(horizontal: false, vertical: true)
-
-            Spacer(minLength: 8)
-
-            // Luxury "Get Started / ಪ್ರಾರಂಭಿಸಿ" Button
-            Button {
-                let generator = UIImpactFeedbackGenerator(style: .medium)
-                generator.impactOccurred()
-                onCompletion(selectedLanguage)
-            } label: {
-                HStack(spacing: 10) {
-                    Text(selectedLanguage == .kannada ? "ಪ್ರಾರಂಭಿಸಿ" : "Get Started")
-                        .font(.system(size: 17, weight: .bold, design: .rounded))
-                        .foregroundColor(.white)
-
-                    Image(systemName: "arrow.right")
-                        .font(.system(size: 14, weight: .bold))
-                        .foregroundColor(.white.opacity(0.9))
-                }
-                .frame(maxWidth: .infinity)
-                .frame(height: 54)
-                .background(
-                    ZStack {
-                        // Deep emerald velvet gradient (anchored in #022B24)
-                        LinearGradient(
-                            colors: [
-                                LuxuryLanguageTheme.deepGreenTop,
-                                LuxuryLanguageTheme.deepGreenBase
-                            ],
-                            startPoint: .top,
-                            endPoint: .bottom
+        ScrollView(showsIndicators: false) {
+            VStack(spacing: 14) {
+                // Luxury Header Medallion
+                ZStack {
+                    // Outer subtle glowing aura ring
+                    Circle()
+                        .strokeBorder(
+                            LinearGradient(
+                                colors: [
+                                    LuxuryLanguageTheme.champagneGold.opacity(0.55),
+                                    LuxuryLanguageTheme.accent.opacity(0.30)
+                                ],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            lineWidth: 1.5
                         )
+                        .frame(width: 56, height: 56)
 
-                        // Top bevel specular highlight for enamel glass effect
-                        RoundedRectangle(cornerRadius: 16)
-                            .strokeBorder(
-                                LinearGradient(
-                                    colors: [
-                                        Color.white.opacity(0.25),
-                                        Color.white.opacity(0.04),
-                                        Color.clear
-                                    ],
-                                    startPoint: .top,
-                                    endPoint: .bottom
-                                ),
-                                lineWidth: 1
-                            )
+                    // Inner velvet circular disc
+                    Circle()
+                        .fill(LuxuryLanguageTheme.badgeSelectedBackground)
+                        .frame(width: 46, height: 46)
+
+                    // Globe Icon
+                    Image(systemName: "globe")
+                        .font(.system(size: 23, weight: .semibold))
+                        .foregroundColor(LuxuryLanguageTheme.accent)
+                }
+                .padding(.top, 18)
+
+                // Title & Subtitle
+                VStack(spacing: 5) {
+                    Text("Choose App Language")
+                        .font(.system(size: 20, weight: .bold, design: .rounded))
+                        .foregroundColor(.primary)
+
+                    Text("ಆ್ಯಪ್ ಭಾಷೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ  •  اختر لغة التطبيق")
+                        .font(.system(size: 13.5, weight: .medium))
+                        .foregroundColor(.secondary)
+                        .tracking(0.2)
+                }
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 12)
+
+                // Language Cards
+                VStack(spacing: 10) {
+                    languageCard(
+                        language: .kannada,
+                        primaryTitle: "ಕನ್ನಡ",
+                        subtitle: "Kannada",
+                        badge: "ಅ ಆ ಇ"
+                    )
+
+                    languageCard(
+                        language: .english,
+                        primaryTitle: "English",
+                        subtitle: "English",
+                        badge: "A B C"
+                    )
+
+                    languageCard(
+                        language: .arabic,
+                        primaryTitle: "العربية",
+                        subtitle: "Arabic",
+                        badge: "ا ب ت"
+                    )
+                }
+                .padding(.horizontal, 20)
+
+                // Subtitle Note
+                HStack(spacing: 6) {
+                    Image(systemName: "info.circle")
+                        .font(.system(size: 12))
+                        .foregroundColor(.secondary.opacity(0.8))
+
+                    Text(settingsNoteText)
+                        .font(.system(size: 12))
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                }
+                .padding(.horizontal, 24)
+                .fixedSize(horizontal: false, vertical: true)
+
+                // Luxury "Get Started / ಪ್ರಾರಂಭಿಸಿ / ابدأ" Button
+                Button {
+                    let generator = UIImpactFeedbackGenerator(style: .medium)
+                    generator.impactOccurred()
+                    onCompletion(selectedLanguage)
+                } label: {
+                    HStack(spacing: 10) {
+                        Text(ctaButtonText)
+                            .font(.system(size: 17, weight: .bold, design: .rounded))
+                            .foregroundColor(.white)
+
+                        Image(systemName: selectedLanguage == .arabic ? "arrow.left" : "arrow.right")
+                            .font(.system(size: 14, weight: .bold))
+                            .foregroundColor(.white.opacity(0.9))
                     }
-                )
-                .cornerRadius(16)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 16)
-                        .stroke(LuxuryLanguageTheme.buttonBorder, lineWidth: 1)
-                )
-                .shadow(
-                    color: LuxuryLanguageTheme.deepGreenBase.opacity(0.4),
-                    radius: 12,
-                    x: 0,
-                    y: 6
-                )
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 52)
+                    .background(
+                        ZStack {
+                            // Deep emerald velvet gradient (anchored in #022B24)
+                            LinearGradient(
+                                colors: [
+                                    LuxuryLanguageTheme.deepGreenTop,
+                                    LuxuryLanguageTheme.deepGreenBase
+                                ],
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+
+                            // Top bevel specular highlight for enamel glass effect
+                            RoundedRectangle(cornerRadius: 16)
+                                .strokeBorder(
+                                    LinearGradient(
+                                        colors: [
+                                            Color.white.opacity(0.25),
+                                            Color.white.opacity(0.04),
+                                            Color.clear
+                                        ],
+                                        startPoint: .top,
+                                        endPoint: .bottom
+                                    ),
+                                    lineWidth: 1
+                                )
+                        }
+                    )
+                    .cornerRadius(16)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 16)
+                            .stroke(LuxuryLanguageTheme.buttonBorder, lineWidth: 1)
+                    )
+                    .shadow(
+                        color: LuxuryLanguageTheme.deepGreenBase.opacity(0.4),
+                        radius: 12,
+                        x: 0,
+                        y: 6
+                    )
+                }
+                .buttonStyle(LuxuryButtonStyle())
+                .padding(.horizontal, 20)
+                .padding(.top, 2)
+                .padding(.bottom, 20)
             }
-            .buttonStyle(LuxuryButtonStyle())
-            .padding(.horizontal, 20)
-            .padding(.bottom, 22)
         }
         .background(Color(UIColor.systemBackground))
+    }
+
+    private var settingsNoteText: String {
+        switch selectedLanguage {
+        case .kannada: return "ನೀವು ಇದನ್ನು ಸೆಟ್ಟಿಂಗ್‌ಗಳಲ್ಲಿ ಯಾವಾಗ ಬೇಕಾದರೂ ಬದಲಾಯಿಸಬಹುದು"
+        case .arabic: return "يمكنك تغيير اللغة في أي وقت من الإعدادات"
+        case .english: return "You can change this anytime in Settings"
+        }
+    }
+
+    private var ctaButtonText: String {
+        switch selectedLanguage {
+        case .kannada: return "ಪ್ರಾರಂಭಿಸಿ"
+        case .arabic: return "ابدأ"
+        case .english: return "Get Started"
+        }
     }
 
     private func languageCard(
@@ -252,9 +277,11 @@ public struct InitialLanguageView: View {
                         .font(.system(size: 17, weight: isSelected ? .bold : .medium, design: .rounded))
                         .foregroundColor(.primary)
 
-                    Text(subtitle)
-                        .font(.system(size: 13))
-                        .foregroundColor(.secondary)
+                    if subtitle != primaryTitle {
+                        Text(subtitle)
+                            .font(.system(size: 13))
+                            .foregroundColor(.secondary)
+                    }
                 }
 
                 Spacer()

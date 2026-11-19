@@ -41,7 +41,10 @@ struct ReadingSelector: View {
     }
 
     private func renderingMode(for reading: Reading) -> QuranThemedImage.RenderingMode {
-        reading.usesInvertedQuranImageRenderingInDarkMode ? .invertInDarkMode : .tinted
+        if reading.preservesHueInDarkMode {
+            return .invertPreservingHueInDarkMode
+        }
+        return reading.usesInvertedQuranImageRenderingInDarkMode ? .invertInDarkMode : .tinted
     }
 }
 

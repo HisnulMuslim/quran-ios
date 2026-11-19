@@ -39,7 +39,7 @@ struct TranslationVerseView: View {
     }
 
     private var compareTitle: String {
-        (AppLanguage == .kannada || Locale.current.languageCode == "kn") ? "ಹೋಲಿಕೆ (ಎಲ್ಲಾ)" : "Compare (All)"
+        lChoice(kn: "ಹೋಲಿಕೆ (ಎಲ್ಲಾ)", en: "Compare (All)", ar: "مقارنة (الكل)")
     }
 
     private func shortName(for translation: Translation) -> String {
